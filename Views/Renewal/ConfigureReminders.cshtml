@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "Configure Reminders";
+}
+<div class="container">
+    <h2><i class="fas fa-cog"></i> Configure Renewal Reminders</h2>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    <form asp-action="ConfigureReminders" method="post">
+        @Html.AntiForgeryToken()
+        <div class="mb-3">
+            <label class="form-label">Deal</label>
+            <select asp-items="ViewBag.Deals" name="dealId" class="form-control">
+                <option value="">Select a Deal</option>
+            </select>
+            <span class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Renewal Date</label>
+            <input name="renewalDate" class="form-control" type="date" />
+            <span class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Renewal Amount</label>
+            <input name="renewalAmount" class="form-control" type="number" step="0.01" />
+            <span class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Remarks</label>
+            <input name="remarks" class="form-control" />
+            <span class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Reminder
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Pipeline
+        </a>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

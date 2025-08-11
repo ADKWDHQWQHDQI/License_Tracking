@@ -1,0 +1,436 @@
+@model License_Tracking.ViewModels.ProjectPipelineListViewModel
+
+@{
+    ViewData["Title"] = "Pipeline - Sheet View";
+}
+
+<div class="container-fluid">
+    <!-- Header with View Switcher -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-table"></i> Project Pipeline - Sheet View</h2>
+            <p class="text-muted mb-0">Desktop-optimized data table with advanced filtering and bulk actions</p>
+        </div>
+        <div class="btn-group" role="group">
+            <a asp-action="Index" asp-route-view="list" class="btn btn-outline-primary">
+                <i class="fas fa-list"></i> List
+            </a>
+            <button type="button" class="btn btn-primary active">
+                <i class="fas fa-table"></i> Sheet
+            </button>
+            <a asp-action="Index" asp-route-view="kanban" class="btn btn-outline-primary">
+                <i class="fas fa-columns"></i> Kanban
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Actions and Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <!-- Filters -->
+                    <form method="get" class="row g-2">
+                        <input type="hidden" name="view" value="sheet" />
+                        <div class="col-md-3">
+                            <select name="statusFilter" class="form-select">
+                                <option value="">All Statuses</option>
+                                <option value="Pipeline" selected="@(ViewBag.StatusFilter == "Pipeline")">Pipeline
+                                </option>
+                                <option value="Qualified" selected="@(ViewBag.StatusFilter == "Qualified")">Qualified
+                                </option>
+                                <option value="Proposal" selected="@(ViewBag.StatusFilter == "Proposal")">Proposal
+                                </option>
+                                <option value="Negotiation" selected="@(ViewBag.StatusFilter == "Negotiation")">
+                                    Negotiation</option>
+                                <option value="Won" selected="@(ViewBag.StatusFilter == "Won")">Won</option>
+                                <option value="Lost" selected="@(ViewBag.StatusFilter == "Lost")">Lost</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" name="oemFilter" class="form-control" placeholder="Filter by OEM"
+                                value="@ViewBag.OemFilter" />
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" name="customerFilter" class="form-control"
+                                placeholder="Filter by Customer" value="@ViewBag.CustomerFilter" />
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-4 text-end">
+                    <!-- Quick Actions -->
+                    <div class="btn-group">
+                        <a asp-action="Create" class="btn btn-success">
+                            <i class="fas fa-plus"></i> New Project
+                        </a>
+                        <a asp-action="ExportToExcel" class="btn btn-info">
+                            <i class="fas fa-file-excel"></i> Export
+                        </a>
+                        <button type="button" class="btn btn-warning" onclick="toggleBulkActions()">
+                            <i class="fas fa-tasks"></i> Bulk Actions
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bulk Actions Bar (Initially Hidden) -->
+            <div id="bulkActionsBar" class="row mt-3" style="display: none;">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-info-circle"></i>
+                                <span id="selectedCount">0</span> projects selected
+                            </div>
+                            <div class="btn-group">
+                                <select id="bulkStatusSelect" class="form-select form-select-sm">
+                                    <option value="">Select New Status</option>
+                                    <option value="Pipeline">Pipeline</option>
+                                    <option value="Qualified">Qualified</option>
+                                    <option value="Proposal">Proposal</option>
+                                    <option value="Negotiation">Negotiation</option>
+                                    <option value="Won">Won</option>
+                                    <option value="Lost">Lost</option>
+                                </select>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="bulkUpdateStatus()">
+                                    Update Status
+                                </button>
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="toggleBulkActions()">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm mb-0" id="pipelineTable">
+                    <thead class="table-dark sticky-top">
+                        <tr>
+                            <th width="40">
+                                <input type="checkbox" id="selectAll" onchange="toggleAllSelection()" />
+                            </th>
+                            <th width="80">ID</th>
+                            <th width="200">Product</th>
+                            <th width="150">Client</th>
+                            <th width="120">OEM</th>
+                            <th width="100">Status</th>
+                            <th width="80">Probability</th>
+                            <th width="120">Expected Revenue</th>
+                            <th width="120">Expected Cost</th>
+                            <th width="100">Margin</th>
+                            <th width="120">License Date</th>
+                            <th width="120">Expiry Date</th>
+                            <th width="100">Created</th>
+                            <th width="120">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var project in Model.Projects)
+                        {
+                            <tr data-project-id="@project.ProjectPipelineId">
+                                <td>
+                                    <input type="checkbox" class="project-checkbox" value="@project.ProjectPipelineId"
+                                        onchange="updateSelectionCount()" />
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@project.ProjectPipelineId"
+                                        class="text-decoration-none fw-bold">#@project.ProjectPipelineId</a>
+                                </td>
+                                <td>
+                                    <div class="text-truncate" style="max-width: 180px;" title="@project.ProductName">
+                                        @project.ProductName
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-truncate" style="max-width: 130px;" title="@project.ClientName">
+                                        @project.ClientName
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">@project.OemName</span>
+                                </td>
+                                <td>
+                                    @{
+                                        var statusClass = project.ProjectStatus switch
+                                        {
+                                            "Pipeline" => "bg-primary",
+                                            "Qualified" => "bg-info",
+                                            "Proposal" => "bg-warning text-dark",
+                                            "Negotiation" => "bg-danger",
+                                            "Won" => "bg-success",
+                                            "Lost" => "bg-dark",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="badge @statusClass">@project.ProjectStatus</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar" role="progressbar"
+                                            style="width: @project.SuccessProbability%"
+                                            aria-valuenow="@project.SuccessProbability" aria-valuemin="0"
+                                            aria-valuemax="100">
+                                            @project.SuccessProbability%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <span
+                                        class="text-success fw-bold">@project.ExpectedAmountToReceive.ToString("C0")</span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-danger">@project.ExpectedAmountToPay.ToString("C0")</span>
+                                </td>
+                                <td class="text-end">
+                                    @{
+                                        var margin = project.ExpectedAmountToReceive - project.ExpectedAmountToPay;
+                                        var marginClass = margin > 0 ? "text-success" : "text-danger";
+                                    }
+                                    <span class="@marginClass fw-bold">@margin.ToString("C0")</span>
+                                </td>
+                                <td>
+                                    <small>@project.ExpectedLicenseDate.ToString("MMM dd, yyyy")</small>
+                                    @if (project.ExpectedLicenseDate <= DateTime.Now.AddDays(30))
+                                    {
+                                        <br>
+                                
+                                        <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle"></i>
+                                            Soon</span>
+                                    }
+                                </td>
+                                <td>
+                                    <small>@project.ExpectedExpiryDate.ToString("MMM dd, yyyy")</small>
+                                </td>
+                                <td>
+                                    <small class="text-muted">@project.CreatedDate.ToString("MMM dd")</small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Details" asp-route-id="@project.ProjectPipelineId"
+                                            class="btn btn-outline-primary btn-sm" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@project.ProjectPipelineId"
+                                            class="btn btn-outline-secondary btn-sm" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-success btn-sm"
+                                            onclick="convertToDeal(@project.ProjectPipelineId)" title="Convert to Deal">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (!Model.Projects.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No pipeline projects found</h5>
+                    <p class="text-muted">Create your first pipeline project to get started.</p>
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create New Project
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Summary Row -->
+    @if (Model.Projects.Any())
+    {
+        <div class="card mt-3">
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <h6>Total Projects</h6>
+                        <h4 class="text-primary">@Model.TotalCount</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Total Revenue</h6>
+                        <h4 class="text-success">@Model.TotalProjectedRevenue.ToString("C")</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Total Margin</h6>
+                        <h4 class="text-info">@Model.TotalProjectedMargin.ToString("C")</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Avg. Probability</h6>
+                        <h4 class="text-warning">@(Model.Projects.Any() ? Model.Projects.Average(p =>
+                                                    p.SuccessProbability).ToString("F1") : "0")%</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Convert to Deal Modal -->
+<div class="modal fade" id="convertToDealModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Convert to Deal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to convert this pipeline project to an active deal?</p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    This will create a new deal with the project information and mark the pipeline project as converted.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="convertForm" method="post" asp-action="ConvertToDeal" style="display: inline;">
+                    <input type="hidden" id="convertProjectId" name="id" />
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-exchange-alt"></i> Convert to Deal
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .table td {
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+
+        .sticky-top {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table-responsive {
+            max-height: 70vh;
+        }
+
+        .progress {
+            background-color: #e9ecef;
+        }
+
+        .text-truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        let bulkActionsVisible = false;
+
+        function toggleBulkActions() {
+            bulkActionsVisible = !bulkActionsVisible;
+            const bulkBar = document.getElementById('bulkActionsBar');
+
+            if (bulkActionsVisible) {
+                bulkBar.style.display = 'block';
+                document.querySelectorAll('.project-checkbox').forEach(cb => cb.style.display = 'inline-block');
+                document.getElementById('selectAll').style.display = 'inline-block';
+            } else {
+                bulkBar.style.display = 'none';
+                document.querySelectorAll('.project-checkbox').forEach(cb => {
+                    cb.style.display = 'none';
+                    cb.checked = false;
+                });
+                document.getElementById('selectAll').style.display = 'none';
+                document.getElementById('selectAll').checked = false;
+                updateSelectionCount();
+            }
+        }
+
+        function toggleAllSelection() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.project-checkbox');
+
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateSelectionCount();
+        }
+
+        function updateSelectionCount() {
+            const checkedBoxes = document.querySelectorAll('.project-checkbox:checked');
+            document.getElementById('selectedCount').textContent = checkedBoxes.length;
+        }
+
+        function bulkUpdateStatus() {
+            const checkedBoxes = document.querySelectorAll('.project-checkbox:checked');
+            const newStatus = document.getElementById('bulkStatusSelect').value;
+
+            if (checkedBoxes.length === 0) {
+                alert('Please select at least one project.');
+                return;
+            }
+
+            if (!newStatus) {
+                alert('Please select a status.');
+                return;
+            }
+
+            const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
+
+            fetch('/ProjectPipeline/BulkUpdateStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': document.querySelector('[name="__RequestVerificationToken"]').value
+                },
+                body: new URLSearchParams({
+                    selectedIds: selectedIds,
+                    newStatus: newStatus
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Error updating projects');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating projects');
+                });
+        }
+
+        function convertToDeal(projectId) {
+            document.getElementById('convertProjectId').value = projectId;
+            new bootstrap.Modal(document.getElementById('convertToDealModal')).show();
+        }
+
+        // Initialize table functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            // Hide checkboxes initially
+            document.querySelectorAll('.project-checkbox').forEach(cb => cb.style.display = 'none');
+            document.getElementById('selectAll').style.display = 'none';
+        });
+    </script>
+}

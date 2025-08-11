@@ -1,0 +1,221 @@
+@model IEnumerable<License_Tracking.ViewModels.MarginBreakupViewModel>
+@{
+    ViewData["Title"] = "Margin Breakup Analysis";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-percentage"></i> Margin Breakup Analysis</h2>
+            <p class="text-muted">Detailed margin analysis by license with OEM and client breakdown</p>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-filter"></i> Filters</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="MarginBreakup">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate" name="startDate" value="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate" name="endDate" value="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="oemFilter" class="form-label">OEM Filter</label>
+                        <input type="text" class="form-control" id="oemFilter" name="oemFilter" value="@ViewBag.OemFilter" placeholder="Enter OEM name..." />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="clientFilter" class="form-label">Client Filter</label>
+                        <input type="text" class="form-control" id="clientFilter" name="clientFilter" value="@ViewBag.ClientFilter" placeholder="Enter client name..." />
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <a href="@Url.Action("MarginBreakup")" class="btn btn-secondary">Clear Filters</a>
+                        <a href="@Url.Action("ExportMarginBreakupExcel", new { startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, oemFilter = ViewBag.OemFilter, clientFilter = ViewBag.ClientFilter })" class="btn btn-success">
+                            <i class="fas fa-file-excel"></i> Export to Excel
+                        </a>
+                        <button class="btn btn-primary" onclick="openMarginBreakupChart()">
+                            <i class="fas fa-chart-pie"></i> Visualize Data
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-table"></i> Margin Breakup Results (@Model.Count() records)</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="marginTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Deal ID</th>
+                                <th>Product</th>
+                                <th>OEM</th>
+                                <th>Client</th>
+                                <th>Amount Received</th>
+                                <th>Amount Paid</th>
+                                <th>Calculated Margin</th>
+                                <th>Actual Margin</th>
+                                <th>Profit %</th>
+                                <th>License Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td><span class="badge bg-primary">@item.DealId</span></td>
+                                    <td>@item.ProductName</td>
+                                    <td>@item.OemName</td>
+                                    <td>@item.ClientName</td>
+                                    <td class="text-success">@item.AmountReceived.ToString("C")</td>
+                                    <td class="text-danger">@item.AmountPaid.ToString("C")</td>
+                                    <td class="text-info">@item.CalculatedMargin.ToString("C")</td>
+                                    <td class="text-primary">@item.ActualMargin.ToString("C")</td>
+                                    <td>
+                                        @if (item.ProfitPercentage >= 20)
+                                        {
+                                            <span class="badge bg-success">@item.ProfitPercentage.ToString("F1")%</span>
+                                        }
+                                        else if (item.ProfitPercentage >= 10)
+                                        {
+                                            <span class="badge bg-warning">@item.ProfitPercentage.ToString("F1")%</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">@item.ProfitPercentage.ToString("F1")%</span>
+                                        }
+                                    </td>
+                                    <td>@item.LicenseDate.ToString("yyyy-MM-dd")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Summary Statistics -->
+                <div class="row mt-4">
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>@Model.Sum(m => m.AmountReceived).ToString("C")</h5>
+                                <p class="mb-0 text-muted">Total Revenue</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>@Model.Sum(m => m.AmountPaid).ToString("C")</h5>
+                                <p class="mb-0 text-muted">Total Costs</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>@Model.Sum(m => m.ActualMargin).ToString("C")</h5>
+                                <p class="mb-0 text-muted">Total Margin</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>@((Model.Sum(m => m.AmountReceived) > 0 ? (Model.Sum(m => m.ActualMargin) / Model.Sum(m => m.AmountReceived)) * 100 : 0).ToString("F1"))%</h5>
+                                <p class="mb-0 text-muted">Overall Margin %</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No margin data found for the selected criteria.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#marginTable').DataTable({
+                "pageLength": 25,
+                "order": [[ 6, "desc" ]], // Sort by Actual Margin descending
+                "columnDefs": [
+                    { "type": "currency", "targets": [4, 5, 6, 7] }
+                ]
+            });
+        });
+
+        function openMarginBreakupChart() {
+            // Get margin data for visualization
+            const marginData = @Html.Raw(Json.Serialize(Model.GroupBy(m => m.OemName).Select(g => new { 
+                OemName = g.Key, 
+                TotalMargin = g.Sum(m => m.ActualMargin), 
+                LicenseCount = g.Count() 
+            })));
+
+            let chartConfig = {
+                type: 'bar',
+                data: {
+                    labels: marginData.map(item => item.OemName),
+                    datasets: [{
+                        label: 'Total Margin',
+                        data: marginData.map(item => item.TotalMargin),
+                        backgroundColor: '#4BC0C0',
+                        borderColor: '#4BC0C0',
+                        borderWidth: 1
+                    }, {
+                        label: 'License Count',
+                        data: marginData.map(item => item.LicenseCount),
+                        backgroundColor: '#36A2EB',
+                        borderColor: '#36A2EB',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Margin Breakup by OEM'
+                        }
+                    }
+                }
+            };
+
+            // Check if xaiCanvasPanel is available
+            if (window.xaiCanvasPanel) {
+                window.xaiCanvasPanel.open({
+                    content: {
+                        type: "chartjs",
+                        config: chartConfig
+                    }
+                });
+            } else {
+                alert('Chart visualization not available. Please ensure Chart.js is loaded.');
+            }
+        }
+    </script>
+}

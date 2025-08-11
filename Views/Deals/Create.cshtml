@@ -1,0 +1,818 @@
+@model License_Tracking.Models.Deal
+
+@{
+    ViewData["Title"] = "Create New Deal";
+}
+
+<!-- Professional Alert Container -->
+<div class="alert-container"></div>
+
+<!-- Professional Enterprise Deal Creation Form -->
+<div class="desktop-page-container">
+    <!-- Page Header -->
+    <div class="desktop-page-header">
+        <div class="desktop-page-title">
+            <h1><i class="fas fa-handshake"></i> Create New Deal</h1>
+            <p>4-Phase B2B2B Workflow Management - Customer to OEM License Management</p>
+        </div>
+        <div class="desktop-page-actions">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Deals</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 4-Phase Workflow Indicator -->
+    <div class="phase-indicator mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="phase-step active text-center p-3 border rounded">
+                    <i class="fas fa-user-friends fa-2x mb-2 text-primary"></i>
+                    <h6>Phase 1</h6>
+                    <small>Customer PO</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="phase-step text-center p-3 border rounded">
+                    <i class="fas fa-shopping-cart fa-2x mb-2 text-muted"></i>
+                    <h6>Phase 2</h6>
+                    <small>OEM Procurement</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="phase-step text-center p-3 border rounded">
+                    <i class="fas fa-key fa-2x mb-2 text-muted"></i>
+                    <h6>Phase 3</h6>
+                    <small>License Delivery</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="phase-step text-center p-3 border rounded">
+                    <i class="fas fa-check-circle fa-2x mb-2 text-muted"></i>
+                    <h6>Phase 4</h6>
+                    <small>OEM Settlement</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deal Creation Form -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-plus-circle"></i>
+                New Deal Information
+            </h5>
+            <small class="text-muted">Enter comprehensive deal details for effective B2B2B workflow tracking</small>
+        </div>
+        
+        <div class="card-body">
+            <form asp-action="Create" class="needs-validation" id="dealCreationForm" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                
+                <!-- Section 1: Basic Deal Information -->
+                <div class="form-section mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="fas fa-info-circle"></i>
+                        Basic Deal Information
+                    </h6>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group mb-3">
+                                <label asp-for="DealName" class="form-label fw-semibold">
+                                    Deal/Project Name <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="DealName" class="form-control" 
+                                       placeholder="Enter descriptive deal name" required />
+                                <span asp-validation-for="DealName" class="invalid-feedback"></span>
+                                <div class="form-text">Choose a clear, descriptive name for easy identification</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="DealType" class="form-label fw-semibold">Deal Type</label>
+                                <select asp-for="DealType" class="form-select">
+                                    <option value="">Select Deal Type</option>
+                                    <option value="New">New License</option>
+                                    <option value="Renewal">License Renewal</option>
+                                    <option value="Upgrade">License Upgrade</option>
+                                    <option value="Expansion">License Expansion</option>
+                                </select>
+                                <span asp-validation-for="DealType" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="DealStage" class="form-label fw-semibold">Deal Stage</label>
+                                <select asp-for="DealStage" class="form-select">
+                                    <option value="Lead">Lead - Initial Contact</option>
+                                    <option value="Qualified">Qualified - Requirements Confirmed</option>
+                                    <option value="Quoted">Quoted - Proposal Sent</option>
+                                    <option value="Negotiation">Negotiation - In Progress</option>
+                                </select>
+                                <span asp-validation-for="DealStage" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="Quantity" class="form-label fw-semibold">
+                                    Quantity <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Quantity" type="number" min="1" class="form-control" 
+                                       placeholder="Number of licenses" required />
+                                <span asp-validation-for="Quantity" class="invalid-feedback"></span>
+                                <div class="form-text">Total number of licenses required</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="DealProbability" class="form-label fw-semibold">Success Probability</label>
+                                <select asp-for="DealProbability" class="form-select">
+                                    <option value="0.1">10% - Early Stage</option>
+                                    <option value="0.25">25% - Initial Interest</option>
+                                    <option value="0.5" selected>50% - Qualified Lead</option>
+                                    <option value="0.75">75% - Strong Interest</option>
+                                    <option value="0.9">90% - Almost Closed</option>
+                                </select>
+                                <span asp-validation-for="DealProbability" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Customer & Contact Selection -->
+                <div class="form-section mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="fas fa-building"></i>
+                        Customer & Contact Information
+                    </h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="CompanyId" class="form-label fw-semibold">
+                                    Customer Company <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="CompanyId" class="form-select" asp-items="ViewBag.CompanyId" 
+                                        id="customerSelect" required>
+                                    <option value="">-- Select Customer Company --</option>
+                                </select>
+                                <span asp-validation-for="CompanyId" class="invalid-feedback"></span>
+                                <div class="form-text">Choose the customer company for this deal</div>
+                                <small class="text-muted">
+                                    <a href="/Companies/Create" class="text-decoration-none" target="_blank">
+                                        <i class="fas fa-plus"></i> Add new customer
+                                    </a>
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="ContactId" class="form-label fw-semibold">Primary Contact</label>
+                                <select asp-for="ContactId" class="form-select" id="contactSelect" disabled>
+                                    <option value="">-- Select Primary Contact --</option>
+                                </select>
+                                <span asp-validation-for="ContactId" class="invalid-feedback"></span>
+                                <div class="form-text">Primary contact person for this deal</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: OEM & Product Selection -->
+                <div class="form-section mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="fas fa-industry"></i>
+                        OEM Partner & Product Selection
+                    </h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="OemId" class="form-label fw-semibold">
+                                    OEM Partner <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="OemId" class="form-select" asp-items="ViewBag.OemId" 
+                                        id="oemSelect" required>
+                                    <option value="">-- Select OEM Partner --</option>
+                                </select>
+                                <span asp-validation-for="OemId" class="invalid-feedback"></span>
+                                <div class="form-text">Choose the OEM partner for product procurement</div>
+                                <small class="text-muted">
+                                    <a href="/Oems/Create" class="text-decoration-none" target="_blank">
+                                        <i class="fas fa-plus"></i> Add new OEM
+                                    </a>
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="ProductId" class="form-label fw-semibold">
+                                    Product <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="ProductId" class="form-select" id="productSelect" 
+                                        disabled required>
+                                    <option value="">-- Select Product --</option>
+                                </select>
+                                <span asp-validation-for="ProductId" class="invalid-feedback"></span>
+                                <div class="form-text">Select the specific product/license to be procured</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Information Display -->
+                    <div id="productInfo" class="alert alert-info mt-3" style="display: none;">
+                        <h6><i class="fas fa-cube"></i> Product Information</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <strong>License Type:</strong>
+                                <span id="licenseType">-</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Unit Price:</strong>
+                                <span id="unitPrice">-</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Category:</strong>
+                                <span id="productCategory">-</span>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <strong>Description:</strong>
+                            <p id="productDescription" class="mb-0">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Deal Timeline & Expectations -->
+                <div class="form-section mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="fas fa-calendar-alt"></i>
+                        Timeline & Expectations
+                    </h6>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="ExpectedCloseDate" class="form-label fw-semibold">Expected Close Date</label>
+                                <input asp-for="ExpectedCloseDate" type="date" class="form-control" />
+                                <span asp-validation-for="ExpectedCloseDate" class="invalid-feedback"></span>
+                                <div class="form-text">Target date for deal closure</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="LicenseStartDate" class="form-label fw-semibold">Desired License Start</label>
+                                <input asp-for="LicenseStartDate" type="date" class="form-control" />
+                                <span asp-validation-for="LicenseStartDate" class="invalid-feedback"></span>
+                                <div class="form-text">When the customer wants to start using the licenses</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="LicenseEndDate" class="form-label fw-semibold">License End Date</label>
+                                <input asp-for="LicenseEndDate" type="date" class="form-control" />
+                                <span asp-validation-for="LicenseEndDate" class="invalid-feedback"></span>
+                                <div class="form-text">License expiration date (for subscriptions)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: Financial Information -->
+                <div class="form-section mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="fas fa-dollar-sign"></i>
+                        Financial Information & Pricing
+                    </h6>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="CustomerInvoiceAmount" class="form-label fw-semibold">Customer Invoice Amount</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₹</span>
+                                    <input asp-for="CustomerInvoiceAmount" type="number" step="0.01" 
+                                           class="form-control" placeholder="0.00" />
+                                </div>
+                                <span asp-validation-for="CustomerInvoiceAmount" class="invalid-feedback"></span>
+                                <div class="form-text">Amount to be invoiced to customer</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="OemQuoteAmount" class="form-label fw-semibold">OEM Quote Amount</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₹</span>
+                                    <input asp-for="OemQuoteAmount" type="number" step="0.01" 
+                                           class="form-control" placeholder="0.00" />
+                                </div>
+                                <span asp-validation-for="OemQuoteAmount" class="invalid-feedback"></span>
+                                <div class="form-text">Expected cost from OEM partner</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="EstimatedMargin" class="form-label fw-semibold">Estimated Margin</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₹</span>
+                                    <input asp-for="EstimatedMargin" type="number" step="0.01" 
+                                           class="form-control" placeholder="0.00" readonly />
+                                </div>
+                                <span asp-validation-for="EstimatedMargin" class="invalid-feedback"></span>
+                                <div class="form-text">Calculated margin (Customer Amount - OEM Cost)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 6: Assignment & Notes -->
+                <div class="form-section mb-4">
+                    <h6 class="text-primary border-bottom pb-2 mb-3">
+                        <i class="fas fa-user-tie"></i>
+                        Assignment & Additional Information
+                    </h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="AssignedTo" class="form-label fw-semibold">Assigned To</label>
+                                <select asp-for="AssignedTo" class="form-select">
+                                    <option value="">-- Select Team Member --</option>
+                                    <option value="@User.Identity.Name">Myself</option>
+                                </select>
+                                <span asp-validation-for="AssignedTo" class="invalid-feedback"></span>
+                                <div class="form-text">Team member responsible for this deal</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-semibold">Deal Priority</label>
+                                <select name="Priority" class="form-select">
+                                    <option value="">Select Priority</option>
+                                    <option value="Low">Low Priority</option>
+                                    <option value="Medium" selected>Medium Priority</option>
+                                    <option value="High">High Priority</option>
+                                    <option value="Critical">Critical Priority</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Notes" class="form-label fw-semibold">Deal Notes</label>
+                        <textarea asp-for="Notes" class="form-control" rows="4" 
+                                  placeholder="Add any relevant notes, requirements, or special considerations for this deal..."></textarea>
+                        <span asp-validation-for="Notes" class="invalid-feedback"></span>
+                        <div class="form-text">Add detailed notes about customer requirements, special terms, or other relevant information</div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="border-top pt-3">
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </a>
+                        <div>
+                            <button type="button" class="btn btn-outline-primary me-2" onclick="saveDraft()">
+                                <i class="fas fa-save"></i>
+                                Save as Draft
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-handshake"></i>
+                                Create Deal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Professional Deal Creation JavaScript
+    class DealCreation {
+        constructor() {
+            this.products = [];
+            this.contacts = [];
+            this.init();
+        }
+
+        init() {
+            this.setupEventListeners();
+            this.setupValidation();
+            this.setupAutoCalculations();
+            this.loadInitialData();
+        }
+
+        setupEventListeners() {
+            // Form submission
+            document.getElementById('dealCreationForm').addEventListener('submit', (e) => {
+                if (!this.validateForm()) {
+                    e.preventDefault();
+                    this.showNotification('Please fix the validation errors before submitting', 'error');
+                }
+            });
+
+            // Real-time calculations
+            const amountFields = ['CustomerInvoiceAmount', 'OemQuoteAmount'];
+            amountFields.forEach(field => {
+                const element = document.querySelector(`[name="${field}"]`);
+                if (element) {
+                    element.addEventListener('input', () => this.calculateMargin());
+                }
+            });
+
+            // Quantity change
+            const quantityField = document.querySelector('[name="Quantity"]');
+            if (quantityField) {
+                quantityField.addEventListener('input', () => this.updatePricing());
+            }
+        }
+
+        async loadCompanyContacts(companyId) {
+            if (!companyId) {
+                this.clearContacts();
+                return;
+            }
+
+            try {
+                const response = await fetch(`/Deals/GetContactsByCompany?companyId=${companyId}`);
+                if (response.ok) {
+                    this.contacts = await response.json();
+                    this.populateContacts();
+                } else {
+                    console.error('Failed to load contacts');
+                    this.showNotification('Failed to load company contacts', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+                this.showNotification('Error loading contacts', 'error');
+            }
+        }
+
+        async loadOemProducts(oemId) {
+            if (!oemId) {
+                this.clearProducts();
+                return;
+            }
+
+            try {
+                const response = await fetch(`/Deals/GetProductsByOem?oemId=${oemId}`);
+                if (response.ok) {
+                    this.products = await response.json();
+                    this.populateProducts();
+                } else {
+                    console.error('Failed to load products');
+                    this.showNotification('Failed to load OEM products', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+                this.showNotification('Error loading products', 'error');
+            }
+        }
+
+        populateContacts() {
+            const contactSelect = document.querySelector('#contactSelect');
+            if (!contactSelect) return;
+
+            contactSelect.innerHTML = '<option value="">-- Select Primary Contact --</option>';
+
+            this.contacts.forEach(contact => {
+                const option = document.createElement('option');
+                option.value = contact.value;
+                option.textContent = contact.text;
+                contactSelect.appendChild(option);
+            });
+            contactSelect.disabled = false;
+        }
+
+        populateProducts() {
+            const productSelect = document.querySelector('#productSelect');
+            if (!productSelect) return;
+
+            productSelect.innerHTML = '<option value="">-- Select Product --</option>';
+
+            this.products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.value;
+                option.textContent = product.text;
+                option.dataset.category = product.category || '';
+                option.dataset.unitPrice = product.unitPrice || '';
+                option.dataset.licenseType = product.licenseType || '';
+                option.dataset.description = product.description || '';
+                productSelect.appendChild(option);
+            });
+            productSelect.disabled = false;
+        }
+
+        clearContacts() {
+            const contactSelect = document.querySelector('#contactSelect');
+            if (contactSelect) {
+                contactSelect.innerHTML = '<option value="">-- Select Primary Contact --</option>';
+                contactSelect.disabled = true;
+            }
+        }
+
+        clearProducts() {
+            const productSelect = document.querySelector('#productSelect');
+            if (productSelect) {
+                productSelect.innerHTML = '<option value="">-- Select Product --</option>';
+                productSelect.disabled = true;
+            }
+            this.hideProductInfo();
+        }
+
+        updateProductInfo(productId) {
+            if (!productId) {
+                this.hideProductInfo();
+                return;
+            }
+
+            const productSelect = document.querySelector('#productSelect');
+            const selectedOption = productSelect.options[productSelect.selectedIndex];
+            
+            if (selectedOption && selectedOption.value) {
+                const product = {
+                    licenseType: selectedOption.dataset.licenseType,
+                    unitPrice: selectedOption.dataset.unitPrice,
+                    productCategory: selectedOption.dataset.category,
+                    productDescription: selectedOption.dataset.description
+                };
+                this.showProductInfo(product);
+                this.updatePricing();
+            }
+        }
+
+        showProductInfo(product) {
+            const infoDiv = document.getElementById('productInfo');
+            if (!infoDiv) return;
+
+            document.getElementById('licenseType').textContent = product.licenseType || '-';
+            document.getElementById('unitPrice').textContent = product.unitPrice ? `₹${parseFloat(product.unitPrice).toLocaleString()}` : '-';
+            document.getElementById('productCategory').textContent = product.productCategory || '-';
+            document.getElementById('productDescription').textContent = product.productDescription || 'No description available';
+
+            infoDiv.style.display = 'block';
+        }
+
+        hideProductInfo() {
+            const infoDiv = document.getElementById('productInfo');
+            if (infoDiv) {
+                infoDiv.style.display = 'none';
+            }
+        }
+
+        updatePricing() {
+            const productSelect = document.querySelector('#productSelect');
+            const quantity = parseInt(document.querySelector('[name="Quantity"]').value) || 0;
+
+            if (productSelect.value && quantity > 0) {
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                const unitPrice = parseFloat(selectedOption.dataset.unitPrice);
+                
+                if (unitPrice) {
+                    const totalAmount = unitPrice * quantity;
+                    document.querySelector('[name="CustomerInvoiceAmount"]').value = totalAmount;
+                    
+                    // Estimate OEM cost (80% of customer price as default)
+                    const estimatedOemCost = totalAmount * 0.8;
+                    document.querySelector('[name="OemQuoteAmount"]').value = estimatedOemCost;
+                    
+                    this.calculateMargin();
+                }
+            }
+        }
+
+        calculateMargin() {
+            const customerAmount = parseFloat(document.querySelector('[name="CustomerInvoiceAmount"]').value) || 0;
+            const oemAmount = parseFloat(document.querySelector('[name="OemQuoteAmount"]').value) || 0;
+            const margin = customerAmount - oemAmount;
+
+            const marginField = document.querySelector('[name="EstimatedMargin"]');
+            if (marginField) {
+                marginField.value = margin.toFixed(2);
+                
+                // Visual feedback for margin
+                if (margin > 0) {
+                    marginField.style.color = '#10b981';
+                } else if (margin < 0) {
+                    marginField.style.color = '#ef4444';
+                } else {
+                    marginField.style.color = '';
+                }
+            }
+        }
+
+        setupValidation() {
+            const form = document.getElementById('dealCreationForm');
+            
+            // Bootstrap validation
+            form.addEventListener('submit', (event) => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+
+            // Real-time validation
+            const requiredFields = document.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                field.addEventListener('blur', () => this.validateField(field));
+                field.addEventListener('input', () => this.clearFieldError(field));
+            });
+        }
+
+        validateField(field) {
+            this.clearFieldError(field);
+            
+            if (field.hasAttribute('required') && !field.value.trim()) {
+                this.showFieldError(field, 'This field is required');
+                return false;
+            }
+            
+            return true;
+        }
+
+        showFieldError(field, message) {
+            field.classList.add('is-invalid');
+            field.classList.remove('is-valid');
+        }
+
+        clearFieldError(field) {
+            field.classList.remove('is-invalid');
+            if (field.value.trim()) {
+                field.classList.add('is-valid');
+            }
+        }
+
+        validateForm() {
+            const requiredFields = document.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!this.validateField(field)) {
+                    isValid = false;
+                }
+            });
+            
+            return isValid;
+        }
+
+        setupAutoCalculations() {
+            // Set default assignment to current user
+            const assignedToField = document.querySelector('[name="AssignedTo"]');
+            if (assignedToField && !assignedToField.value) {
+                assignedToField.value = '@User.Identity.Name';
+            }
+
+            // Set default expected close date (30 days from now)
+            const closeDateField = document.querySelector('[name="ExpectedCloseDate"]');
+            if (closeDateField && !closeDateField.value) {
+                const futureDate = new Date();
+                futureDate.setDate(futureDate.getDate() + 30);
+                closeDateField.value = futureDate.toISOString().split('T')[0];
+            }
+        }
+
+        loadInitialData() {
+            console.log('Deal creation form initialized');
+        }
+
+        saveDraft() {
+            this.showNotification('Draft saving functionality coming soon!', 'info');
+        }
+
+        showNotification(message, type) {
+            // Simple notification - can be enhanced with toast library
+            alert(`${type.toUpperCase()}: ${message}`);
+        }
+    }
+
+    // Global functions for compatibility
+    function loadCompanyContacts(companyId) {
+        if (window.dealCreation) {
+            window.dealCreation.loadCompanyContacts(companyId);
+        }
+    }
+
+    function loadOemProducts(oemId) {
+        if (window.dealCreation) {
+            window.dealCreation.loadOemProducts(oemId);
+        }
+    }
+
+    function updateProductInfo(productId) {
+        if (window.dealCreation) {
+            window.dealCreation.updateProductInfo(productId);
+        }
+    }
+
+    function saveDraft() {
+        if (window.dealCreation) {
+            window.dealCreation.saveDraft();
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        window.dealCreation = new DealCreation();
+        
+        // Setup dropdown change handlers
+        document.getElementById('customerSelect').addEventListener('change', function() {
+            loadCompanyContacts(this.value);
+        });
+        
+        document.getElementById('oemSelect').addEventListener('change', function() {
+            loadOemProducts(this.value);
+        });
+        
+        document.getElementById('productSelect').addEventListener('change', function() {
+            updateProductInfo(this.value);
+        });
+    });
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<style>
+    .desktop-page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .desktop-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .desktop-page-title h1 {
+        color: #2563eb;
+        margin-bottom: 5px;
+    }
+
+    .form-section {
+        background: #f8fafc;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        border-left: 4px solid #6366f1;
+    }
+
+    .phase-step.active {
+        background: #e0f2fe;
+        border-color: #0284c7 !important;
+    }
+
+    .phase-step.active i {
+        color: #0284c7 !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+    }
+
+    .btn-primary {
+        background-color: #6366f1;
+        border-color: #6366f1;
+    }
+
+    .btn-primary:hover {
+        background-color: #5b21b6;
+        border-color: #5b21b6;
+    }
+
+    .is-invalid {
+        border-color: #dc3545;
+    }
+
+    .is-valid {
+        border-color: #198754;
+    }
+</style>

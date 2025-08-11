@@ -1,0 +1,202 @@
+﻿@{
+    ViewData["Title"] = "License Tracking System";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="hero-section py-5">
+                <div class="mb-4">
+                    <i class="fas fa-certificate fa-4x text-primary"></i>
+                </div>
+                <h1 class="display-4 fw-bold text-primary">License Tracking System</h1>
+                <p class="lead text-muted mb-4">
+                    Comprehensive solution for managing software licenses, renewals, billing, and procurement tracking
+                </p>
+
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="alert alert-success d-inline-block">
+                        <i class="fas fa-check-circle"></i> Welcome back, <strong>@User.Identity.Name</strong>!
+                    </div>
+                    <div class="mt-3">
+                        <a asp-controller="License" asp-action="Index" class="btn btn-primary btn-lg">
+                            <i class="fas fa-clipboard-list"></i> Manage Licenses
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="mt-4">
+                        <a asp-controller="Auth" asp-action="Login" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </a>
+                        <a asp-controller="Auth" asp-action="Register" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-key fa-3x text-primary mb-3"></i>
+                    <h4 class="card-title">License Management</h4>
+                    <p class="card-text">Track software licenses, expiry dates, and calculate margins with complete CRUD
+                        operations.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-bell fa-3x text-warning mb-3"></i>
+                    <h4 class="card-title">Renewal Alerts</h4>
+                    <p class="card-text">Automated renewal reminders and expiry tracking to never miss important dates.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-users fa-3x text-success mb-3"></i>
+                    <h4 class="card-title">Role-Based Access</h4>
+                    <p class="card-text">Secure access control with Admin, Sales, Finance, Operations, and Management
+                        roles.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || User.IsInRole("Management") ||
+        User.IsInRole("Finance")))
+    {
+        <!-- Quick Access to Analytics Features -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3 class="text-center mb-4"><i class="fas fa-chart-line text-primary"></i> Analytics Dashboard</h3>
+            </div>
+        </div>
+        <!-- Analytics section moved to Phase 6 implementation -->
+    }
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bell"></i> Quick Notification Access
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3 mb-3">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
+                                    <h6>Critical Alerts</h6>
+                                    <span id="criticalCount" class="badge bg-danger">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="fas fa-exclamation-circle fa-2x text-warning mb-2"></i>
+                                    <h6>High Priority</h6>
+                                    <span id="highCount" class="badge bg-warning">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="fas fa-calendar-alt fa-2x text-info mb-2"></i>
+                                    <h6>Renewals</h6>
+                                    <span id="renewalCount" class="badge bg-info">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="fas fa-clock fa-2x text-secondary mb-2"></i>
+                                    <h6>Overdue</h6>
+                                    <span id="overdueCount" class="badge bg-secondary">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="/Notification/Dashboard" class="btn btn-primary btn-lg">
+                                <i class="fas fa-bell"></i> Open Notification Center
+                            </a>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a href="/Home/CreateDemoNotifications" class="btn btn-outline-info btn-sm ms-2">
+                                    <i class="fas fa-sync-alt"></i> Generate Alerts
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (User.Identity?.IsAuthenticated != true)
+    {
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Get Started</h5>
+                        <p class="card-text">Sign in with the demo credentials or register for a new account.</p>
+                        <div class="alert alert-info d-inline-block">
+                            <strong>Demo Admin:</strong> admin@licenseapp.com / Admin@1234
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    @section Scripts {
+        <script>
+            $(document).ready(function () {
+                loadNotificationStats();
+                // Auto-refresh every 60 seconds
+                setInterval(loadNotificationStats, 60000);
+            });
+
+            function loadNotificationStats() {
+                $.get('/Notification/GetNotificationStats')
+                    .done(function (stats) {
+                        $('#criticalCount').text(stats.Critical);
+                        $('#highCount').text(stats.High);
+                        $('#renewalCount').text(stats.Renewals);
+                        $('#overdueCount').text(stats.Overdue);
+                    })
+                    .fail(function () {
+                        console.log('Error loading notification stats');
+                        // Show default values on error
+                        $('#criticalCount').text('0');
+                        $('#highCount').text('0');
+                        $('#renewalCount').text('0');
+                        $('#overdueCount').text('0');
+                    });
+            }
+
+            function updateStatsBadges(totalCount) {
+                // For now, show total count distributed
+                // In a real implementation, you'd want to get detailed stats
+                $('#criticalCount').text(Math.floor(totalCount * 0.1) || 0);
+                $('#highCount').text(Math.floor(totalCount * 0.3) || 0);
+                $('#renewalCount').text(Math.floor(totalCount * 0.4) || 0);
+                $('#overdueCount').text(Math.floor(totalCount * 0.2) || 0);
+            }
+        </script>
+    }
+}

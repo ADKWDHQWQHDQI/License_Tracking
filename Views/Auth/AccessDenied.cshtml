@@ -1,0 +1,58 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card shadow">
+                <div class="card-body py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-exclamation-triangle fa-4x text-warning"></i>
+                    </div>
+                    <h2 class="card-title text-danger">Access Denied</h2>
+                    <p class="card-text text-muted mb-4">
+                        You do not have the required permissions to access this page.
+                        <br>
+                        Please contact your administrator if you believe this is an error.
+                    </p>
+                    
+                    <div class="alert alert-info">
+                        <strong>Your Role:</strong> 
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <span class="badge bg-danger">Admin</span>
+                        }
+                        else if (User.IsInRole("Sales"))
+                        {
+                            <span class="badge bg-primary">Sales</span>
+                        }
+                        else if (User.IsInRole("Finance"))
+                        {
+                            <span class="badge bg-success">Finance</span>
+                        }
+                        else if (User.IsInRole("Operations"))
+                        {
+                            <span class="badge bg-warning">Operations</span>
+                        }
+                        else if (User.IsInRole("Management"))
+                        {
+                            <span class="badge bg-info">Management</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Unknown</span>
+                        }
+                    </div>
+                    
+                    <a asp-action="Index" asp-controller="Home" class="btn btn-primary">
+                        <i class="fas fa-home"></i> Return to Home
+                    </a>
+                    <a asp-action="Index" asp-controller="License" class="btn btn-outline-primary ms-2">
+                        <i class="fas fa-clipboard-list"></i> View Licenses
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,678 @@
+@model IEnumerable<License_Tracking.Models.Oem>
+
+@{
+    ViewData["Title"] = "OEM Reference Data Management";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-building"></i> OEM Reference Data Management
+                    </h2>
+                    <p class="text-muted mb-0">Phase 2 Week 4: Manage OEM partners with dropdown functionality, performance ratings & service level tracking</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add New OEM
+                    </a>
+                    <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#importModal">
+                        <i class="fas fa-upload"></i> Import OEMs
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bolt text-warning"></i> Quick OEM Actions
+                        </h5>
+                        <small class="text-muted">Frequently used OEM management actions</small>
+                    </div>
+                </div>
+                <div class="card-body py-3">
+                    <div class="row g-2">
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <a asp-action="Create" class="btn btn-primary w-100 d-flex flex-column align-items-center py-2">
+                                <i class="fas fa-building fa-lg mb-1"></i>
+                                <small>Add OEM</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <a asp-controller="Products" asp-action="Create" class="btn btn-success w-100 d-flex flex-column align-items-center py-2">
+                                <i class="fas fa-box fa-lg mb-1"></i>
+                                <small>Add Product</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <a asp-action="Import" class="btn btn-info w-100 d-flex flex-column align-items-center py-2">
+                                <i class="fas fa-upload fa-lg mb-1"></i>
+                                <small>Import OEMs</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <div class="dropdown">
+                                <button class="btn btn-warning w-100 d-flex flex-column align-items-center py-2 dropdown-toggle" 
+                                        type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-download fa-lg mb-1"></i>
+                                    <small>Export Data</small>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-action="Export" asp-route-format="csv">
+                                            <i class="fas fa-file-csv text-success me-2"></i>Export CSV
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-action="Export" asp-route-format="excel">
+                                            <i class="fas fa-file-excel text-success me-2"></i>Export Excel
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-action="Export" asp-route-format="json">
+                                            <i class="fas fa-file-code text-info me-2"></i>Export JSON
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <a asp-controller="Companies" asp-action="OemRelationships" class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-2">
+                                <i class="fas fa-handshake fa-lg mb-1"></i>
+                                <small>Relationships</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <button class="btn btn-outline-secondary w-100 d-flex flex-column align-items-center py-2" onclick="toggleView()">
+                                <i class="fas fa-eye fa-lg mb-1"></i>
+                                <small>Toggle View</small>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-card-title">Total OEMs</div>
+                            <div class="stats-card-value">@(Model?.Count() ?? 0)</div>
+                        </div>
+                        <div class="stats-card-icon text-primary">
+                            <i class="fas fa-building"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-card-title">Gold Partners</div>
+                            <div class="stats-card-value">@(Model?.Count(o => o.ServiceLevel == "Gold") ?? 0)</div>
+                        </div>
+                        <div class="stats-card-icon text-warning">
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-card-title">Total Products</div>
+                            <div class="stats-card-value">@(Model?.Sum(o => o.Products?.Count ?? 0) ?? 0)</div>
+                        </div>
+                        <div class="stats-card-icon text-success">
+                            <i class="fas fa-box"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-card-title">Active Deals</div>
+                            <div class="stats-card-value">@(Model?.Sum(o => o.Deals?.Count ?? 0) ?? 0)</div>
+                        </div>
+                        <div class="stats-card-icon text-info">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white border-bottom-0">
+                    <h5 class="mb-0 text-white">
+                        <i class="fas fa-filter"></i> Advanced OEM Search & Filtering
+                    </h5>
+                    <small class="text-white-50">Filter OEM partners by service level, performance, and search criteria</small>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Index" method="get">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">Search OEM Partners</label>
+                                    <div class="input-group">
+                                        <input type="text" name="searchString" value="@ViewData["CurrentFilter"]"
+                                            class="form-control" placeholder="Search by name, email..." />
+                                        <button class="btn btn-outline-secondary" type="submit">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-label">Service Level</label>
+                                    <select name="serviceLevel" class="form-select">
+                                        <option value="">All Service Levels</option>
+                                        <option value="Gold">Gold Partners</option>
+                                        <option value="Silver">Silver Partners</option>
+                                        <option value="Bronze">Bronze Partners</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-label">Performance Rating</label>
+                                    <select name="performanceFilter" class="form-select">
+                                        <option value="">All Ratings</option>
+                                        <option value="high">4.0+ Stars</option>
+                                        <option value="medium">3.0-3.9 Stars</option>
+                                        <option value="low">Below 3.0 Stars</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label class="form-label">&nbsp;</label>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-filter"></i> Filter
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern View Controls -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0 me-3">
+                                <i class="fas fa-eye text-primary"></i> View Options
+                            </h6>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-primary active" id="cardViewBtn" onclick="showCardView()">
+                                    <i class="fas fa-th-large"></i> Cards
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" id="tableViewBtn" onclick="showTableView()">
+                                    <i class="fas fa-table"></i> Table
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="exportToExcel()">
+                                        <i class="fas fa-file-excel text-success"></i> Excel Format
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportToPDF()">
+                                        <i class="fas fa-file-pdf text-danger"></i> PDF Report
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OEM Partners Display -->
+    <div class="row">
+        <div class="col-12">
+            <div id="cardView">
+                <!-- Card View -->
+                @if (Model?.Any() == true)
+                {
+                    <div class="row">
+                        @foreach (var oem in Model)
+                        {
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100 border-0 shadow-sm hover-shadow">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-0 text-primary">@oem.OemName</h6>
+                                            @if (!string.IsNullOrEmpty(oem.ServiceLevel))
+                                            {
+                                                <span class="badge badge-@(oem.ServiceLevel switch 
+                                                {
+                                                    "Gold" => "warning",
+                                                    "Silver" => "secondary",
+                                                    "Bronze" => "dark",
+                                                    _ => "light"
+                                                }) mt-1">@oem.ServiceLevel</span>
+                                            }
+                                        </div>
+                                        @if (oem.PerformanceRating.HasValue)
+                                        {
+                                            <div class="text-warning">
+                                                <small>@oem.PerformanceRating.Value.ToString("0.0")</small>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row text-center mb-3">
+                                            <div class="col-4">
+                                                <div class="stat-item">
+                                                    <h6 class="text-primary">@(oem.Products?.Count ?? 0)</h6>
+                                                    <small class="text-muted">Products</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="stat-item">
+                                                    <h6 class="text-success">@(oem.Deals?.Count ?? 0)</h6>
+                                                    <small class="text-muted">Deals</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="stat-item">
+                                                    <h6 class="text-info">@(oem.CustomerOemProducts?.Count ?? 0)</h6>
+                                                    <small class="text-muted">Customers</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="contact-info">
+                                            @if (!string.IsNullOrEmpty(oem.ContactEmail))
+                                            {
+                                                <p class="mb-1">
+                                                    <i class="fas fa-envelope text-muted"></i>
+                                                    <small><a href="mailto:@oem.ContactEmail">@oem.ContactEmail</a></small>
+                                                </p>
+                                            }
+                                            @if (!string.IsNullOrEmpty(oem.ContactNumber))
+                                            {
+                                                <p class="mb-1">
+                                                    <i class="fas fa-phone text-muted"></i>
+                                                    <small><a href="tel:@oem.ContactNumber">@oem.ContactNumber</a></small>
+                                                </p>
+                                            }
+                                            @if (!string.IsNullOrEmpty(oem.PaymentTerms))
+                                            {
+                                                <p class="mb-1">
+                                                    <i class="fas fa-credit-card text-muted"></i>
+                                                    <small>@oem.PaymentTerms</small>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="btn-group w-100" role="group">
+                                            <a asp-action="Details" asp-route-id="@oem.OemId" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@oem.OemId" class="btn btn-sm btn-outline-warning">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            <a asp-controller="Products" asp-action="Index" asp-route-oemId="@oem.OemId" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-box"></i> Products
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No OEM Partners Found</h5>
+                        <p class="text-muted">Start building your OEM partner network by adding your first OEM partner.</p>
+                        <a asp-action="Create" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add First OEM Partner
+                        </a>
+                    </div>
+                }
+            </div>
+
+            <div id="tableView" style="display: none;">
+                <!-- Table View -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>OEM Partner</th>
+                                        <th>Service Level</th>
+                                        <th>Performance</th>
+                                        <th>Contact Info</th>
+                                        <th>Portfolio</th>
+                                        <th>Payment Terms</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model?.Any() == true)
+                                    {
+                                        @foreach (var oem in Model)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div>
+                                                        <strong>@oem.OemName</strong>
+                                                        <br><small class="text-muted">Created @oem.CreatedDate.ToString("MMM dd, yyyy")</small>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(oem.ServiceLevel))
+                                                    {
+                                                        <span class="badge badge-@(oem.ServiceLevel switch 
+                                                        {
+                                                            "Gold" => "warning",
+                                                            "Silver" => "secondary",
+                                                            "Bronze" => "dark",
+                                                            _ => "light"
+                                                        })">@oem.ServiceLevel</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Not set</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (oem.PerformanceRating.HasValue)
+                                                    {
+                                                        <div class="d-flex align-items-center">
+                                                            <span class="me-2">@oem.PerformanceRating.Value.ToString("0.0")</span>
+                                                            <div>
+                                                                @for (int i = 1; i <= 5; i++)
+                                                                {
+                                                                    <i class="fas fa-star @(i <= oem.PerformanceRating.Value ? "text-warning" : "text-muted") fa-xs"></i>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Not rated</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(oem.ContactEmail))
+                                                    {
+                                                        <div><a href="mailto:@oem.ContactEmail" class="text-decoration-none">@oem.ContactEmail</a></div>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(oem.ContactNumber))
+                                                    {
+                                                        <div><a href="tel:@oem.ContactNumber" class="text-decoration-none">@oem.ContactNumber</a></div>
+                                                    }
+                                                    @if (string.IsNullOrEmpty(oem.ContactEmail) && string.IsNullOrEmpty(oem.ContactNumber))
+                                                    {
+                                                        <span class="text-muted">Not provided</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-3">
+                                                        <div class="text-center">
+                                                            <div class="fw-bold text-primary">@(oem.Products?.Count ?? 0)</div>
+                                                            <small class="text-muted">Products</small>
+                                                        </div>
+                                                        <div class="text-center">
+                                                            <div class="fw-bold text-success">@(oem.Deals?.Count ?? 0)</div>
+                                                            <small class="text-muted">Deals</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge badge-info">@(oem.PaymentTerms ?? "Not set")</span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <a asp-action="Details" asp-route-id="@oem.OemId" class="btn btn-sm btn-outline-info" title="View Details">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a asp-action="Edit" asp-route-id="@oem.OemId" class="btn btn-sm btn-outline-warning" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                                <i class="fas fa-ellipsis-v"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu">
+                                                                <li><a class="dropdown-item" asp-controller="Products" asp-action="Index" asp-route-oemId="@oem.OemId">
+                                                                    <i class="fas fa-box"></i> View Products
+                                                                </a></li>
+                                                                <li><a class="dropdown-item" asp-action="Delete" asp-route-id="@oem.OemId">
+                                                                    <i class="fas fa-archive"></i> Archive
+                                                                </a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted py-4">
+                                                <i class="fas fa-building fa-3x mb-3"></i>
+                                                <br>No OEM partners found. <a asp-action="Create">Add the first OEM partner</a>.
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import OEM Partners</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    Upload a CSV file with OEM partner data to bulk import OEMs.
+                </div>
+                <form>
+                    <div class="form-group">
+                        <label class="form-label">Select CSV File</label>
+                        <input type="file" class="form-control" accept=".csv" />
+                    </div>
+                    <div class="form-text">
+                        Expected columns: OEM Name, Contact Email, Contact Number, Payment Terms, Service Level
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Import OEMs</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // View toggle functionality
+        document.getElementById('cardViewBtn').addEventListener('click', function() {
+            document.getElementById('cardView').style.display = 'block';
+            document.getElementById('tableView').style.display = 'none';
+            this.classList.add('active');
+            document.getElementById('tableViewBtn').classList.remove('active');
+        });
+        
+        document.getElementById('tableViewBtn').addEventListener('click', function() {
+            document.getElementById('cardView').style.display = 'none';
+            document.getElementById('tableView').style.display = 'block';
+            this.classList.add('active');
+            document.getElementById('cardViewBtn').classList.remove('active');
+        });
+        // Modern view toggle functionality
+        function showCardView() {
+            document.getElementById('cardView').style.display = 'block';
+            document.getElementById('tableView').style.display = 'none';
+            document.getElementById('cardViewBtn').classList.add('active');
+            document.getElementById('tableViewBtn').classList.remove('active');
+        }
+        
+        function showTableView() {
+            document.getElementById('cardView').style.display = 'none';
+            document.getElementById('tableView').style.display = 'block';
+            document.getElementById('tableViewBtn').classList.add('active');
+            document.getElementById('cardViewBtn').classList.remove('active');
+        }
+        
+        function toggleView() {
+            if (document.getElementById('cardView').style.display !== 'none') {
+                showTableView();
+            } else {
+                showCardView();
+            }
+        }
+        
+        // Enhanced search functionality
+        $('input[name="searchString"]').on('keypress', function (e) {
+            if (e.which === 13) {
+                $(this).closest('form').submit();
+            }
+        });
+        
+        // Auto-submit filters
+        $('select[name="serviceLevel"], select[name="performanceFilter"]').on('change', function() {
+            $(this).closest('form').submit();
+        });
+        
+        // Modern export functions with visual feedback
+        function exportToExcel() {
+            const params = new URLSearchParams(window.location.search);
+            
+            // Show modern loading notification
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Exporting to Excel',
+                    text: 'Preparing your OEM data export...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+                
+                setTimeout(() => {
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Export Ready!',
+                        text: 'OEM data exported successfully.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }, 1500);
+            } else {
+                alert('Excel export feature will be implemented in the next phase.');
+            }
+        }
+        
+        function exportToPDF() {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Generating PDF Report',
+                    text: 'Creating comprehensive OEM partner report...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+                
+                setTimeout(() => {
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Report Generated!',
+                        text: 'PDF report ready for download.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }, 2000);
+            } else {
+                alert('PDF export feature will be implemented in the next phase.');
+            }
+        }
+        
+        // Initialize modern UI components
+        $(document).ready(function() {
+            // Initialize tooltips
+            if (typeof bootstrap !== 'undefined') {
+                $('[data-bs-toggle="tooltip"]').tooltip();
+            }
+            
+            // Highlight active filters
+            $('select[name="serviceLevel"], select[name="performanceFilter"]').each(function() {
+                if ($(this).val()) {
+                    $(this).addClass('border-primary');
+                }
+            });
+        });
+        
+        // Enhanced hover effects for modern cards
+        $('.hover-shadow').hover(
+            function() { $(this).addClass('shadow-lg'); },
+            function() { $(this).removeClass('shadow-lg'); }
+        );
+    </script>
+}

@@ -1,0 +1,205 @@
+@model License_Tracking.Models.Product
+
+@{
+    ViewData["Title"] = "Add New Product";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-box"></i> Add New Product
+                    </h2>
+                    <p class="text-muted mb-0">Phase 2 Week 5: Create product with OEM linkage, categorization and
+                        pricing management</p>
+                </div>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+
+            <!-- Form -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white border-bottom-0">
+                    <h5 class="mb-0 text-white">
+                        <i class="fas fa-plus-circle"></i> Product Information
+                    </h5>
+                    <small class="text-white-50">Fill in the product details for the catalog</small>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Success/Error Messages -->
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                        <!-- Product Name & OEM -->
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label asp-for="ProductName" class="form-label fw-semibold">Product Name <span
+                                            class="text-danger">*</span></label>
+                                    <input asp-for="ProductName" class="form-control"
+                                        placeholder="Enter product name" />
+                                    <span asp-validation-for="ProductName" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="OemId" class="form-label fw-semibold">OEM Partner <span
+                                            class="text-danger">*</span></label>
+                                    <select asp-for="OemId" class="form-select" asp-items="@ViewBag.OemId">
+                                        <option value="">Select OEM Partner</option>
+                                    </select>
+                                    <span asp-validation-for="OemId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category & License Type -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ProductCategory" class="form-label fw-semibold">Product
+                                        Category</label>
+                                    <select asp-for="ProductCategory" class="form-select">
+                                        <option value="">Select Category</option>
+                                        <option value="Software">Software</option>
+                                        <option value="Operating System">Operating System</option>
+                                        <option value="Productivity">Productivity</option>
+                                        <option value="Security">Security</option>
+                                        <option value="Database">Database</option>
+                                        <option value="Development Tools">Development Tools</option>
+                                        <option value="Server">Server</option>
+                                        <option value="Cloud Services">Cloud Services</option>
+                                        <option value="Business Applications">Business Applications</option>
+                                        <option value="Analytics & BI">Analytics & BI</option>
+                                    </select>
+                                    <span asp-validation-for="ProductCategory" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="LicenseType" class="form-label fw-semibold">License Type</label>
+                                    <select asp-for="LicenseType" class="form-select">
+                                        <option value="">Select License Type</option>
+                                        <option value="Subscription">Subscription</option>
+                                        <option value="Perpetual">Perpetual</option>
+                                        <option value="Trial">Trial</option>
+                                        <option value="Educational">Educational</option>
+                                        <option value="Enterprise">Enterprise</option>
+                                        <option value="Volume">Volume</option>
+                                    </select>
+                                    <span asp-validation-for="LicenseType" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Description -->
+                        <div class="form-group mb-3">
+                            <label asp-for="ProductDescription" class="form-label fw-semibold">Product
+                                Description</label>
+                            <textarea asp-for="ProductDescription" class="form-control" rows="3"
+                                placeholder="Brief description of the product features and benefits"></textarea>
+                            <span asp-validation-for="ProductDescription" class="text-danger"></span>
+                        </div>
+
+                        <!-- Pricing -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="UnitPrice" class="form-label fw-semibold">Unit Price (USD)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input asp-for="UnitPrice" type="number" step="0.01" class="form-control"
+                                            placeholder="0.00" />
+                                    </div>
+                                    <span asp-validation-for="UnitPrice" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold">Pricing Notes</label>
+                                    <input type="text" class="form-control"
+                                        placeholder="e.g., Per user/month, One-time fee" />
+                                    <small class="text-muted">Optional pricing context for reference</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle"></i>
+                                    Product will be linked to the selected OEM partner for dynamic dropdown
+                                    relationships
+                                </small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Create Product
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Related Information -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-primary">
+                                <i class="fas fa-lightbulb"></i> Phase 2 Week 5 Features
+                            </h6>
+                            <ul class="mb-0 small">
+                                <li>Dynamic OEM-Product dropdown relationships</li>
+                                <li>Product categorization and pricing management</li>
+                                <li>Integration with deal creation workflow</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-success">
+                                <i class="fas fa-check-circle"></i> Next Steps
+                            </h6>
+                            <p class="mb-0 small">After creating this product, it will be available in the deal creation
+                                workflow when the associated OEM is selected.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

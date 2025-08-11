@@ -1,0 +1,299 @@
+@model License_Tracking.ViewModels.ProjectPipelineListViewModel
+
+@{
+    ViewData["Title"] = "Project Pipeline";
+}
+
+<div class="container-fluid">
+    <!-- Header with View Switcher -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-project-diagram"></i> Project Pipeline - List View</h2>
+            <p class="text-muted mb-0">Track and manage future license projects</p>
+        </div>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary active">
+                <i class="fas fa-list"></i> List
+            </button>
+            <a asp-action="Index" asp-route-view="sheet" class="btn btn-outline-primary">
+                <i class="fas fa-table"></i> Sheet
+            </a>
+            <a asp-action="Index" asp-route-view="kanban" class="btn btn-outline-primary">
+                <i class="fas fa-columns"></i> Kanban
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-list"></i> Pipeline Projects
+                            </h5>
+                        </div>
+                        <div>
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> New Project
+                            </a>
+                            <a asp-action="ExportToExcel" class="btn btn-success">
+                                <i class="fas fa-file-excel"></i> Export
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title">Total Projects</h6>
+                                            <h4 class="mb-0">@Model.TotalCount</h4>
+                                        </div>
+                                        <div class="ms-3">
+                                            <i class="fas fa-list-ul fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title">Projected Revenue</h6>
+                                            <h4 class="mb-0">@Model.TotalProjectedRevenue.ToString("C")</h4>
+                                        </div>
+                                        <div class="ms-3">
+                                            <i class="fas fa-dollar-sign fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title">Projected Margin</h6>
+                                            <h4 class="mb-0">@Model.TotalProjectedMargin.ToString("C")</h4>
+                                        </div>
+                                        <div class="ms-3">
+                                            <i class="fas fa-chart-line fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title">Avg Success Rate</h6>
+                                            <h4 class="mb-0">
+                                                @if (Model.Projects.Any())
+                                                {
+                                                    @($"{Model.Projects.Average(p => p.SuccessProbability):F0}%")
+                                                }
+                                                else
+                                                {
+                                                    <text>N/A</text>
+                                                }
+                                            </h4>
+                                        </div>
+                                        <div class="ms-3">
+                                            <i class="fas fa-percentage fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <form method="get" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">Status Filter</label>
+                                <select name="statusFilter" class="form-select" onchange="this.form.submit()">
+                                    <option value="">All Statuses</option>
+                                    <option value="Pipeline" selected="@(Model.StatusFilter == "Pipeline")">Pipeline
+                                    </option>
+                                    <option value="Negotiation" selected="@(Model.StatusFilter == "Negotiation")">
+                                        Negotiation</option>
+                                    <option value="Pending" selected="@(Model.StatusFilter == "Pending")">Pending
+                                    </option>
+                                    <option value="Confirmed" selected="@(Model.StatusFilter == "Confirmed")">Confirmed
+                                    </option>
+                                    <option value="Lost" selected="@(Model.StatusFilter == "Lost")">Lost</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">OEM Filter</label>
+                                <input name="oemFilter" value="@Model.OemFilter" class="form-control"
+                                    placeholder="Filter by OEM..." />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Customer Filter</label>
+                                <input name="customerFilter" value="@Model.CustomerFilter" class="form-control"
+                                    placeholder="Filter by Customer..." />
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-outline-primary me-2">Filter</button>
+                                <a href="@Url.Action("Index")" class="btn btn-outline-secondary">Clear</a>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Projects Table -->
+                    @if (Model.Projects.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>OEM</th>
+                                        <th>Customer</th>
+                                        <th>Expected License Date</th>
+                                        <th>Status</th>
+                                        <th>Success %</th>
+                                        <th>Projected Revenue</th>
+                                        <th>Projected Margin</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var project in Model.Projects)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@project.ProductName</strong>
+                                                @if (!string.IsNullOrEmpty(project.CustomerPoNumber))
+                                                {
+                                                    <br>
+                                        
+                                                    <small class="text-muted">PO: @project.CustomerPoNumber</small>
+                                                }
+                                            </td>
+                                            <td>@project.OemName</td>
+                                            <td>
+                                                @project.ClientName
+                                                @if (!string.IsNullOrEmpty(project.ClientContactEmail))
+                                                {
+                                                    <br>
+                                        
+                                                    <small class="text-muted">@project.ClientContactEmail</small>
+                                                }
+                                            </td>
+                                            <td>
+                                                @project.ExpectedLicenseDate.ToString("MM/dd/yyyy")
+                                                <br><small class="text-muted">Exp:
+                                                    @project.ExpectedExpiryDate.ToString("MM/dd/yyyy")</small>
+                                            </td>
+                                            <td>
+                                                <span
+                                                    class="badge bg-@(project.ProjectStatus == "Confirmed" ? "success" : 
+                                                                                                                            project.ProjectStatus == "Lost" ? "danger" :
+                                                                                                                            project.ProjectStatus == "Negotiation" ? "warning" :
+                                                                                                                            project.ProjectStatus == "Pending" ? "info" : "secondary")">
+                                                    @project.ProjectStatus
+                                                </span>
+                                                @if (project.IsConverted)
+                                                {
+                                                    <br>
+                                        
+                                                    <span class="badge bg-success">Converted</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-@(project.SuccessProbability >= 75 ? "success" : 
+                                                                                                                                            project.SuccessProbability >= 50 ? "info" :
+                                                                                                                                            project.SuccessProbability >= 25 ? "warning" : "danger")"
+                                                        role="progressbar" style="width: @(project.SuccessProbability)%">
+                                                        @(project.SuccessProbability)%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>@project.ProjectedRevenue.ToString("C")</strong>
+                                                <br><small class="text-muted">of
+                                                    @project.ExpectedAmountToReceive.ToString("C")</small>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>@project.ProjectedMargin.ToString("C")</strong>
+                                                <br><small
+                                                    class="text-muted">@project.ProjectedProfitMargin.ToString("F1")%</small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a asp-action="Details" asp-route-id="@project.ProjectPipelineId"
+                                                        class="btn btn-outline-info" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a asp-action="Edit" asp-route-id="@project.ProjectPipelineId"
+                                                        class="btn btn-outline-warning" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    @if (!project.IsConverted && project.ProjectStatus == "Confirmed")
+                                                    {
+                                                        <a asp-action="ConvertToLicense" asp-route-id="@project.ProjectPipelineId"
+                                                            class="btn btn-outline-success" title="Convert to License"
+                                                            onclick="return confirm('Convert this project to an actual license?')">
+                                                            <i class="fas fa-exchange-alt"></i>
+                                                        </a>
+                                                    }
+                                                    <a asp-action="Delete" asp-route-id="@project.ProjectPipelineId"
+                                                        class="btn btn-outline-danger" title="Delete"
+                                                        onclick="return confirm('Are you sure you want to delete this project?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-project-diagram fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Projects Found</h4>
+                            <p class="text-muted">Start by creating your first project pipeline entry.</p>
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Create First Project
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-submit filters after a delay
+        let filterTimeout;
+        document.querySelectorAll('input[name="oemFilter"], input[name="customerFilter"]').forEach(input => {
+            input.addEventListener('input', function () {
+                clearTimeout(filterTimeout);
+                filterTimeout = setTimeout(() => {
+                    this.form.submit();
+                }, 500);
+            });
+        });
+    </script>
+}

@@ -1,0 +1,822 @@
+@model License_Tracking.Models.Deal
+
+@{
+    ViewData["Title"] = "Deal Details - " + Model.DealName;
+}
+
+<div class="container-fluid py-4"
+    style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh;">
+    <!-- Header Section -->
+    <div class="card mb-4"
+        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 20px; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2">
+                        <i class="fas fa-handshake fa-2x"></i> @Model.DealName
+                    </h1>
+                    <p class="mb-0 opacity-75">4-Phase B2B2B Workflow - Deal Details & Progress</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    @if (User.IsInRole("Admin") || User.IsInRole("Sales"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@Model.DealId" class="btn btn-light btn-lg me-2">
+                            <i class="fas fa-edit"></i> Edit Deal
+                        </a>
+                    }
+                    <a asp-action="Index" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-arrow-left"></i> Back to Deals
+                    </a>
+                </div>
+            </div>
+
+            <!-- Deal Status Overview -->
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="text-center p-3" style="background: rgba(255,255,255,0.2); border-radius: 12px;">
+                        @{
+                            var stageIcon = Model.DealStage switch
+                            {
+                                "Lead" => "fas fa-user-friends",
+                                "Quoted" => "fas fa-shopping-cart",
+                                "Negotiation" => "fas fa-key",
+                                "Won" => "fas fa-check-circle",
+                                "Lost" => "fas fa-times-circle",
+                                _ => "fas fa-user-friends"
+                            };
+                        }
+                        <i class="@stageIcon fa-2x mb-2"></i>
+                        <h5>@Model.DealStage</h5>
+                        <small>Current Phase</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center p-3" style="background: rgba(255,255,255,0.2); border-radius: 12px;">
+                        <i class="fas fa-calendar fa-2x mb-2"></i>
+                        <h5>@Model.ExpectedCloseDate?.ToString("MMM dd, yyyy")</h5>
+                        <small>Expected Close</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center p-3" style="background: rgba(255,255,255,0.2); border-radius: 12px;">
+                        <i class="fas fa-percentage fa-2x mb-2"></i>
+                        <h5>@((Model.DealProbability ?? 0) * 100)%</h5>
+                        <small>Success Probability</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center p-3" style="background: rgba(255,255,255,0.2); border-radius: 12px;">
+                        <i class="fas fa-box fa-2x mb-2"></i>
+                        <h5>@Model.Quantity</h5>
+                        <small>Licenses</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Deal Information -->
+        <div class="col-lg-8">
+            <!-- Basic Information Card -->
+            <div class="card mb-4" style="border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                <div class="card-header"
+                    style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-radius: 15px 15px 0 0;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i> Basic Deal Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted">Customer Company</label>
+                                <p class="fs-5">
+                                    <i class="fas fa-building text-primary"></i> @Model.Company?.CompanyName
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted">Primary Contact</label>
+                                <p class="fs-5">
+                                    <i class="fas fa-user text-primary"></i> @Model.ContactPerson?.Name
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted">OEM Partner</label>
+                                <p class="fs-5">
+                                    <i class="fas fa-industry text-primary"></i> @Model.Oem?.OemName
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted">Product</label>
+                                <p class="fs-5">
+                                    <i class="fas fa-box text-primary"></i> @Model.Product?.ProductName
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted">Deal Type</label>
+                                <p class="fs-5">
+                                    @{
+                                        var typeIcon = Model.DealType switch
+                                        {
+                                            "New" => "fas fa-plus text-success",
+                                            "Renewal" => "fas fa-redo text-warning",
+                                            "Upgrade" => "fas fa-arrow-up text-info",
+                                            _ => "fas fa-question text-muted"
+                                        };
+                                    }
+                                    <i class="@typeIcon"></i> @Model.DealType
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted">Assigned To</label>
+                                <p class="fs-5">
+                                    <i class="fas fa-user-tie text-primary"></i> @Model.AssignedTo
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Deal Notes</label>
+                            <div class="p-3"
+                                style="background: #f8fafc; border-radius: 10px; border-left: 4px solid #6366f1;">
+                                @Model.Notes
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- 4-Phase Workflow Progress -->
+            <div class="card mb-4" style="border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                <div class="card-header"
+                    style="background: linear-gradient(135deg, #10b981, #059669); color: white; border-radius: 15px 15px 0 0;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tasks"></i> 4-Phase Workflow Progress
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Phase 1: Customer Engagement -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0" style="color: #3b82f6;">
+                                <i class="fas fa-user-friends"></i> Phase 1: Customer Engagement
+                            </h6>
+                            <span class="badge"
+                                style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 0.5rem 1rem; border-radius: 25px;">
+                                @(Model.DealStage == "Lead" ? "Active" : "Completed")
+                            </span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <small class="text-muted">Customer PO Number</small>
+                                <p class="fw-bold">@(Model.CustomerPoNumber ?? "Pending")</p>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">Customer PO Date</small>
+                                <p class="fw-bold">@(Model.CustomerPoDate?.ToString("MMM dd, yyyy") ?? "Pending")</p>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">Payment Status</small>
+                                <p class="fw-bold">
+                                    @{
+                                        var paymentClass = Model.CustomerPaymentStatus switch
+                                        {
+                                            "Paid" => "text-success",
+                                            "Pending" => "text-warning",
+                                            "Overdue" => "text-danger",
+                                            _ => "text-muted"
+                                        };
+                                    }
+                                    <span class="@paymentClass">@(Model.CustomerPaymentStatus ?? "Pending")</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2: OEM Procurement -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0" style="color: #f59e0b;">
+                                <i class="fas fa-shopping-cart"></i> Phase 2: OEM Procurement
+                            </h6>
+                            <span class="badge"
+                                style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 0.5rem 1rem; border-radius: 25px;">
+                                @(Model.DealStage == "Quoted" ? "Active" : (Model.DealStage == "Lead" ? "Pending" :
+                                                                "Completed"))
+                            </span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <small class="text-muted">OEM Quote Amount</small>
+                                <p class="fw-bold">@(Model.OemQuoteAmount?.ToString("C") ?? "Pending")</p>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">Canarys PO Number</small>
+                                <p class="fw-bold">@(Model.CanarysPoNumber ?? "Pending")</p>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">Estimated Margin</small>
+                                <p class="fw-bold">@(Model.EstimatedMargin?.ToString("C") ?? "Calculating")</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3: License Delivery -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0" style="color: #06b6d4;">
+                                <i class="fas fa-key"></i> Phase 3: License Delivery
+                            </h6>
+                            <span class="badge"
+                                style="background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; padding: 0.5rem 1rem; border-radius: 25px;">
+                                @(Model.DealStage == "Negotiation" ? "Active" : (new[] { "Lead", "Quoted"
+                                                                }.Contains(Model.DealStage) ? "Pending" : "Completed"))
+                            </span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <small class="text-muted">License Start Date</small>
+                                <p class="fw-bold">@(Model.LicenseStartDate?.ToString("MMM dd, yyyy") ?? "Pending")</p>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">License End Date</small>
+                                <p class="fw-bold">@(Model.LicenseEndDate?.ToString("MMM dd, yyyy") ?? "Pending")</p>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">Delivery Status</small>
+                                <p class="fw-bold">
+                                    @{
+                                        var deliveryClass = Model.LicenseDeliveryStatus switch
+                                        {
+                                            "Delivered" => "text-success",
+                                            "Active" => "text-success",
+                                            "Pending" => "text-warning",
+                                            _ => "text-muted"
+                                        };
+                                    }
+                                    <span class="@deliveryClass">@(Model.LicenseDeliveryStatus ?? "Pending")</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 4: OEM Settlement -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0" style="color: #10b981;">
+                                <i class="fas fa-check-circle"></i> Phase 4: OEM Settlement
+                            </h6>
+                            <span class="badge"
+                                style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 0.5rem 1rem; border-radius: 25px;">
+                                @(Model.DealStage == "Won" ? "Active" : "Pending")
+                            </span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <small class="text-muted">OEM Invoice Number</small>
+                                <p class="fw-bold">@(Model.OemInvoiceNumber ?? "Pending")</p>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">OEM Invoice Amount</small>
+                                <p class="fw-bold">@(Model.OemInvoiceAmount?.ToString("C") ?? "Pending")</p>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">Payment Status</small>
+                                <p class="fw-bold">
+                                    @{
+                                        var oemPaymentClass = Model.OemPaymentStatus switch
+                                        {
+                                            "Paid" => "text-success",
+                                            "Pending" => "text-warning",
+                                            _ => "text-muted"
+                                        };
+                                    }
+                                    <span class="@oemPaymentClass">@(Model.OemPaymentStatus ?? "Pending")</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card mb-4" style="border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                <div class="card-header"
+                    style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border-radius: 15px 15px 0 0;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (User.IsInRole("Admin") || User.IsInRole("Sales"))
+                    {
+                        <div class="d-grid gap-2">
+                            <a asp-action="Edit" asp-route-id="@Model.DealId" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Edit Deal Details
+                            </a>
+
+                            <!-- Phase Management Actions -->
+                            @if (User.IsInRole("Admin") || User.IsInRole("Operations"))
+                            {
+                                <a asp-controller="DealPhase" asp-action="Phase3LicenseDelivery" asp-route-id="@Model.DealId"
+                                    class="btn btn-success">
+                                    <i class="fas fa-key"></i> Manage License Delivery
+                                </a>
+                            }
+
+                            @if (User.IsInRole("Admin") || User.IsInRole("Finance"))
+                            {
+                                <a asp-controller="DealPhase" asp-action="Phase4OemSettlement" asp-route-id="@Model.DealId"
+                                    class="btn btn-info">
+                                    <i class="fas fa-credit-card"></i> Manage OEM Settlement
+                                </a>
+                            }
+
+                            <!-- Invoice Management -->
+                            @if (User.IsInRole("Admin") || User.IsInRole("Finance"))
+                            {
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-warning dropdown-toggle w-100" type="button"
+                                        data-bs-toggle="dropdown">
+                                        <i class="fas fa-file-invoice"></i> Invoice Actions
+                                    </button>
+                                    <ul class="dropdown-menu w-100">
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="InvoiceManagement"
+                                                asp-action="GenerateCustomerInvoice" asp-route-dealId="@Model.DealId">
+                                                <i class="fas fa-user"></i> Generate Customer Invoice
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="InvoiceManagement"
+                                                asp-action="GenerateOemInvoice" asp-route-dealId="@Model.DealId">
+                                                <i class="fas fa-industry"></i> Generate OEM Invoice
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            }
+
+                            <!-- Deal Assignment -->
+                            @if (User.IsInRole("Admin") || User.IsInRole("Management"))
+                            {
+                                <a asp-controller="DealPhase" asp-action="AssignDeal" asp-route-id="@Model.DealId"
+                                    class="btn btn-outline-secondary">
+                                    <i class="fas fa-user-cog"></i> Assign Deal
+                                </a>
+                            }
+
+                            <!-- Traditional Stage Management -->
+                            @if (Model.DealStage == "Lead")
+                            {
+                                <button class="btn btn-warning" onclick="updateDealStage(@Model.DealId, 'Quoted')">
+                                    <i class="fas fa-arrow-right"></i> Move to Phase 2
+                                </button>
+                            }
+                            else if (Model.DealStage == "Quoted")
+                            {
+                                <button class="btn btn-info" onclick="updateDealStage(@Model.DealId, 'Negotiation')">
+                                    <i class="fas fa-arrow-right"></i> Move to Phase 3
+                                </button>
+                            }
+                            else if (Model.DealStage == "Negotiation")
+                            {
+                                <button class="btn btn-success" onclick="updateDealStage(@Model.DealId, 'Won')">
+                                    <i class="fas fa-check"></i> Mark as Won
+                                </button>
+                                <button class="btn btn-danger" onclick="updateDealStage(@Model.DealId, 'Lost')">
+                                    <i class="fas fa-times"></i> Mark as Lost
+                                </button>
+                            }
+
+                            <button class="btn btn-outline-primary" onclick="window.print()">
+                                <i class="fas fa-print"></i> Print Deal Details
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Deal Timeline -->
+            <div class="card mb-4" style="border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                <div class="card-header"
+                    style="background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; border-radius: 15px 15px 0 0;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history"></i> Deal Timeline
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker" style="background: #3b82f6;"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Deal Created</h6>
+                                <small class="text-muted">@Model.CreatedDate.ToString("MMM dd, yyyy hh:mm tt")</small>
+                                <p class="mb-0 small">by @Model.CreatedBy</p>
+                            </div>
+                        </div>
+
+                        @if (Model.CustomerPoDate.HasValue)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker" style="background: #f59e0b;"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Customer PO Received</h6>
+                                    <small class="text-muted">@Model.CustomerPoDate?.ToString("MMM dd, yyyy")</small>
+                                    <p class="mb-0 small">PO: @Model.CustomerPoNumber</p>
+                                </div>
+                            </div>
+                        }
+
+                        @if (Model.CanarysPoDate.HasValue)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker" style="background: #06b6d4;"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">OEM PO Sent</h6>
+                                    <small class="text-muted">@Model.CanarysPoDate?.ToString("MMM dd, yyyy")</small>
+                                    <p class="mb-0 small">PO: @Model.CanarysPoNumber</p>
+                                </div>
+                            </div>
+                        }
+
+                        @if (Model.LicenseStartDate.HasValue)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker" style="background: #10b981;"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">License Delivered</h6>
+                                    <small class="text-muted">@Model.LicenseStartDate?.ToString("MMM dd, yyyy")</small>
+                                    <p class="mb-0 small">Status: @Model.LicenseDeliveryStatus</p>
+                                </div>
+                            </div>
+                        }
+
+                        @if (Model.ActualCloseDate.HasValue)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker" style="background: #059669;"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Deal Closed</h6>
+                                    <small class="text-muted">@Model.ActualCloseDate?.ToString("MMM dd, yyyy")</small>
+                                    <p class="mb-0 small">Final Status: @Model.DealStage</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="card" style="border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                <div class="card-header"
+                    style="background: linear-gradient(135deg, #ec4899, #db2777); color: white; border-radius: 15px 15px 0 0;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line"></i> Key Metrics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="p-3" style="background: #f8fafc; border-radius: 10px;">
+                                <h6 class="text-muted mb-1">Customer Invoice</h6>
+                                <h5 class="mb-0">@(Model.CustomerInvoiceAmount?.ToString("C") ?? "TBD")</h5>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="p-3" style="background: #f8fafc; border-radius: 10px;">
+                                <h6 class="text-muted mb-1">OEM Quote</h6>
+                                <h5 class="mb-0">@(Model.OemQuoteAmount?.ToString("C") ?? "TBD")</h5>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="p-3"
+                                style="background: linear-gradient(135deg, #10b981, #059669); color: white; border-radius: 10px;">
+                                <h6 class="mb-1 opacity-75">Estimated Margin</h6>
+                                <h4 class="mb-0">@(Model.EstimatedMargin?.ToString("C") ?? "Calculating...")</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e2e8f0;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -12px;
+        top: 4px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .timeline-content {
+        margin-left: 1rem;
+    }
+
+    @@media print {
+
+        .btn,
+        .card-header {
+            display: none !important;
+        }
+    }
+</style>
+
+<!-- JavaScript for Quick Actions -->
+<script>
+    function updateDealStage(dealId, newStage) {
+        if (confirm(`Are you sure you want to move this deal to ${newStage} stage?`)) {
+            fetch('/Deals/UpdateDealStage', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ dealId: dealId, newStage: newStage })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error updating deal stage: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating deal stage:', error);
+                    alert('Error updating deal stage. Please try again.');
+                });
+        }
+    }
+</script>
+
+<!-- Activity Timeline Section - Week 9 Enhancement -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-gradient"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history"></i> Activity Timeline & CRM Tracking
+                    </h5>
+                    <div>
+                        <a asp-controller="Activity" asp-action="Create" asp-route-entityType="Deal"
+                            asp-route-entityId="@Model.DealId" class="btn btn-light btn-sm">
+                            <i class="fas fa-plus"></i> Add Activity
+                        </a>
+                        <a asp-controller="Activity" asp-action="DealTimeline" asp-route-dealId="@Model.DealId"
+                            class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-timeline"></i> Full Timeline
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="activityTimeline">
+                    <div class="text-center">
+                        <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                        <p class="text-muted mt-2">Loading activity timeline...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Deal Export & Advanced Actions - Week 9 Enhancement -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-tools"></i> Advanced Deal Actions & Export</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-download"></i> Export Options</h6>
+                        <div class="btn-group w-100" role="group">
+                            <button type="button" class="btn btn-outline-success" onclick="exportDealDetails('pdf')">
+                                <i class="fas fa-file-pdf"></i> PDF Report
+                            </button>
+                            <button type="button" class="btn btn-outline-success" onclick="exportDealDetails('excel')">
+                                <i class="fas fa-file-excel"></i> Excel Export
+                            </button>
+                            <button type="button" class="btn btn-outline-success"
+                                onclick="exportDealDetails('summary')">
+                                <i class="fas fa-file-alt"></i> Deal Summary
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-cog"></i> Deal Management</h6>
+                        <div class="btn-group w-100" role="group">
+                            <button type="button" class="btn btn-outline-primary" onclick="cloneDeal(@Model.DealId)">
+                                <i class="fas fa-copy"></i> Clone Deal
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" onclick="archiveDeal(@Model.DealId)">
+                                <i class="fas fa-archive"></i> Archive
+                            </button>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <button type="button" class="btn btn-outline-danger" onclick="deleteDeal(@Model.DealId)">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Activity Timeline Loading - Week 9 CRM Enhancement
+    $(document).ready(function () {
+        loadActivityTimeline();
+    });
+
+    function loadActivityTimeline() {
+        $.get('/Activity/GetDealActivities?dealId=@Model.DealId', function (activities) {
+            const timeline = $('#activityTimeline');
+            timeline.empty();
+
+            if (activities && activities.length > 0) {
+                let timelineHtml = '<div class="timeline">';
+                activities.forEach(function (activity) {
+                    const icon = getActivityIcon(activity.activityType);
+                    const statusClass = activity.status === 'Completed' ? 'bg-success' :
+                        activity.status === 'Cancelled' ? 'bg-danger' : 'bg-warning';
+
+                    timelineHtml += `
+                        <div class="timeline-item">
+                            <div class="timeline-marker ${statusClass}">
+                                <i class="${icon}"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>${activity.subject}</h6>
+                                <p class="text-muted">${activity.description || 'No description'}</p>
+                                <small class="text-muted">
+                                    ${activity.activityType} • ${new Date(activity.activityDate).toLocaleDateString()} 
+                                    • ${activity.assignedTo}
+                                </small>
+                            </div>
+                        </div>
+                    `;
+                });
+                timelineHtml += '</div>';
+                timeline.html(timelineHtml);
+            } else {
+                timeline.html(`
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No activities recorded yet</h6>
+                        <a href="/Activity/Create?entityType=Deal&entityId=@Model.DealId" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add First Activity
+                        </a>
+                    </div>
+                `);
+            }
+        }).fail(function () {
+            $('#activityTimeline').html(`
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Unable to load activity timeline. 
+                    <a href="/Activity/DealTimeline/@Model.DealId">View full timeline</a>
+                </div>
+            `);
+        });
+    }
+
+    function getActivityIcon(type) {
+        const icons = {
+            'Call': 'fas fa-phone',
+            'Email': 'fas fa-envelope',
+            'Meeting': 'fas fa-users',
+            'Follow-up': 'fas fa-clock',
+            'Demo': 'fas fa-presentation',
+            'Proposal': 'fas fa-file-contract',
+            'Contract': 'fas fa-handshake'
+        };
+        return icons[type] || 'fas fa-calendar';
+    }
+
+    // Export Functions - Week 9 Enhancement
+    function exportDealDetails(format) {
+        const url = `/Deals/ExportDeal?id=@Model.DealId&format=${format}`;
+        window.open(url, '_blank');
+    }
+
+    function cloneDeal(dealId) {
+        if (confirm('Create a copy of this deal with similar details?')) {
+            window.location.href = `/Deals/Clone/${dealId}`;
+        }
+    }
+
+    function archiveDeal(dealId) {
+        if (confirm('Archive this deal? It will be moved to archived deals.')) {
+            $.post('/Deals/Archive', { id: dealId }, function (result) {
+                if (result.success) {
+                    window.location.href = '/Deals';
+                } else {
+                    alert('Error archiving deal: ' + result.message);
+                }
+            });
+        }
+    }
+
+    function deleteDeal(dealId) {
+        if (confirm('Permanently delete this deal? This action cannot be undone.')) {
+            window.location.href = `/Deals/Delete/${dealId}`;
+        }
+    }
+</script>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -45px;
+        top: 5px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+    }
+
+    .timeline-content {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 3px solid #007bff;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: -30px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #dee2e6;
+    }
+</style>

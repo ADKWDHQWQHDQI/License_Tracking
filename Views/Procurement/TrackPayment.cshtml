@@ -1,0 +1,38 @@
+@{
+    ViewData["Title"] = "Track Payment";
+    var licenses = ViewBag.Licenses as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>;
+}
+<h2>Track Payment</h2>
+<form asp-action="TrackPayment" method="post">
+    <div class="mb-3">
+        <label>License</label>
+        <select name="licenseId" class="form-control" required>
+            <option value="">Select a License</option>
+            @if (licenses != null)
+            {
+                @foreach (var l in licenses)
+                {
+                    <option value="@l.Value">@l.Text</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>OEM PO Number</label>
+        <input name="oemPoNumber" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label>OEM PO Amount</label>
+        <input name="oemPoAmount" class="form-control" type="number" step="0.01" required />
+    </div>
+    <div class="mb-3">
+        <label>OEM Invoice Number</label>
+        <input name="oemInvoiceNumber" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label>Amount Paid</label>
+        <input name="amountPaid" class="form-control" type="number" step="0.01" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Save Payment</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>

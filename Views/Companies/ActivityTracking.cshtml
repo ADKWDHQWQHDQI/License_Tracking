@@ -1,0 +1,367 @@
+@model License_Tracking.Models.Company
+
+@{
+    ViewData["Title"] = $"Activity Tracking - {Model.CompanyName}";
+    var activities = ViewBag.Activities as List<License_Tracking.Models.Activity>;
+    var newActivity = ViewBag.NewActivity as License_Tracking.Models.Activity;
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-history"></i> Activity Tracking
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Track customer activities for <strong>@Model.CompanyName</strong>
+                    </p>
+                </div>
+                <div>
+                    <a asp-action="CustomerProfile" asp-route-id="@Model.CompanyId" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left mr-1"></i>Back to Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Activity Form -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plus text-success"></i> Log New Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="LogActivity" method="post">
+                        <input type="hidden" name="RelatedEntityType" value="Company" />
+                        <input type="hidden" name="RelatedEntityId" value="@Model.CompanyId" />
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="ActivityType" class="form-label">Activity Type <span class="text-danger">*</span></label>
+                                    <select class="form-control" name="ActivityType" required>
+                                        <option value="">Select Type</option>
+                                        <option value="Call">Phone Call</option>
+                                        <option value="Email">Email</option>
+                                        <option value="Meeting">Meeting</option>
+                                        <option value="Follow-up">Follow-up</option>
+                                        <option value="Demo">Product Demo</option>
+                                        <option value="Proposal">Proposal Sent</option>
+                                        <option value="Contract">Contract Discussion</option>
+                                        <option value="Support">Support Request</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="Priority" class="form-label">Priority</label>
+                                    <select class="form-control" name="Priority">
+                                        <option value="Low">Low</option>
+                                        <option value="Medium" selected>Medium</option>
+                                        <option value="High">High</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="ActivityDate" class="form-label">Activity Date</label>
+                                    <input type="datetime-local" class="form-control" name="ActivityDate" 
+                                           value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="Status" class="form-label">Status</label>
+                                    <select class="form-control" name="Status">
+                                        <option value="Pending">Pending</option>
+                                        <option value="Completed" selected>Completed</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="Subject" class="form-label">Subject <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="Subject" required 
+                                           placeholder="Brief subject of the activity" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="AssignedTo" class="form-label">Assigned To</label>
+                                    <input type="text" class="form-control" name="AssignedTo" 
+                                           value="@(User.Identity?.Name ?? "")" 
+                                           placeholder="Person responsible" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="Description" class="form-label">Description</label>
+                                    <textarea class="form-control" name="Description" rows="3" 
+                                              placeholder="Detailed description of the activity..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-plus"></i> Log Activity
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Timeline -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-timeline text-primary"></i> Activity Timeline (@(activities?.Count ?? 0) Activities)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (activities?.Any() == true)
+                    {
+                        <div class="timeline">
+                            @foreach (var activity in activities)
+                            {
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-@(activity.Status switch 
+                                    {
+                                        "Completed" => "success",
+                                        "Pending" => "warning",
+                                        "Cancelled" => "danger",
+                                        _ => "secondary"
+                                    })"></div>
+                                    <div class="timeline-content">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <h6 class="timeline-title">
+                                                <i class="fas fa-@(activity.ActivityType switch 
+                                                {
+                                                    "Call" => "phone",
+                                                    "Email" => "envelope",
+                                                    "Meeting" => "users",
+                                                    "Demo" => "desktop",
+                                                    "Proposal" => "file-alt",
+                                                    "Contract" => "file-contract",
+                                                    "Support" => "life-ring",
+                                                    _ => "circle"
+                                                })"></i>
+                                                @activity.Subject
+                                            </h6>
+                                            <div>
+                                                <span class="badge badge-@(activity.Priority switch 
+                                                {
+                                                    "High" => "danger",
+                                                    "Medium" => "warning",
+                                                    "Low" => "info",
+                                                    _ => "secondary"
+                                                })">@activity.Priority</span>
+                                                <span class="badge badge-@(activity.Status switch 
+                                                {
+                                                    "Completed" => "success",
+                                                    "Pending" => "warning",
+                                                    "Cancelled" => "danger",
+                                                    _ => "secondary"
+                                                }) ml-1">@activity.Status</span>
+                                            </div>
+                                        </div>
+                                        
+                                        @if (!string.IsNullOrEmpty(activity.Description))
+                                        {
+                                            <p class="timeline-description">@activity.Description</p>
+                                        }
+                                        
+                                        <div class="timeline-meta">
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar"></i> @activity.ActivityDate.ToString("MMMM dd, yyyy 'at' h:mm tt")
+                                                @if (!string.IsNullOrEmpty(activity.AssignedTo))
+                                                {
+                                                    <span class="ml-3">
+                                                        <i class="fas fa-user"></i> @activity.AssignedTo
+                                                    </span>
+                                                }
+                                                @if (!string.IsNullOrEmpty(activity.CreatedBy))
+                                                {
+                                                    <span class="ml-3">
+                                                        <i class="fas fa-user-edit"></i> Created by @activity.CreatedBy
+                                                    </span>
+                                                }
+                                            </small>
+                                        </div>
+                                        
+                                        <div class="timeline-actions mt-2">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="editActivity(@activity.ActivityId)">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            @if (activity.Status == "Pending")
+                                            {
+                                                <button type="button" class="btn btn-sm btn-outline-success" onclick="markCompleted(@activity.ActivityId)">
+                                                    <i class="fas fa-check"></i> Mark Complete
+                                                </button>
+                                            }
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteActivity(@activity.ActivityId)">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        
+                        <!-- Activity Statistics -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6>Activity Statistics</h6>
+                                        <div class="row text-center">
+                                            <div class="col-md-3">
+                                                <div class="stat-item">
+                                                    <h4 class="text-primary">@activities.Count</h4>
+                                                    <small>Total Activities</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="stat-item">
+                                                    <h4 class="text-success">@activities.Count(a => a.Status == "Completed")</h4>
+                                                    <small>Completed</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="stat-item">
+                                                    <h4 class="text-warning">@activities.Count(a => a.Status == "Pending")</h4>
+                                                    <small>Pending</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="stat-item">
+                                                    <h4 class="text-info">@activities.Count(a => a.ActivityDate.Month == DateTime.Now.Month && a.ActivityDate.Year == DateTime.Now.Year)</h4>
+                                                    <small>This Month</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No Activities Logged</h5>
+                            <p class="text-muted">Start tracking customer interactions by logging your first activity above.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles for Timeline -->
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #dee2e6;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -23px;
+        top: 5px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px #dee2e6;
+    }
+    
+    .timeline-content {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 3px solid #007bff;
+    }
+    
+    .timeline-title {
+        margin-bottom: 5px;
+        color: #495057;
+    }
+    
+    .timeline-description {
+        margin-bottom: 10px;
+        color: #6c757d;
+    }
+    
+    .timeline-meta {
+        margin-bottom: 10px;
+    }
+    
+    .timeline-actions .btn {
+        margin-right: 5px;
+    }
+    
+    .stat-item {
+        padding: 10px;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function editActivity(activityId) {
+            alert('Activity editing will be fully implemented in Phase 2 - Activity ID: ' + activityId);
+        }
+        
+        function markCompleted(activityId) {
+            if (confirm('Mark this activity as completed?')) {
+                alert('Activity completion will be implemented in Phase 2 - Activity ID: ' + activityId);
+            }
+        }
+        
+        function deleteActivity(activityId) {
+            if (confirm('Are you sure you want to delete this activity?')) {
+                alert('Activity deletion will be implemented in Phase 2 - Activity ID: ' + activityId);
+            }
+        }
+        
+        // Auto-hide success messages
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.alert').fadeOut();
+            }, 5000);
+        });
+    </script>
+}

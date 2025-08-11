@@ -1,0 +1,248 @@
+@model License_Tracking.ViewModels.ReportDashboardViewModel
+@{
+    ViewData["Title"] = "Enhanced Reporting Dashboard";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-chart-line"></i> Enhanced Reporting Dashboard</h2>
+            <p class="text-muted">Comprehensive business intelligence and financial analysis reports</p>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>@Model.TotalDeals</h4>
+                            <p class="mb-0">Total Deals</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-certificate fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>@Model.TotalRevenue.ToString("C")</h4>
+                            <p class="mb-0">Total Revenue</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>@Model.TotalCosts.ToString("C")</h4>
+                            <p class="mb-0">Total Costs</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-coins fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>@Model.TotalMargin.ToString("C")</h4>
+                            <p class="mb-0">Total Margin</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Access Reports -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Financial Analysis Reports</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="@Url.Action("MarginBreakup")" class="list-group-item list-group-item-action">
+                            <i class="fas fa-percentage"></i> Margin Breakup Analysis
+                            <small class="text-muted d-block">Detailed margin analysis by OEM and client</small>
+                        </a>
+                        <a href="@Url.Action("RevenueBreakdown")" class="list-group-item list-group-item-action">
+                            <i class="fas fa-chart-pie"></i> Revenue Breakdown
+                            <small class="text-muted d-block">Revenue analysis grouped by OEM or client</small>
+                        </a>
+                        <a href="@Url.Action("ProfitAnalysis")" class="list-group-item list-group-item-action">
+                            <i class="fas fa-calculator"></i> Profit Analysis
+                            <small class="text-muted d-block">Comprehensive profit analysis with drill-down</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-users"></i> Customer & OEM Reports</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="@Url.Action("CustomerProfitability")" class="list-group-item list-group-item-action">
+                            <i class="fas fa-trophy"></i> Customer Profitability Rankings
+                            <small class="text-muted d-block">Top customers by profitability and revenue</small>
+                        </a>
+                        <a href="@Url.Action("OemCostEfficiency")" class="list-group-item list-group-item-action">
+                            <i class="fas fa-industry"></i> OEM Cost Efficiency Analysis
+                            <small class="text-muted d-block">OEM cost efficiency and margin analysis</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Performers -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-star"></i> Top 5 Customers by Profit</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.TopCustomers.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Customer</th>
+                                        <th>Profit</th>
+                                        <th>Margin %</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var customer in Model.TopCustomers)
+                                    {
+                                        <tr>
+                                            <td><span class="badge badge-primary">@customer.Rank</span></td>
+                                            <td>@customer.CustomerName</td>
+                                            <td>@customer.TotalProfit.ToString("C")</td>
+                                            <td>@customer.ProfitMarginPercentage.ToString("F1")%</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No customer data available</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-cog"></i> Top 5 OEMs by Efficiency</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.TopOEMs.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>OEM</th>
+                                        <th>Efficiency Ratio</th>
+                                        <th>Margin %</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var oem in Model.TopOEMs)
+                                    {
+                                        <tr>
+                                            <td><span class="badge badge-success">@oem.EfficiencyRank</span></td>
+                                            <td>@oem.OemName</td>
+                                            <td>@oem.CostEfficiencyRatio.ToString("F2")</td>
+                                            <td>@oem.MarginPercentage.ToString("F1")%</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No OEM data available</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Options -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-download"></i> Export Reports</h5>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group" role="group">
+                        <a href="@Url.Action("ExportMarginBreakupExcel")" class="btn btn-success" target="_blank">
+                            <i class="fas fa-file-excel"></i> Export Margin Breakup (Excel)
+                        </a>
+                        <a href="@Url.Action("ExportCustomerProfitabilityExcel")" class="btn btn-success"
+                            target="_blank">
+                            <i class="fas fa-file-excel"></i> Export Customer Profitability (Excel)
+                        </a>
+                        <button class="btn btn-info" onclick="openBulkVisualization()">
+                            <i class="fas fa-chart-line"></i> Bulk Data Visualization
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Add any JavaScript for dashboard interactivity
+        $(document).ready(function () {
+            // Initialize tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+        function openBulkVisualization() {
+            // Open a comprehensive visualization
+            alert('Opening comprehensive data visualization...');
+            // This could open a modal with multiple charts or redirect to a dedicated visualization page
+        }
+    </script>
+}

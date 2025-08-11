@@ -1,0 +1,135 @@
+@model License_Tracking.Models.AlertConfiguration
+
+@{
+    ViewData["Title"] = "Create Alert Configuration";
+}
+
+@section Styles {
+    <style>
+        .threshold-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .threshold-badge {
+            margin: 2px;
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-plus"></i> Create Alert Configuration
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="ConfigurationName" class="form-label">Configuration Name</label>
+                                    <input asp-for="ConfigurationName" class="form-control" placeholder="e.g., Standard Alerts, Extended Alerts" />
+                                    <span asp-validation-for="ConfigurationName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="IsDefault" class="form-check-input" />
+                                        <label asp-for="IsDefault" class="form-check-label">
+                                            Set as Default Configuration
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="AlertThresholds" class="form-label">Alert Thresholds (JSON Array)</label>
+                            <input asp-for="AlertThresholds" class="form-control" id="alertThresholds" 
+                                   placeholder="[90,60,45,30,15,7,3,1]" />
+                            <span asp-validation-for="AlertThresholds" class="text-danger"></span>
+                            <small class="form-text text-muted">
+                                Enter days as a JSON array. Example: [90,60,45,30,15,7,3,1] for alerts at 90, 60, 45, 30, 15, 7, 3, and 1 days before expiry.
+                            </small>
+                            <div id="thresholdPreview" class="threshold-preview">
+                                <strong>Preview:</strong>
+                                <div id="thresholdBadges"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" 
+                                      placeholder="Optional description for this alert configuration..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="IsActive" class="form-check-input" checked />
+                                <label asp-for="IsActive" class="form-check-label">
+                                    Active Configuration
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">Only active configurations can be selected for licenses.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Create Configuration
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            updateThresholdPreview();
+            
+            $('#alertThresholds').on('input', function() {
+                updateThresholdPreview();
+            });
+        });
+
+        function updateThresholdPreview() {
+            var input = $('#alertThresholds').val();
+            var badgesDiv = $('#thresholdBadges');
+            
+            try {
+                var thresholds = JSON.parse(input);
+                if (Array.isArray(thresholds)) {
+                    var badges = '';
+                    thresholds.sort((a, b) => b - a); // Sort descending
+                    thresholds.forEach(function(threshold) {
+                        if (Number.isInteger(threshold) && threshold > 0) {
+                            badges += '<span class="badge bg-info threshold-badge">' + threshold + ' days</span>';
+                        }
+                    });
+                    badgesDiv.html(badges || '<span class="text-muted">No valid thresholds</span>');
+                } else {
+                    badgesDiv.html('<span class="text-danger">Invalid format: not an array</span>');
+                }
+            } catch (e) {
+                badgesDiv.html('<span class="text-danger">Invalid JSON format</span>');
+            }
+        }
+    </script>
+}

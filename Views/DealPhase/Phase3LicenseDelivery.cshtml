@@ -1,0 +1,212 @@
+@model License_Tracking.Models.Deal
+
+@{
+    ViewData["Title"] = "Phase 3 - License Delivery";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-key"></i> Phase 3 - License Delivery</h2>
+                    <p class="text-muted">Manage license delivery and activation for @Model.Company.CompanyName</p>
+                </div>
+                <a asp-controller="Deals" asp-action="Details" asp-route-id="@Model.DealId" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Deal
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deal Information Summary -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Deal Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Deal Name:</strong><br>
+                            @Model.DealName
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Customer:</strong><br>
+                            @Model.Company.CompanyName
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Product:</strong><br>
+                            @Model.Product.ProductName
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Quantity:</strong><br>
+                            @Model.Quantity licenses
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- License Delivery Form -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-key"></i> License Delivery Details</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Phase3LicenseDelivery" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">License Start Date *</label>
+                                    <input name="LicenseStartDate" type="date" class="form-control"
+                                        value="@Model.LicenseStartDate?.ToString("yyyy-MM-dd")" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">License End Date *</label>
+                                    <input name="LicenseEndDate" type="date" class="form-control"
+                                        value="@Model.LicenseEndDate?.ToString("yyyy-MM-dd")" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Delivery Status *</label>
+                                    <select name="LicenseDeliveryStatus" class="form-select" required>
+                                        <option value="Pending" selected="@(Model.LicenseDeliveryStatus == "Pending")">
+                                            Pending</option>
+                                        <option value="In Progress"
+                                            selected="@(Model.LicenseDeliveryStatus == "In Progress")">In Progress
+                                        </option>
+                                        <option value="Delivered"
+                                            selected="@(Model.LicenseDeliveryStatus == "Delivered")">Delivered</option>
+                                        <option value="Active" selected="@(Model.LicenseDeliveryStatus == "Active")">
+                                            Active</option>
+                                        <option value="Issue" selected="@(Model.LicenseDeliveryStatus == "Issue")">Issue
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">OEM License Reference</label>
+                                    <input name="OemLicenseReference" type="text" class="form-control"
+                                        placeholder="OEM-provided license reference" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">License Delivery Notes</label>
+                            <textarea name="Notes" class="form-control" rows="4"
+                                placeholder="Add details about license delivery, activation steps, or any issues...">@Model.Notes</textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-controller="Deals" asp-action="Details" asp-route-id="@Model.DealId"
+                                class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Update License Delivery
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase Status Sidebar -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">4-Phase Workflow Status</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-user-friends text-success"></i> Phase 1: Customer PO</span>
+                            <span class="badge bg-success">Completed</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-shopping-cart text-success"></i> Phase 2: OEM Procurement</span>
+                            <span class="badge bg-success">Completed</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-key text-warning"></i> Phase 3: License Delivery</span>
+                            <span class="badge bg-warning">In Progress</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-credit-card text-muted"></i> Phase 4: OEM Settlement</span>
+                            <span class="badge bg-secondary">Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-envelope"></i> Email Customer
+                        </a>
+                        <a href="#" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-phone"></i> Contact OEM
+                        </a>
+                        <a asp-controller="Deals" asp-action="Edit" asp-route-id="@Model.DealId"
+                            class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-edit"></i> Edit Deal
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            // Auto-calculate license end date based on start date (1 year default)
+            $('input[name="LicenseStartDate"]').change(function () {
+                var startDate = new Date($(this).val());
+                if (startDate) {
+                    var endDate = new Date(startDate);
+                    endDate.setFullYear(endDate.getFullYear() + 1);
+                    $('input[name="LicenseEndDate"]').val(endDate.toISOString().split('T')[0]);
+                }
+            });
+
+            // Status change validation
+            $('select[name="LicenseDeliveryStatus"]').change(function () {
+                var status = $(this).val();
+                if (status === 'Delivered' || status === 'Active') {
+                    $('input[name="LicenseStartDate"]').prop('required', true);
+                    $('input[name="LicenseEndDate"]').prop('required', true);
+                }
+            });
+        });
+    </script>
+}

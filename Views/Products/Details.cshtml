@@ -1,0 +1,412 @@
+@model License_Tracking.Models.Product
+
+@{
+    ViewData["Title"] = $"Product Details - {Model.ProductName}";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-box"></i> @Model.ProductName
+                    </h2>
+                    <p class="text-muted mb-0">Phase 2 Week 5: Product details with OEM linkage and catalog information</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.ProductId" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Edit Product
+                    </a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-card-title">OEM Partner</div>
+                            <div class="stats-card-value text-truncate">@(Model.Oem?.OemName ?? "N/A")</div>
+                        </div>
+                        <div class="stats-card-icon text-primary">
+                            <i class="fas fa-building"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-card-title">License Type</div>
+                            <div class="stats-card-value">@(Model.LicenseType ?? "Not set")</div>
+                        </div>
+                        <div class="stats-card-icon text-success">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-card-title">Unit Price</div>
+                            <div class="stats-card-value">@(Model.UnitPrice?.ToString("C") ?? "Not set")</div>
+                        </div>
+                        <div class="stats-card-icon text-warning">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-card-title">Active Deals</div>
+                            <div class="stats-card-value">@(Model.Deals?.Count ?? 0)</div>
+                        </div>
+                        <div class="stats-card-icon text-info">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Tabbed Interface -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white border-bottom-0">
+                    <ul class="nav nav-tabs card-header-tabs border-0" id="productTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active text-white border-0" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                                <i class="fas fa-info-circle"></i> Overview
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-white-50 border-0" id="deals-tab" data-bs-toggle="tab" data-bs-target="#deals" type="button" role="tab">
+                                <i class="fas fa-handshake"></i> Active Deals (@(Model.Deals?.Count ?? 0))
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-white-50 border-0" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
+                                <i class="fas fa-chart-line"></i> Performance
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="productTabsContent">
+                        <!-- Overview Tab -->
+                        <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                            <div class="row">
+                                <!-- Product Information -->
+                                <div class="col-md-8">
+                                    <h5 class="text-primary mb-4">
+                                        <i class="fas fa-info-circle"></i> Product Information
+                                    </h5>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="info-item mb-3">
+                                                <label class="fw-bold text-muted">Product Name:</label>
+                                                <p class="mb-0">@Model.ProductName</p>
+                                            </div>
+                                            
+                                            <div class="info-item mb-3">
+                                                <label class="fw-bold text-muted">Category:</label>
+                                                <p class="mb-0">
+                                                    @if (!string.IsNullOrEmpty(Model.ProductCategory))
+                                                    {
+                                                        <span class="badge bg-secondary">@Model.ProductCategory</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Not categorized</span>
+                                                    }
+                                                </p>
+                                            </div>
+
+                                            <div class="info-item mb-3">
+                                                <label class="fw-bold text-muted">License Type:</label>
+                                                <p class="mb-0">
+                                                    @if (!string.IsNullOrEmpty(Model.LicenseType))
+                                                    {
+                                                        <span class="badge badge-@(Model.LicenseType switch 
+                                                        {
+                                                            "Subscription" => "success",
+                                                            "Perpetual" => "primary",
+                                                            "Trial" => "warning",
+                                                            _ => "secondary"
+                                                        })">@Model.LicenseType</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Not specified</span>
+                                                    }
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="info-item mb-3">
+                                                <label class="fw-bold text-muted">OEM Partner:</label>
+                                                <p class="mb-0">
+                                                    @if (Model.Oem != null)
+                                                    {
+                                                        <a asp-controller="Oems" asp-action="Details" asp-route-id="@Model.Oem.OemId" class="text-decoration-none">
+                                                            <span class="badge bg-primary">@Model.Oem.OemName</span>
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">No OEM assigned</span>
+                                                    }
+                                                </p>
+                                            </div>
+
+                                            <div class="info-item mb-3">
+                                                <label class="fw-bold text-muted">Unit Price:</label>
+                                                <p class="mb-0">
+                                                    @if (Model.UnitPrice.HasValue)
+                                                    {
+                                                        <span class="h5 text-success">@Model.UnitPrice.Value.ToString("C")</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Price not set</span>
+                                                    }
+                                                </p>
+                                            </div>
+
+                                            <div class="info-item mb-3">
+                                                <label class="fw-bold text-muted">Created Date:</label>
+                                                <p class="mb-0">@Model.CreatedDate.ToString("MMMM dd, yyyy")</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if (!string.IsNullOrEmpty(Model.ProductDescription))
+                                    {
+                                        <div class="info-item mt-4">
+                                            <label class="fw-bold text-muted">Description:</label>
+                                            <p class="mb-0">@Model.ProductDescription</p>
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Quick Actions -->
+                                <div class="col-md-4">
+                                    <h5 class="text-primary mb-4">
+                                        <i class="fas fa-bolt"></i> Quick Actions
+                                    </h5>
+                                    
+                                    <div class="d-grid gap-2">
+                                        <a asp-action="Edit" asp-route-id="@Model.ProductId" class="btn btn-warning">
+                                            <i class="fas fa-edit"></i> Edit Product
+                                        </a>
+                                        
+                                        @if (Model.Oem != null)
+                                        {
+                                            <a asp-controller="Oems" asp-action="Details" asp-route-id="@Model.Oem.OemId" class="btn btn-outline-primary">
+                                                <i class="fas fa-building"></i> View OEM Details
+                                            </a>
+                                        }
+                                        
+                                        <a asp-controller="Deals" asp-action="Create" asp-route-productId="@Model.ProductId" class="btn btn-outline-success">
+                                            <i class="fas fa-plus"></i> Create Deal
+                                        </a>
+                                        
+                                        <button class="btn btn-outline-info" onclick="generateProductReport()">
+                                            <i class="fas fa-chart-bar"></i> Generate Report
+                                        </button>
+                                        
+                                        <a asp-action="Delete" asp-route-id="@Model.ProductId" class="btn btn-outline-danger">
+                                            <i class="fas fa-archive"></i> Archive Product
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Deals Tab -->
+                        <div class="tab-pane fade" id="deals" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="text-primary mb-0">
+                                    <i class="fas fa-handshake"></i> Active Deals
+                                </h5>
+                                <a asp-controller="Deals" asp-action="Create" asp-route-productId="@Model.ProductId" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Create Deal
+                                </a>
+                            </div>
+
+                            @if (Model.Deals?.Any() == true)
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Deal/Project</th>
+                                                <th>Customer</th>
+                                                <th>Status</th>
+                                                <th>Value</th>
+                                                <th>Created</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var deal in Model.Deals.Where(d => d.IsActive))
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <a asp-controller="Deals" asp-action="Details" asp-route-id="@deal.DealId" class="text-decoration-none">
+                                                            @deal.DealName
+                                                        </a>
+                                                    </td>
+                                                    <td>@deal.Company?.CompanyName</td>
+                                                    <td>
+                                                        <span class="badge bg-info">@deal.DealStage</span>
+                                                    </td>
+                                                    <td>
+                                                        @if (deal.CustomerInvoiceAmount.HasValue)
+                                                        {
+                                                            <span class="text-success">@deal.CustomerInvoiceAmount.Value.ToString("C")</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">-</span>
+                                                        }
+                                                    </td>
+                                                    <td>@deal.CreatedDate.ToString("MMM dd, yyyy")</td>
+                                                    <td>
+                                                        <a asp-controller="Deals" asp-action="Details" asp-route-id="@deal.DealId" class="btn btn-sm btn-outline-info">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-5">
+                                    <i class="fas fa-handshake fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No Active Deals</h5>
+                                    <p class="text-muted">No deals are currently using this product.</p>
+                                    <a asp-controller="Deals" asp-action="Create" asp-route-productId="@Model.ProductId" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> Create First Deal
+                                    </a>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Performance Tab -->
+                        <div class="tab-pane fade" id="analytics" role="tabpanel">
+                            <h5 class="text-primary mb-4">
+                                <i class="fas fa-chart-line"></i> Product Performance Metrics
+                            </h5>
+
+                            <div class="row">
+                                <!-- Performance Metrics -->
+                                <div class="col-md-12">
+                                    <div class="card border-0 bg-light">
+                                        <div class="card-body">
+                                            <div class="row text-center">
+                                                <div class="col-md-3">
+                                                    <div class="metric-item">
+                                                        <h4 class="text-primary">@(Model.Deals?.Count ?? 0)</h4>
+                                                        <small class="text-muted">Total Deals</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="metric-item">
+                                                        <h4 class="text-success">
+                                                            @if (Model.Deals?.Any() == true)
+                                                            {
+                                                                @(Model.Deals.Sum(d => d.Quantity))
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>0</span>
+                                                            }
+                                                        </h4>
+                                                        <small class="text-muted">Total Licenses Sold</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="metric-item">
+                                                        <h4 class="text-info">
+                                                            @if (Model.Deals?.Any() == true)
+                                                            {
+                                                                @(Model.Deals.Average(d => d.CustomerInvoiceAmount ?? 0).ToString("C"))
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>$0</span>
+                                                            }
+                                                        </h4>
+                                                        <small class="text-muted">Avg Deal Value</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="metric-item">
+                                                        <h4 class="text-warning">
+                                                            @if (Model.Deals?.Any() == true)
+                                                            {
+                                                                @(Model.Deals.Sum(d => d.CustomerInvoiceAmount ?? 0).ToString("C"))
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>$0</span>
+                                                            }
+                                                        </h4>
+                                                        <small class="text-muted">Total Revenue</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mt-4">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Phase 2 Week 5:</strong> Product performance analytics with deal tracking and revenue metrics.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function generateProductReport() {
+            // Phase 2 Week 5: Product-specific report generation
+            alert('Product performance report generation will be implemented with detailed analytics.');
+        }
+    </script>
+}

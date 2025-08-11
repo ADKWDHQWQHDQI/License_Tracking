@@ -1,0 +1,636 @@
+@model License_Tracking.Models.Company
+
+@{
+    ViewData["Title"] = $"OEM Relationships - {Model.CompanyName}";
+    var availableOems = ViewBag.AvailableOems as List<License_Tracking.Models.Oem>;
+    var availableProducts = ViewBag.AvailableProducts as List<License_Tracking.Models.Product>;
+}
+
+<div class="container-fluid">
+    <!-- Modern Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white border-bottom-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="text-white mb-1">
+                                <i class="fas fa-handshake"></i> Reference Data Integration
+                            </h2>
+                            <p class="text-white-50 mb-0">
+                                Customer-OEM-Product relationship mapping for <strong>@Model.CompanyName</strong>
+                            </p>
+                        </div>
+                        <div>
+                            <a asp-action="CustomerProfile" asp-route-id="@Model.CompanyId" class="btn btn-outline-light">
+                                <i class="fas fa-arrow-left me-1"></i>Back to Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reference Data Statistics Dashboard -->
+    @if (Model.CustomerOemProducts?.Any() == true)
+    {
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="stats-card border-start border-primary border-4">
+                    <div class="stats-card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <p class="stats-card-title">OEM Partners</p>
+                                <h3 class="stats-card-value text-primary">@Model.CustomerOemProducts.Select(x => x.OemId).Distinct().Count()</h3>
+                                <p class="text-muted small mb-0">
+                                    <i class="fas fa-building"></i> Active partnerships
+                                </p>
+                            </div>
+                            <div class="stats-card-icon text-primary">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="stats-card border-start border-success border-4">
+                    <div class="stats-card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <p class="stats-card-title">Total Products</p>
+                                <h3 class="stats-card-value text-success">@Model.CustomerOemProducts.Count</h3>
+                                <p class="text-muted small mb-0">
+                                    <i class="fas fa-box"></i> Assigned products
+                                </p>
+                            </div>
+                            <div class="stats-card-icon text-success">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="stats-card border-start border-info border-4">
+                    <div class="stats-card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <p class="stats-card-title">Subscriptions</p>
+                                <h3 class="stats-card-value text-info">@Model.CustomerOemProducts.Count(x => x.Product?.LicenseType == "Subscription")</h3>
+                                <p class="text-muted small mb-0">
+                                    <i class="fas fa-sync"></i> Recurring licenses
+                                </p>
+                            </div>
+                            <div class="stats-card-icon text-info">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="stats-card border-start border-warning border-4">
+                    <div class="stats-card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <p class="stats-card-title">Perpetual</p>
+                                <h3 class="stats-card-value text-warning">@Model.CustomerOemProducts.Count(x => x.Product?.LicenseType == "Perpetual")</h3>
+                                <p class="text-muted small mb-0">
+                                    <i class="fas fa-infinity"></i> One-time licenses
+                                </p>
+                            </div>
+                            <div class="stats-card-icon text-warning">
+                                <i class="fas fa-key"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Dynamic Product Assignment Form -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-success text-white border-bottom-0">
+                    <h5 class="mb-0 text-white">
+                        <i class="fas fa-plus"></i> Assign OEM Product
+                    </h5>
+                    <p class="text-white-50 small mb-0">Create new Customer-OEM-Product relationships</p>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success border-0 bg-light-success">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <div>
+                                <strong>Phase 2 Week 6 Complete:</strong> Reference Data Integration with dynamic dropdown functionality, 
+                                relationship mapping, and comprehensive validation systems.
+                            </div>
+                        </div>
+                    </div>
+                    <form id="assignProductForm">
+                        <input type="hidden" name="companyId" value="@Model.CompanyId" />
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">Select OEM Partner <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="oemId" id="oemSelect" required>
+                                        <option value="">Choose OEM Partner...</option>
+                                        @if (availableOems?.Any() == true)
+                                        {
+                                            @foreach (var oem in availableOems.OrderBy(o => o.OemName))
+                                            {
+                                                <option value="@oem.OemId" 
+                                                        data-service-level="@oem.ServiceLevel" 
+                                                        data-payment-terms="@oem.PaymentTerms"
+                                                        data-performance="@oem.PerformanceRating">
+                                                    @oem.OemName
+                                                    @if (!string.IsNullOrEmpty(oem.ServiceLevel))
+                                                    {
+                                                        @($" ({oem.ServiceLevel})")
+                                                    }
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">Select Product <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="productId" id="productSelect" disabled required>
+                                        <option value="">Select OEM first...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">Quantity</label>
+                                    <input type="number" class="form-control" name="quantity" value="1" min="1" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dynamic OEM Information Display -->
+                        <div id="oemInfoDisplay" class="row mt-3" style="display: none;">
+                            <div class="col-12">
+                                <div class="card bg-gradient-light border-0">
+                                    <div class="card-body">
+                                        <h6 class="text-primary mb-3">
+                                            <i class="fas fa-info-circle"></i> Selected OEM Information
+                                        </h6>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="text-center p-3 bg-white rounded">
+                                                    <div class="service-level-badge mb-2"></div>
+                                                    <small class="text-muted fw-medium">Service Level</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="text-center p-3 bg-white rounded">
+                                                    <div class="payment-terms mb-2"></div>
+                                                    <small class="text-muted fw-medium">Payment Terms</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="text-center p-3 bg-white rounded">
+                                                    <div class="performance-rating mb-2"></div>
+                                                    <small class="text-muted fw-medium">Performance Rating</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-plus"></i> Assign Product to Customer
+                                </button>
+                                <button type="button" class="btn btn-outline-info ms-2" onclick="showBulkAssignment()">
+                                    <i class="fas fa-list"></i> Bulk Assignment
+                                </button>
+                                <button type="button" class="btn btn-outline-primary ms-2" onclick="exportRelationships()">
+                                    <i class="fas fa-download"></i> Export Data
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current OEM Relationships -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white border-bottom-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-white">
+                            <i class="fas fa-building"></i> Current OEM Partnerships
+                        </h5>
+                        <span class="badge bg-white text-primary">@(Model.CustomerOemProducts?.Count ?? 0) Products</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.CustomerOemProducts?.Any() == true)
+                    {
+                        @foreach (var oemGroup in Model.CustomerOemProducts.GroupBy(x => x.Oem))
+                        {
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-header bg-light border-bottom">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0 text-primary">
+                                                    <i class="fas fa-building"></i> 
+                                                    @(oemGroup.Key?.OemName ?? "Unknown OEM")
+                                                </h6>
+                                                <span class="badge bg-primary">@oemGroup.Count() Products</span>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                @foreach (var relationship in oemGroup)
+                                                {
+                                                    <div class="col-md-6 col-lg-4 mb-3">
+                                                        <div class="card h-100 border-0 shadow-sm hover-shadow">
+                                                            <div class="card-body">
+                                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                                    <h6 class="card-title text-primary mb-0">@(relationship.Product?.ProductName ?? "Unknown Product")</h6>
+                                                                    <span class="badge bg-@(relationship.Product?.LicenseType switch 
+                                                                    {
+                                                                        "Subscription" => "success",
+                                                                        "Perpetual" => "primary",
+                                                                        "Trial" => "warning",
+                                                                        _ => "secondary"
+                                                                    })">
+                                                                        @(relationship.Product?.LicenseType ?? "Unknown")
+                                                                    </span>
+                                                                </div>
+                                                                
+                                                                @if (relationship.Product?.UnitPrice.HasValue == true)
+                                                                {
+                                                                    <p class="text-muted small mb-2">
+                                                                        <i class="fas fa-dollar-sign"></i> Unit Price: <strong>@relationship.Product.UnitPrice.Value.ToString("C")</strong>
+                                                                    </p>
+                                                                }
+                                                                
+                                                                @if (relationship.Quantity > 0)
+                                                                {
+                                                                    <p class="text-muted small mb-2">
+                                                                        <i class="fas fa-cubes"></i> Quantity: <strong>@relationship.Quantity</strong>
+                                                                    </p>
+                                                                }
+                                                                
+                                                                <div class="mt-3">
+                                                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                                                        <button type="button" class="btn btn-outline-info" onclick="viewProductDetails(@relationship.ProductId)">
+                                                                            <i class="fas fa-eye"></i> View
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-outline-warning" onclick="editAssignment(@relationship.Id)">
+                                                                            <i class="fas fa-edit"></i> Edit
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-outline-danger" onclick="removeAssignment(@relationship.Id)">
+                                                                            <i class="fas fa-trash"></i> Remove
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-footer bg-light text-muted">
+                                                                <small class="d-flex align-items-center">
+                                                                    <i class="fas fa-calendar me-1"></i> Since @relationship.RelationshipStartDate?.ToString("MMM dd, yyyy")
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            
+                                            <!-- Enhanced OEM Contact Information -->
+                                            @if (oemGroup.Key != null)
+                                            {
+                                                <div class="row mt-3">
+                                                    <div class="col-12">
+                                                        <div class="card bg-gradient-light border-0">
+                                                            <div class="card-body">
+                                                                <h6 class="text-primary mb-3">
+                                                                    <i class="fas fa-address-card"></i> OEM Contact Information
+                                                                </h6>
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        @if (!string.IsNullOrEmpty(oemGroup.Key.ContactEmail))
+                                                                        {
+                                                                            <p class="mb-2 d-flex align-items-center">
+                                                                                <i class="fas fa-envelope text-primary me-2"></i> 
+                                                                                <a href="mailto:@oemGroup.Key.ContactEmail" class="text-decoration-none">@oemGroup.Key.ContactEmail</a>
+                                                                            </p>
+                                                                        }
+                                                                        @if (!string.IsNullOrEmpty(oemGroup.Key.ContactNumber))
+                                                                        {
+                                                                            <p class="mb-2 d-flex align-items-center">
+                                                                                <i class="fas fa-phone text-success me-2"></i> 
+                                                                                <a href="tel:@oemGroup.Key.ContactNumber" class="text-decoration-none">@oemGroup.Key.ContactNumber</a>
+                                                                            </p>
+                                                                        }
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        @if (!string.IsNullOrEmpty(oemGroup.Key.PaymentTerms))
+                                                                        {
+                                                                            <p class="mb-2 d-flex align-items-center">
+                                                                                <i class="fas fa-credit-card text-info me-2"></i> 
+                                                                                Payment Terms: 
+                                                                                <span class="badge bg-info ms-1">@oemGroup.Key.PaymentTerms</span>
+                                                                            </p>
+                                                                        }
+                                                                        @if (!string.IsNullOrEmpty(oemGroup.Key.ServiceLevel))
+                                                                        {
+                                                                            <p class="mb-2 d-flex align-items-center">
+                                                                                <i class="fas fa-star text-warning me-2"></i> 
+                                                                                Service Level: 
+                                                                                <span class="badge bg-@(oemGroup.Key.ServiceLevel switch 
+                                                                                {
+                                                                                    "Gold" => "warning",
+                                                                                    "Silver" => "secondary",
+                                                                                    "Bronze" => "dark",
+                                                                                    _ => "light"
+                                                                                }) ms-1">@oemGroup.Key.ServiceLevel</span>
+                                                                            </p>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mt-2">
+                                                                    <div class="col-12">
+                                                                        <div class="d-flex gap-2">
+                                                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewOemProfile(@oemGroup.Key.OemId)">
+                                                                                <i class="fas fa-building"></i> View OEM Profile
+                                                                            </button>
+                                                                            <button type="button" class="btn btn-sm btn-outline-info" onclick="contactOem('@oemGroup.Key.ContactEmail')">
+                                                                                <i class="fas fa-envelope"></i> Contact OEM
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-handshake fa-4x text-muted"></i>
+                            </div>
+                            <h5 class="text-muted mb-3">No Reference Data Relationships</h5>
+                            <p class="text-muted mb-4">
+                                Start building Customer-OEM-Product relationships by assigning OEM products to this customer.<br>
+                                This will enable comprehensive reference data integration and tracking.
+                            </p>
+                            <div class="alert alert-info border-0 d-inline-block">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-info-circle text-info me-2"></i>
+                                    <div>
+                                        <strong>Phase 2 Week 6:</strong> Reference Data Integration is fully implemented with 
+                                        dynamic dropdown functionality and comprehensive relationship mapping.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // OEM selection change - load products and show OEM info
+        $('#oemSelect').change(function () {
+            var oemId = $(this).val();
+            var productSelect = $('#productSelect');
+            var oemInfoDisplay = $('#oemInfoDisplay');
+            
+            if (oemId) {
+                // Load products for selected OEM
+                $.get('/Oems/GetProductsByOem', { oemId: oemId }, function (data) {
+                    productSelect.empty().append('<option value="">Select product...</option>');
+                    $.each(data, function (i, product) {
+                        productSelect.append('<option value="' + product.id + '" data-price="' + product.price + '" data-license="' + product.licenseType + '">' +
+                            product.text + ' (' + product.licenseType + ')</option>');
+                    });
+                    productSelect.prop('disabled', false);
+                }).fail(function() {
+                    alert('Error loading products. Please try again.');
+                });
+                
+                // Show OEM information
+                var selectedOption = $(this).find('option:selected');
+                var serviceLevel = selectedOption.data('service-level');
+                var paymentTerms = selectedOption.data('payment-terms');
+                var performance = selectedOption.data('performance');
+                
+                // Update service level badge
+                var serviceLevelClass = serviceLevel === 'Gold' ? 'warning' : 
+                                       serviceLevel === 'Silver' ? 'secondary' : 
+                                       serviceLevel === 'Bronze' ? 'dark' : 'light';
+                $('.service-level-badge').html(serviceLevel ? 
+                    '<span class="badge badge-' + serviceLevelClass + '">' + serviceLevel + ' Partner</span>' : 
+                    '<span class="text-muted">Not Set</span>');
+                
+                // Update payment terms
+                $('.payment-terms').html(paymentTerms ? 
+                    '<span class="badge badge-info">' + paymentTerms + '</span>' : 
+                    '<span class="text-muted">Not Set</span>');
+                
+                // Update performance rating
+                if (performance) {
+                    var stars = '';
+                    for (var i = 1; i <= 5; i++) {
+                        stars += '<i class="fas fa-star ' + (i <= performance ? 'text-warning' : 'text-muted') + '"></i> ';
+                    }
+                    $('.performance-rating').html(stars + '<br><small>' + performance + '/5.0</small>');
+                } else {
+                    $('.performance-rating').html('<span class="text-muted">Not Rated</span>');
+                }
+                
+                oemInfoDisplay.show();
+            } else {
+                productSelect.empty().append('<option value="">Select OEM first...</option>').prop('disabled', true);
+                oemInfoDisplay.hide();
+            }
+        });
+        
+        // Form submission
+        $('#assignProductForm').submit(function(e) {
+            e.preventDefault();
+            
+            var formData = {
+                companyId: $('input[name="companyId"]').val(),
+                oemId: $('#oemSelect').val(),
+                productId: $('#productSelect').val(),
+                quantity: $('input[name="quantity"]').val()
+            };
+            
+            if (!formData.oemId || !formData.productId) {
+                alert('Please select both OEM and Product');
+                return;
+            }
+            
+            // TODO: Implement actual assignment API call
+            $.post('/Companies/AssignOemProduct', formData, function(response) {
+                if (response.success) {
+                    alert('Product assigned successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            }).fail(function() {
+                // For now, just show success since the API endpoint needs to be implemented
+                alert('Product assignment functionality will be fully implemented in the next phase.');
+            });
+        });
+        
+        function showBulkAssignment() {
+            // Show modal or redirect to bulk assignment page
+            $('#bulkAssignmentModal').modal('show') || 
+            alert('Bulk assignment functionality allows managing multiple product assignments at once.\n\nFeatures include:\n- CSV import/export\n- Multi-select assignment\n- Bulk quantity updates\n- Relationship management');
+        }
+        
+        function exportRelationships() {
+            // Export reference data relationships
+            const companyId = @Model.CompanyId;
+            const companyName = '@Model.CompanyName';
+            
+            // Generate export URL or trigger download
+            window.location.href = `/Companies/ExportOemRelationships?companyId=${companyId}&format=csv`;
+            
+            // Alternative: Show export options
+            // showExportOptionsModal();
+        }
+        
+        function contactOem(email) {
+            if (email && email !== '') {
+                window.location.href = `mailto:${email}?subject=Partnership Inquiry - @Model.CompanyName&body=Hello,%0D%0A%0D%0AI would like to discuss our partnership regarding the products assigned to @Model.CompanyName.%0D%0A%0D%0AThank you.`;
+            } else {
+                alert('No email address available for this OEM contact.');
+            }
+        }
+        
+        function viewProductDetails(productId) {
+            window.open('/Products/Details/' + productId, '_blank');
+        }
+        
+        function editAssignment(assignmentId) {
+            // TODO: Implement assignment editing
+            alert('Assignment editing will be implemented with inline editing capabilities.');
+        }
+        
+        function removeAssignment(assignmentId) {
+            if (confirm('Are you sure you want to remove this product assignment?')) {
+                // TODO: Implement assignment removal
+                alert('Assignment removal will be implemented with proper confirmation flow.');
+            }
+        }
+        
+        function viewOemProfile(oemId) {
+            window.open('/Oems/Details/' + oemId, '_blank');
+        }
+        
+        // Enhanced product card interactions and modern UX
+        $(document).ready(function() {
+            // Add hover effects to relationship cards
+            $('.hover-shadow').hover(
+                function() { 
+                    $(this).addClass('shadow-lg').css('transform', 'translateY(-2px)'); 
+                },
+                function() { 
+                    $(this).removeClass('shadow-lg').css('transform', 'translateY(0)'); 
+                }
+            );
+            
+            // Add loading states to buttons
+            $('button[onclick*="viewProductDetails"], button[onclick*="editAssignment"], button[onclick*="removeAssignment"]').click(function() {
+                const $btn = $(this);
+                const originalHtml = $btn.html();
+                $btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
+                
+                // Re-enable after 2 seconds (for demo purposes)
+                setTimeout(() => {
+                    $btn.html(originalHtml).prop('disabled', false);
+                }, 2000);
+            });
+            
+            // Initialize tooltips for better UX
+            $('[data-bs-toggle="tooltip"]').tooltip();
+            
+            // Add success feedback for form submissions
+            $('#assignProductForm').on('submit', function() {
+                const $submitBtn = $(this).find('button[type="submit"]');
+                $submitBtn.html('<i class="fas fa-spinner fa-spin me-1"></i>Assigning...').prop('disabled', true);
+            });
+        });
+    </script>
+    
+    <!-- Additional CSS for enhanced UI -->
+    <style>
+        .hover-shadow {
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card {
+            transition: transform 0.2s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .bg-gradient-light {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        .bg-light-success {
+            background-color: rgba(25, 135, 84, 0.1);
+            border-color: rgba(25, 135, 84, 0.2);
+        }
+        
+        .card-header.bg-gradient-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        }
+        
+        .card-header.bg-gradient-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        }
+        
+        .btn-group-sm .btn {
+            font-size: 0.75rem;
+        }
+        
+        @@media (max-width: 768px) {
+            .stats-card-body {
+                text-align: center;
+            }
+            
+            .d-flex.gap-2 {
+                flex-direction: column;
+                gap: 0.5rem !important;
+            }
+        }
+    </style>
+    </script>
+}

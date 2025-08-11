@@ -1,0 +1,187 @@
+@model IEnumerable<License_Tracking.ViewModels.ReportProfitAnalysisViewModel>
+@{
+    ViewData["Title"] = "Profit Analysis Report";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-calculator"></i> Profit Analysis Report</h2>
+            <p class="text-muted">Comprehensive profit analysis with drill-down by OEM, client, or product</p>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-filter"></i> Filters</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="ProfitAnalysis">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate" name="startDate" value="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate" name="endDate" value="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="analysisType" class="form-label">Analysis Type</label>
+                        <select class="form-select" id="analysisType" name="analysisType">
+                            <option value="OEM" selected="@(ViewBag.AnalysisType == "OEM")">By OEM</option>
+                            <option value="Client" selected="@(ViewBag.AnalysisType == "Client")">By Client</option>
+                            <option value="Product" selected="@(ViewBag.AnalysisType == "Product")">By Product</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                        <a href="@Url.Action("ProfitAnalysis")" class="btn btn-secondary">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-table"></i> Profit Analysis Results (@Model.Count() groups)</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="profitTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>@ViewBag.AnalysisType Name</th>
+                                <th>Total Revenue</th>
+                                <th>Total Costs</th>
+                                <th>Total Profit</th>
+                                <th>License Count</th>
+                                <th>Avg Profit/License</th>
+                                <th>Profit Margin %</th>
+                                <th>ROI %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@item.GroupName</td>
+                                    <td class="text-success">@item.TotalRevenue.ToString("C")</td>
+                                    <td class="text-danger">@item.TotalCosts.ToString("C")</td>
+                                    <td class="text-primary fw-bold">@item.TotalProfit.ToString("C")</td>
+                                    <td><span class="badge bg-info">@item.LicenseCount</span></td>
+                                    <td>@item.AvgProfitPerLicense.ToString("C")</td>
+                                    <td>
+                                        @if (item.ProfitMarginPercentage >= 25)
+                                        {
+                                            <span class="badge bg-success">@item.ProfitMarginPercentage.ToString("F1")%</span>
+                                        }
+                                        else if (item.ProfitMarginPercentage >= 15)
+                                        {
+                                            <span class="badge bg-warning text-dark">@item.ProfitMarginPercentage.ToString("F1")%</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">@item.ProfitMarginPercentage.ToString("F1")%</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.ROI >= 50)
+                                        {
+                                            <span class="badge bg-success">@item.ROI.ToString("F1")%</span>
+                                        }
+                                        else if (item.ROI >= 25)
+                                        {
+                                            <span class="badge bg-warning text-dark">@item.ROI.ToString("F1")%</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">@item.ROI.ToString("F1")%</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Summary Statistics -->
+                <div class="row mt-4">
+                    <div class="col-md-2">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>@Model.Sum(p => p.TotalRevenue).ToString("C")</h5>
+                                <p class="mb-0 text-muted">Total Revenue</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>@Model.Sum(p => p.TotalCosts).ToString("C")</h5>
+                                <p class="mb-0 text-muted">Total Costs</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>@Model.Sum(p => p.TotalProfit).ToString("C")</h5>
+                                <p class="mb-0 text-muted">Total Profit</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>@Model.Sum(p => p.LicenseCount)</h5>
+                                <p class="mb-0 text-muted">Total Licenses</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>@((Model.Count() > 0 ? Model.Average(p => p.ProfitMarginPercentage) : 0).ToString("F1"))%</h5>
+                                <p class="mb-0 text-muted">Avg Margin</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>@((Model.Count() > 0 ? Model.Average(p => p.ROI) : 0).ToString("F1"))%</h5>
+                                <p class="mb-0 text-muted">Avg ROI</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No profit analysis data found for the selected criteria.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#profitTable').DataTable({
+                "pageLength": 25,
+                "order": [[ 3, "desc" ]], // Sort by Total Profit descending
+                "columnDefs": [
+                    { "type": "currency", "targets": [1, 2, 3, 5] }
+                ]
+            });
+        });
+    </script>
+}

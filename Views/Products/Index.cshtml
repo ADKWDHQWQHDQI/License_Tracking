@@ -1,0 +1,497 @@
+@model IEnumerable<License_Tracking.Models.Product>
+
+@{
+    ViewData["Title"] = "Product Catalog Management";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-box"></i> Product Catalog Management
+                    </h2>
+                    <p class="text-muted mb-0">Phase 2 Week 5: Product catalog linked to OEMs with dynamic dropdown relationships, categorization & pricing management</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </a>
+                    <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#importModal">
+                        <i class="fas fa-upload"></i> Import Products
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bolt text-warning"></i> Quick Product Actions
+                        </h5>
+                        <small class="text-muted">Frequently used product management actions</small>
+                    </div>
+                </div>
+                <div class="card-body py-3">
+                    <div class="row g-2">
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <a asp-action="Create" class="btn btn-primary w-100 d-flex flex-column align-items-center py-2">
+                                <i class="fas fa-box fa-lg mb-1"></i>
+                                <small>Add Product</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <a asp-controller="Oems" asp-action="Create" class="btn btn-success w-100 d-flex flex-column align-items-center py-2">
+                                <i class="fas fa-building fa-lg mb-1"></i>
+                                <small>Add OEM</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <button class="btn btn-info w-100 d-flex flex-column align-items-center py-2" data-bs-toggle="modal" data-bs-target="#importModal">
+                                <i class="fas fa-upload fa-lg mb-1"></i>
+                                <small>Import Products</small>
+                            </button>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <button class="btn btn-warning w-100 d-flex flex-column align-items-center py-2" onclick="exportToExcel()">
+                                <i class="fas fa-file-excel fa-lg mb-1"></i>
+                                <small>Export Data</small>
+                            </button>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <button class="btn btn-secondary w-100 d-flex flex-column align-items-center py-2" onclick="bulkPriceUpdate()">
+                                <i class="fas fa-calculator fa-lg mb-1"></i>
+                                <small>Bulk Price Update</small>
+                            </button>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <button class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-2" onclick="generateReport()">
+                                <i class="fas fa-chart-bar fa-lg mb-1"></i>
+                                <small>Product Report</small>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-card-title">Total Products</div>
+                            <div class="stats-card-value">@(Model?.Count() ?? 0)</div>
+                        </div>
+                        <div class="stats-card-icon text-primary">
+                            <i class="fas fa-box"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-card-title">Product Categories</div>
+                            <div class="stats-card-value">@(Model?.Select(p => p.ProductCategory).Distinct().Count() ?? 0)</div>
+                        </div>
+                        <div class="stats-card-icon text-success">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-card-title">OEM Partners</div>
+                            <div class="stats-card-value">@(Model?.Select(p => p.OemId).Distinct().Count() ?? 0)</div>
+                        </div>
+                        <div class="stats-card-icon text-info">
+                            <i class="fas fa-building"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-card-title">Avg. Price</div>
+                            <div class="stats-card-value">@(Model?.Where(p => p.UnitPrice.HasValue).Any() == true ? Model.Where(p => p.UnitPrice.HasValue).Average(p => p.UnitPrice!.Value).ToString("C") : "$0")</div>
+                        </div>
+                        <div class="stats-card-icon text-warning">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white border-bottom-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-white">
+                            <i class="fas fa-box"></i> Product Catalog
+                        </h5>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-light" id="cardViewBtn" onclick="showCardView()">
+                                <i class="fas fa-th"></i> Card View
+                            </button>
+                            <button class="btn btn-sm btn-light active" id="tableViewBtn" onclick="showTableView()">
+                                <i class="fas fa-table"></i> Table View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Enhanced Search and Filter Form -->
+                    <form asp-action="Index" method="get" class="mb-4">
+                        <div class="row align-items-end">
+                            <div class="col-lg-4 col-md-6 mb-2">
+                                <label class="form-label fw-semibold">Search Products</label>
+                                <div class="input-group">
+                                    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]"
+                                        class="form-control" placeholder="Search by name or category..." />
+                                    <button class="btn btn-outline-primary" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-2">
+                                <label class="form-label fw-semibold">Filter by OEM</label>
+                                <select name="oemId" class="form-select">
+                                    <option value="">All OEMs</option>
+                                    @if (ViewBag.OemList != null)
+                                    {
+                                        @foreach (var oem in (SelectList)ViewBag.OemList)
+                                        {
+                                            <option value="@oem.Value" selected="@(oem.Value == ViewData["OemFilter"]?.ToString())">@oem.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-2">
+                                <label class="form-label fw-semibold">License Type</label>
+                                <select name="licenseType" class="form-select">
+                                    <option value="">All Types</option>
+                                    <option value="Subscription">Subscription</option>
+                                    <option value="Perpetual">Perpetual</option>
+                                    <option value="Trial">Trial</option>
+                                    <option value="Educational">Educational</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6 mb-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-filter"></i> Apply Filters
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Table View -->
+                    <div id="tableView">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="border-0 fw-semibold">Product Details</th>
+                                        <th class="border-0 fw-semibold">OEM Partner</th>
+                                        <th class="border-0 fw-semibold">Category & Type</th>
+                                        <th class="border-0 fw-semibold">Pricing</th>
+                                        <th class="border-0 fw-semibold">Created</th>
+                                        <th class="border-0 fw-semibold text-center" width="120">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model?.Any() == true)
+                                    {
+                                        @foreach (var product in Model)
+                                        {
+                                            <tr class="border-bottom">
+                                                <td class="py-3">
+                                                    <div>
+                                                        <h6 class="mb-1 text-primary">@product.ProductName</h6>
+                                                        @if (!string.IsNullOrEmpty(product.ProductDescription))
+                                                        {
+                                                            <small class="text-muted">@product.ProductDescription</small>
+                                                        }
+                                                    </div>
+                                                </td>
+                                                <td class="py-3">
+                                                    <span class="badge bg-primary">@product.Oem?.OemName</span>
+                                                </td>
+                                                <td class="py-3">
+                                                    <div>
+                                                        <small class="text-muted d-block">@(product.ProductCategory ?? "General")</small>
+                                                        <span class="badge badge-@(product.LicenseType switch 
+                                                        {
+                                                            "Subscription" => "success",
+                                                            "Perpetual" => "primary", 
+                                                            "Trial" => "warning",
+                                                            _ => "secondary"
+                                                        })">
+                                                            @(product.LicenseType ?? "Not specified")
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3">
+                                                    @if (product.UnitPrice.HasValue)
+                                                    {
+                                                        <span class="fw-bold text-success">@product.UnitPrice.Value.ToString("C")</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Not set</span>
+                                                    }
+                                                </td>
+                                                <td class="py-3">
+                                                    <small class="text-muted">@product.CreatedDate.ToString("MMM dd, yyyy")</small>
+                                                </td>
+                                                <td class="py-3 text-center">
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <a asp-action="Details" asp-route-id="@product.ProductId" class="btn btn-outline-info" title="View Details">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a asp-action="Edit" asp-route-id="@product.ProductId" class="btn btn-outline-warning" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                                <i class="fas fa-ellipsis-v"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu">
+                                                                <li><a class="dropdown-item" asp-action="Delete" asp-route-id="@product.ProductId">
+                                                                    <i class="fas fa-archive"></i> Archive
+                                                                </a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="6" class="text-center py-5">
+                                                <div class="text-center">
+                                                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                                    <h5 class="text-muted">No Products Found</h5>
+                                                    <p class="text-muted">No products match your current filters. Try adjusting your search criteria.</p>
+                                                    <a asp-action="Create" class="btn btn-primary">
+                                                        <i class="fas fa-plus"></i> Add First Product
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Card View (Hidden by default) -->
+                    <div id="cardView" style="display: none;">
+                        <div class="row">
+                            @if (Model?.Any() == true)
+                            {
+                                @foreach (var product in Model)
+                                {
+                                    <div class="col-lg-4 col-md-6 mb-4">
+                                        <div class="card h-100 border-0 shadow-sm hover-shadow">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="card-title text-primary mb-0">@product.ProductName</h6>
+                                                    @if (product.UnitPrice.HasValue)
+                                                    {
+                                                        <span class="badge bg-success">@product.UnitPrice.Value.ToString("C")</span>
+                                                    }
+                                                </div>
+                                                <p class="text-muted small mb-3">@product.Oem?.OemName</p>
+                                                
+                                                @if (!string.IsNullOrEmpty(product.ProductCategory))
+                                                {
+                                                    <p class="mb-1">
+                                                        <i class="fas fa-tag text-muted"></i>
+                                                        <small>@product.ProductCategory</small>
+                                                    </p>
+                                                }
+                                                @if (!string.IsNullOrEmpty(product.LicenseType))
+                                                {
+                                                    <p class="mb-1">
+                                                        <i class="fas fa-certificate text-muted"></i>
+                                                        <small>@product.LicenseType</small>
+                                                    </p>
+                                                }
+                                            </div>
+                                            <div class="card-footer">
+                                                <div class="btn-group w-100" role="group">
+                                                    <a asp-action="Details" asp-route-id="@product.ProductId" class="btn btn-sm btn-outline-info">
+                                                        <i class="fas fa-eye"></i> View
+                                                    </a>
+                                                    <a asp-action="Edit" asp-route-id="@product.ProductId" class="btn btn-sm btn-outline-warning">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
+                                                    <a asp-action="Delete" asp-route-id="@product.ProductId" class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-archive"></i> Archive
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-12">
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">No Products Found</h5>
+                                        <p class="text-muted">No products match your current filters.</p>
+                                        <a asp-action="Create" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Add First Product
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title text-white">
+                    <i class="fas fa-upload"></i> Import Products
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Phase 2 Week 5:</strong> Bulk product import functionality for efficient product catalog management.
+                </p>
+                <form enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Select Excel/CSV File</label>
+                        <input type="file" class="form-control" accept=".xlsx,.xls,.csv">
+                        <small class="text-muted">Supported formats: Excel (.xlsx, .xls) and CSV (.csv)</small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="updateExisting">
+                            <label class="form-check-label" for="updateExisting">
+                                Update existing products if found
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="processImport()">
+                    <i class="fas fa-upload"></i> Import Products
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // View toggle functionality
+        function showCardView() {
+            document.getElementById('cardView').style.display = 'block';
+            document.getElementById('tableView').style.display = 'none';
+            document.getElementById('cardViewBtn').classList.add('active');
+            document.getElementById('tableViewBtn').classList.remove('active');
+        }
+        
+        function showTableView() {
+            document.getElementById('cardView').style.display = 'none';
+            document.getElementById('tableView').style.display = 'block';
+            document.getElementById('tableViewBtn').classList.add('active');
+            document.getElementById('cardViewBtn').classList.remove('active');
+        }
+
+        // Auto-submit form on filter change
+        document.addEventListener('DOMContentLoaded', function() {
+            const oemFilter = document.querySelector('select[name="oemId"]');
+            const licenseFilter = document.querySelector('select[name="licenseType"]');
+            
+            if (oemFilter) {
+                oemFilter.addEventListener('change', function() {
+                    this.form.submit();
+                });
+            }
+            
+            if (licenseFilter) {
+                licenseFilter.addEventListener('change', function() {
+                    this.form.submit();
+                });
+            }
+        });
+
+        // Quick action functions
+        function exportToExcel() {
+            // Phase 2 Week 5: Export functionality for product catalog
+            window.location.href = '/Products/Export';
+        }
+
+        function bulkPriceUpdate() {
+            // Phase 2 Week 5: Bulk price update functionality
+            alert('Bulk price update functionality will be available for efficient pricing management across multiple products.');
+        }
+
+        function generateReport() {
+            // Phase 2 Week 5: Product report generation
+            window.open('/Products/Report', '_blank');
+        }
+
+        function processImport() {
+            // Phase 2 Week 5: Import processing functionality
+            alert('Product import processing will be implemented with validation and error handling.');
+            $('#importModal').modal('hide');
+        }
+
+        // Enhanced search with debounce
+        let searchTimeout;
+        document.querySelector('input[name="searchString"]').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (this.value.length >= 3 || this.value.length === 0) {
+                    this.form.submit();
+                }
+            }, 500);
+        });
+    </script>
+}

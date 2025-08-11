@@ -1,0 +1,187 @@
+@using License_Tracking.Models
+@model Activity
+
+@{
+    ViewData["Title"] = "Edit Activity";
+    ViewData["PageTitle"] = "Edit Activity";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit"></i>
+                        Edit Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="ActivityId" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Type" class="form-label">Activity Type</label>
+                                    <select asp-for="Type" class="form-select" required>
+                                        <option value="">Select Activity Type</option>
+                                        <option value="Call">Phone Call</option>
+                                        <option value="Email">Email</option>
+                                        <option value="Meeting">Meeting</option>
+                                        <option value="Task">Task</option>
+                                        <option value="Demo">Product Demo</option>
+                                        <option value="Follow-up">Follow-up</option>
+                                        <option value="Quote">Quote/Proposal</option>
+                                        <option value="Negotiation">Negotiation</option>
+                                        <option value="Contract">Contract Review</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <span asp-validation-for="Type" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Status" class="form-label">Status</label>
+                                    <select asp-for="Status" class="form-select" required>
+                                        <option value="">Select Status</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                        <option value="Deferred">Deferred</option>
+                                    </select>
+                                    <span asp-validation-for="Status" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="ScheduledDate" class="form-label">Scheduled Date</label>
+                                    <input asp-for="ScheduledDate" type="datetime-local" class="form-control"
+                                        required />
+                                    <span asp-validation-for="ScheduledDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Priority" class="form-label">Priority</label>
+                                    <select asp-for="Priority" class="form-select" required>
+                                        <option value="">Select Priority</option>
+                                        <option value="Low">Low</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="High">High</option>
+                                        <option value="Urgent">Urgent</option>
+                                    </select>
+                                    <span asp-validation-for="Priority" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="EntityType" class="form-label">Related Entity</label>
+                                    <select asp-for="EntityType" class="form-select" id="entityTypeSelect">
+                                        <option value="">No Entity Association</option>
+                                        <option value="Deal">Deal/Opportunity</option>
+                                        <option value="Company">Company</option>
+                                        <option value="Contact">Contact Person</option>
+                                    </select>
+                                    <span asp-validation-for="EntityType" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="EntityId" class="form-label">Entity</label>
+                                    <select asp-for="EntityId" class="form-select" id="entitySelect">
+                                        <option value="">Select Entity First</option>
+                                    </select>
+                                    <span asp-validation-for="EntityId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Subject" class="form-label">Subject</label>
+                            <input asp-for="Subject" class="form-control" placeholder="Brief activity description"
+                                required />
+                            <span asp-validation-for="Subject" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="4"
+                                placeholder="Detailed activity description, outcomes, next steps..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Notes" class="form-label">Notes</label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"
+                                placeholder="Additional notes, reminders, or observations..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i>
+                                Update Activity
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Cancel
+                            </a>
+                            <a asp-action="Details" asp-route-id="@Model.ActivityId" class="btn btn-info">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Dynamic entity loading based on type
+        $('#entityTypeSelect').change(function () {
+            var entityType = $(this).val();
+            var entitySelect = $('#entitySelect');
+
+            entitySelect.empty().append('<option value="">Loading...</option>');
+
+            if (entityType) {
+                $.get('/Activity/GetEntitiesByType', { entityType: entityType })
+                    .done(function (data) {
+                        entitySelect.empty().append('<option value="">Select ' + entityType + '</option>');
+                        $.each(data, function (i, item) {
+                            entitySelect.append('<option value="' + item.value + '">' + item.text + '</option>');
+                        });
+
+                        // Restore selected value if editing
+                        var selectedEntityId = '@Model.EntityId';
+                        if (selectedEntityId) {
+                            entitySelect.val(selectedEntityId);
+                        }
+                    })
+                    .fail(function () {
+                        entitySelect.empty().append('<option value="">Error loading entities</option>');
+                    });
+            } else {
+                entitySelect.empty().append('<option value="">Select Entity Type First</option>');
+            }
+        });
+
+        // Initialize entity dropdown on page load
+        $(document).ready(function () {
+            if ($('#entityTypeSelect').val()) {
+                $('#entityTypeSelect').trigger('change');
+            }
+        });
+    </script>
+}

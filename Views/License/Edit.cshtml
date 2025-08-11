@@ -1,0 +1,251 @@
+@model License_Tracking.ViewModels.LicenseViewModel
+
+@{
+    ViewData["Title"] = "Edit License";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Edit License</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="LicenseId" />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ProductName" class="form-label"></label>
+                                <input asp-for="ProductName" class="form-control" />
+                                <span asp-validation-for="ProductName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="OemName" class="form-label"></label>
+                                <input asp-for="OemName" class="form-control" />
+                                <span asp-validation-for="OemName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ClientName" class="form-label"></label>
+                                <input asp-for="ClientName" class="form-control" />
+                                <span asp-validation-for="ClientName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label asp-for="LicenseDate" class="form-label"></label>
+                                <input asp-for="LicenseDate" class="form-control" type="date" />
+                                <span asp-validation-for="LicenseDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label asp-for="ExpiryDate" class="form-label"></label>
+                                <input asp-for="ExpiryDate" class="form-control" type="date" />
+                                <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <h5 class="text-primary">Customer PO Information</h5>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="CustomerPoNumber" class="form-label"></label>
+                                <input asp-for="CustomerPoNumber" class="form-control" />
+                                <span asp-validation-for="CustomerPoNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="CustomerPoAmount" class="form-label"></label>
+                                <input asp-for="CustomerPoAmount" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="CustomerPoAmount" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="AmountReceived" class="form-label"></label>
+                                <input asp-for="AmountReceived" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="AmountReceived" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CustomerPoItemDescription" class="form-label"></label>
+                            <textarea asp-for="CustomerPoItemDescription" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="CustomerPoItemDescription" class="text-danger"></span>
+                        </div>
+
+                        <hr />
+                        <h5 class="text-primary">OEM PO Information</h5>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="OemPoNumber" class="form-label"></label>
+                                <input asp-for="OemPoNumber" class="form-control" />
+                                <span asp-validation-for="OemPoNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="OemPoAmount" class="form-label"></label>
+                                <input asp-for="OemPoAmount" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="OemPoAmount" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="AmountPaid" class="form-label"></label>
+                                <input asp-for="AmountPaid" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="AmountPaid" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="OemPoItemDescription" class="form-label"></label>
+                            <textarea asp-for="OemPoItemDescription" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="OemPoItemDescription" class="text-danger"></span>
+                        </div>
+
+                        <hr />
+                        <h5 class="text-primary">Invoice & Payment Information</h5>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="InvoiceNumber" class="form-label"></label>
+                                <input asp-for="InvoiceNumber" class="form-control" />
+                                <span asp-validation-for="InvoiceNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="OemInvoiceNumber" class="form-label"></label>
+                                <input asp-for="OemInvoiceNumber" class="form-control" />
+                                <span asp-validation-for="OemInvoiceNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="PaymentStatus" class="form-label"></label>
+                                <select asp-for="PaymentStatus" class="form-select">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Partial">Partial</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                                <span asp-validation-for="PaymentStatus" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <div class="alert alert-info">
+                                    <strong>Margin Calculation:</strong>
+                                    Amount Received (@(Model.AmountReceived.ToString("C"))) - Amount Paid
+                                    (@(Model.AmountPaid.ToString("C"))) =
+                                    <span class="fw-bold @(Model.Margin >= 0 ? "text-success" : "text-danger")">
+                                        @(Model.Margin.ToString("C"))
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <h5 class="text-primary">Additional Information</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ShipToAddress" class="form-label"></label>
+                                <textarea asp-for="ShipToAddress" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="ShipToAddress" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="BillToAddress" class="form-label"></label>
+                                <textarea asp-for="BillToAddress" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="BillToAddress" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LicenseStatus" class="form-label"></label>
+                                <select asp-for="LicenseStatus" class="form-select">
+                                    <option value="Active">Active</option>
+                                    <option value="Expired">Expired</option>
+                                    <option value="Renewed">Renewed</option>
+                                </select>
+                                <span asp-validation-for="LicenseStatus" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Remarks" class="form-label"></label>
+                                <textarea asp-for="Remarks" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="Remarks" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Phase 2 Enhanced Fields -->
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-cogs"></i> Enhanced Finance Options
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="AlertDaysBefore" class="form-label">Alert Days Before Expiry</label>
+                                <input asp-for="AlertDaysBefore" class="form-control" type="number" min="1" max="365" />
+                                <span asp-validation-for="AlertDaysBefore" class="text-danger"></span>
+                                <small class="form-text text-muted">Current: @Model.AlertDaysBefore days</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ManualMarginInput" class="form-label">Manual Margin (%)</label>
+                                <input asp-for="ManualMarginInput" class="form-control" type="number" step="0.01"
+                                    min="0" max="100" />
+                                <span asp-validation-for="ManualMarginInput" class="text-danger"></span>
+                                <small class="form-text text-muted">Override automatic margin calculation</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check mt-4">
+                                    <input asp-for="IsProjectPipeline" class="form-check-input" type="checkbox" />
+                                    <label asp-for="IsProjectPipeline" class="form-check-label">
+                                        Mark as Project Pipeline Item
+                                    </label>
+                                    <span asp-validation-for="IsProjectPipeline" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="MarginNotes" class="form-label">Margin Notes</label>
+                                <textarea asp-for="MarginNotes" class="form-control" rows="3"
+                                    placeholder="Add notes about margin calculations, special pricing, or adjustments..."></textarea>
+                                <span asp-validation-for="MarginNotes" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.MarginInputBy))
+                        {
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="alert alert-info">
+                                        <small>
+                                            <i class="fas fa-info-circle"></i>
+                                            Margin last updated by <strong>@Model.MarginInputBy</strong>
+                                            @if (Model.MarginLastUpdated.HasValue)
+                                            {
+                                                <span>on @Model.MarginLastUpdated.Value.ToString("MM/dd/yyyy HH:mm")</span>
+                                            }
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Update License
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

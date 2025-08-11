@@ -1,0 +1,383 @@
+@model License_Tracking.Models.Deal
+
+@{
+    ViewData["Title"] = "Edit Deal";
+}
+
+<!-- Alert Container -->
+<div class="alert-container"></div>
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="fas fa-edit"></i> Edit Deal</h1>
+                    <p class="text-muted">Update deal information - 4-Phase B2B2B Workflow Management</p>
+                </div>
+                <div>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Deals
+                    </a>
+                    <a asp-action="Details" asp-route-id="@Model?.DealId" class="btn btn-info">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Form -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Deal Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="DealId" />
+                        <input type="hidden" asp-for="CreatedDate" />
+                        <input type="hidden" asp-for="CreatedBy" />
+                        <input type="hidden" asp-for="IsActive" />
+                        <input type="hidden" asp-for="LastModifiedDate" />
+                        <input type="hidden" asp-for="LastModifiedBy" />
+                        <input type="hidden" asp-for="CurrentPhase" />
+
+                        <!-- Basic Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="DealName" class="control-label"></label>
+                                    <input asp-for="DealName" class="form-control" />
+                                    <span asp-validation-for="DealName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="DealType" class="control-label"></label>
+                                    <select asp-for="DealType" class="form-select">
+                                        <option value="">Select Deal Type</option>
+                                        <option value="New">New License</option>
+                                        <option value="Renewal">License Renewal</option>
+                                        <option value="Upgrade">License Upgrade</option>
+                                        <option value="Migration">Migration</option>
+                                    </select>
+                                    <span asp-validation-for="DealType" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Company and Product Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CompanyId" class="control-label">Customer</label>
+                                    <select asp-for="CompanyId" class="form-select" asp-items="ViewBag.CompanyId">
+                                        <option value="">Select Customer</option>
+                                    </select>
+                                    <span asp-validation-for="CompanyId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="OemId" class="control-label">OEM</label>
+                                    <select asp-for="OemId" class="form-select" asp-items="ViewBag.OemId">
+                                        <option value="">Select OEM</option>
+                                    </select>
+                                    <span asp-validation-for="OemId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="ProductId" class="control-label">Product</label>
+                                    <select asp-for="ProductId" class="form-select" asp-items="ViewBag.ProductId">
+                                        <option value="">Select Product</option>
+                                    </select>
+                                    <span asp-validation-for="ProductId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Deal Stage and Assignment -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label asp-for="DealStage" class="control-label">Sales Pipeline Stage</label>
+                                    <select asp-for="DealStage" class="form-select">
+                                        <option value="Lead">Lead</option>
+                                        <option value="Qualified">Qualified</option>
+                                        <option value="Quoted">Quoted</option>
+                                        <option value="Negotiation">Negotiation</option>
+                                        <option value="Won">Won</option>
+                                        <option value="Lost">Lost</option>
+                                    </select>
+                                    <span asp-validation-for="DealStage" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label asp-for="CurrentPhase" class="control-label">Business Workflow Phase</label>
+                                    <select asp-for="CurrentPhase" class="form-select" disabled>
+                                        <option value="Pre-Phase">Pre-Phase (Sales Pipeline)</option>
+                                        <option value="Phase 1">Phase 1 - Customer Engagement</option>
+                                        <option value="Phase 2">Phase 2 - OEM Procurement</option>
+                                        <option value="Phase 3">Phase 3 - License Delivery</option>
+                                        <option value="Phase 4">Phase 4 - OEM Settlement</option>
+                                        <option value="Lost">Lost</option>
+                                    </select>
+                                    <span asp-validation-for="CurrentPhase" class="text-danger"></span>
+                                    <small class="form-text text-muted">Auto-updated based on Sales Stage and completed
+                                        data</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label asp-for="AssignedTo" class="control-label"></label>
+                                    <input asp-for="AssignedTo" class="form-control" />
+                                    <span asp-validation-for="AssignedTo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label asp-for="DealProbability" class="control-label">Probability (%)</label>
+                                    <input asp-for="DealProbability" class="form-control" type="number" step="0.01"
+                                        min="0" max="1" />
+                                    <span asp-validation-for="DealProbability" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label asp-for="Quantity" class="control-label"></label>
+                                    <input asp-for="Quantity" class="form-control" type="number" min="1" />
+                                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phase 1 - Customer PO Information -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-user-friends"></i> Phase 1 - Customer Purchase Order
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="CustomerPoNumber" class="control-label"></label>
+                                            <input asp-for="CustomerPoNumber" class="form-control" />
+                                            <span asp-validation-for="CustomerPoNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="CustomerPoDate" class="control-label"></label>
+                                            <input asp-for="CustomerPoDate" class="form-control" type="date" />
+                                            <span asp-validation-for="CustomerPoDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="CustomerInvoiceAmount" class="control-label"></label>
+                                            <input asp-for="CustomerInvoiceAmount" class="form-control" type="number"
+                                                step="0.01" />
+                                            <span asp-validation-for="CustomerInvoiceAmount" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phase 2 - OEM Procurement -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-shopping-cart"></i> Phase 2 - OEM Procurement</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="OemQuoteAmount" class="control-label"></label>
+                                            <input asp-for="OemQuoteAmount" class="form-control" type="number"
+                                                step="0.01" />
+                                            <span asp-validation-for="OemQuoteAmount" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="CanarysPoNumber" class="control-label"></label>
+                                            <input asp-for="CanarysPoNumber" class="form-control" />
+                                            <span asp-validation-for="CanarysPoNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="CanarysPoDate" class="control-label"></label>
+                                            <input asp-for="CanarysPoDate" class="form-control" type="date" />
+                                            <span asp-validation-for="CanarysPoDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phase 3 - License Delivery -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-key"></i> Phase 3 - License Delivery</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="LicenseStartDate" class="control-label"></label>
+                                            <input asp-for="LicenseStartDate" class="form-control" type="date" />
+                                            <span asp-validation-for="LicenseStartDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="LicenseEndDate" class="control-label"></label>
+                                            <input asp-for="LicenseEndDate" class="form-control" type="date" />
+                                            <span asp-validation-for="LicenseEndDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="LicenseDeliveryStatus" class="control-label"></label>
+                                            <select asp-for="LicenseDeliveryStatus" class="form-select">
+                                                <option value="">Select Status</option>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Delivered">Delivered</option>
+                                                <option value="Activated">Activated</option>
+                                                <option value="Failed">Failed</option>
+                                            </select>
+                                            <span asp-validation-for="LicenseDeliveryStatus" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phase 4 - OEM Settlement -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-handshake"></i> Phase 4 - OEM Settlement</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="OemInvoiceNumber" class="control-label"></label>
+                                            <input asp-for="OemInvoiceNumber" class="form-control" />
+                                            <span asp-validation-for="OemInvoiceNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="OemInvoiceAmount" class="control-label"></label>
+                                            <input asp-for="OemInvoiceAmount" class="form-control" type="number"
+                                                step="0.01" />
+                                            <span asp-validation-for="OemInvoiceAmount" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="OemPaymentStatus" class="control-label"></label>
+                                            <select asp-for="OemPaymentStatus" class="form-select">
+                                                <option value="">Select Status</option>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Paid">Paid</option>
+                                                <option value="Overdue">Overdue</option>
+                                            </select>
+                                            <span asp-validation-for="OemPaymentStatus" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dates and Notes -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ExpectedCloseDate" class="control-label"></label>
+                                    <input asp-for="ExpectedCloseDate" class="form-control" type="date" />
+                                    <span asp-validation-for="ExpectedCloseDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ActualCloseDate" class="control-label"></label>
+                                    <input asp-for="ActualCloseDate" class="form-control" type="date" />
+                                    <span asp-validation-for="ActualCloseDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label asp-for="Notes" class="control-label"></label>
+                                    <textarea asp-for="Notes" class="form-control" rows="4"
+                                        placeholder="Add any notes or comments about this deal..."></textarea>
+                                    <span asp-validation-for="Notes" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Update Deal
+                                    </button>
+                                    <a asp-action="Index" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@Model?.DealId" class="btn btn-info">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Calculate estimated margin when amounts change
+        function calculateMargin() {
+            var customerAmount = parseFloat(document.querySelector('[name="CustomerInvoiceAmount"]').value) || 0;
+            var oemAmount = parseFloat(document.querySelector('[name="OemQuoteAmount"]').value) || 0;
+            var margin = customerAmount - oemAmount;
+            var marginPercentage = customerAmount > 0 ? (margin / customerAmount * 100).toFixed(2) : 0;
+
+            console.log('Estimated Margin: $' + margin.toFixed(2) + ' (' + marginPercentage + '%)');
+        }
+
+        // Attach event listeners
+        document.addEventListener('DOMContentLoaded', function () {
+            var customerAmountInput = document.querySelector('[name="CustomerInvoiceAmount"]');
+            var oemAmountInput = document.querySelector('[name="OemQuoteAmount"]');
+
+            if (customerAmountInput) customerAmountInput.addEventListener('input', calculateMargin);
+            if (oemAmountInput) oemAmountInput.addEventListener('input', calculateMargin);
+
+            // Initial calculation
+            calculateMargin();
+        });
+    </script>
+}

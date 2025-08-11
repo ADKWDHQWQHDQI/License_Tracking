@@ -1,0 +1,379 @@
+@model License_Tracking.Models.Deal
+
+@{
+    ViewData["Title"] = "License Details - Phase 3";
+    var daysToExpiry = Model.LicenseEndDate.HasValue ? (Model.LicenseEndDate.Value - DateTime.Now).Days : 0;
+    var statusBadgeClass = Model.LicenseDeliveryStatus switch
+    {
+        "Active" => "bg-success",
+        "Delivered" => "bg-info", 
+        "Pending" => "bg-warning",
+        "Expired" => "bg-danger",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="container-fluid">
+    <!-- CBMS B2B2B Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1"><i class="fas fa-certificate text-success"></i> License Details</h2>
+                    <p class="text-muted mb-0">Phase 3: @Model.DealName License Information</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <span class="badge @statusBadgeClass fs-6 px-3 py-2">
+                        @(Model.LicenseDeliveryStatus ?? "Unknown")
+                    </span>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Sales"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@Model.DealId" class="btn btn-outline-primary">
+                            <i class="fas fa-edit"></i> Edit License
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4-Phase Workflow Progress -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-light border-0">
+                <div class="card-body py-3">
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="p-2 border-end">
+                                <i class="fas fa-check-circle fa-lg text-success"></i>
+                                <p class="mb-0 mt-1 fw-bold text-success">Phase 1</p>
+                                <small class="text-success">Customer PO ✓</small>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="p-2 border-end">
+                                <i class="fas fa-check-circle fa-lg text-success"></i>
+                                <p class="mb-0 mt-1 fw-bold text-success">Phase 2</p>
+                                <small class="text-success">OEM Procurement ✓</small>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="p-2 border-end bg-success text-white rounded">
+                                <i class="fas fa-certificate fa-lg"></i>
+                                <p class="mb-0 mt-1 fw-bold">Phase 3</p>
+                                <small>License Delivery</small>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="p-2">
+                                <i class="fas fa-money-check-alt fa-lg text-warning"></i>
+                                <p class="mb-0 mt-1 fw-bold text-warning">Phase 4</p>
+                                <small class="text-muted">OEM Settlement</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main License Information -->
+        <div class="col-lg-8">
+            <!-- Deal Overview -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-handshake"></i> Deal Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-5">Deal Name:</dt>
+                                <dd class="col-sm-7 fw-bold">@Model.DealName</dd>
+                                
+                                <dt class="col-sm-5">Deal Type:</dt>
+                                <dd class="col-sm-7">@(Model.DealType ?? "N/A")</dd>
+                                
+                                <dt class="col-sm-5">Deal Stage:</dt>
+                                <dd class="col-sm-7">
+                                    <span class="badge bg-info">@Model.DealStage</span>
+                                </dd>
+                                
+                                <dt class="col-sm-5">Assigned To:</dt>
+                                <dd class="col-sm-7">@(Model.AssignedTo ?? "Unassigned")</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-5">Customer:</dt>
+                                <dd class="col-sm-7 fw-bold">@(Model.Company?.CompanyName ?? "N/A")</dd>
+                                
+                                <dt class="col-sm-5">OEM Partner:</dt>
+                                <dd class="col-sm-7">@(Model.Oem?.OemName ?? "N/A")</dd>
+                                
+                                <dt class="col-sm-5">Product:</dt>
+                                <dd class="col-sm-7">@(Model.Product?.ProductName ?? "N/A")</dd>
+                                
+                                <dt class="col-sm-5">Quantity:</dt>
+                                <dd class="col-sm-7 fw-bold">@Model.Quantity licenses</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- License Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-certificate"></i> License Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-5">License Start:</dt>
+                                <dd class="col-sm-7">
+                                    @if (Model.LicenseStartDate.HasValue)
+                                    {
+                                        <strong>@Model.LicenseStartDate.Value.ToString("MMM dd, yyyy")</strong>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not Set</span>
+                                    }
+                                </dd>
+                                
+                                <dt class="col-sm-5">License End:</dt>
+                                <dd class="col-sm-7">
+                                    @if (Model.LicenseEndDate.HasValue)
+                                    {
+                                        <strong>@Model.LicenseEndDate.Value.ToString("MMM dd, yyyy")</strong>
+                                        @if (daysToExpiry <= 0)
+                                        {
+                                            <br><span class="badge bg-danger">Expired @Math.Abs(daysToExpiry) days ago</span>
+                                        }
+                                        else if (daysToExpiry <= 30)
+                                        {
+                                            <br><span class="badge bg-warning">Expires in @daysToExpiry days</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not Set</span>
+                                    }
+                                </dd>
+                                
+                                <dt class="col-sm-5">Duration:</dt>
+                                <dd class="col-sm-7">
+                                    @if (Model.LicenseStartDate.HasValue && Model.LicenseEndDate.HasValue)
+                                    {
+                                        var duration = (Model.LicenseEndDate.Value - Model.LicenseStartDate.Value).Days;
+                                        <span>@duration days</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-5">Delivery Status:</dt>
+                                <dd class="col-sm-7">
+                                    <span class="badge @statusBadgeClass">@(Model.LicenseDeliveryStatus ?? "Unknown")</span>
+                                </dd>
+                                
+                                <dt class="col-sm-5">License Type:</dt>
+                                <dd class="col-sm-7">@(Model.Product?.LicenseType ?? "N/A")</dd>
+                                
+                                <dt class="col-sm-5">Product Category:</dt>
+                                <dd class="col-sm-7">@(Model.Product?.ProductCategory ?? "N/A")</dd>
+                                
+                                <dt class="col-sm-5">Unit Price:</dt>
+                                <dd class="col-sm-7">@(Model.Product?.UnitPrice?.ToString("C") ?? "N/A")</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <hr />
+                        <div>
+                            <dt>Notes:</dt>
+                            <dd class="mt-2">
+                                <div class="alert alert-light">
+                                    @Model.Notes
+                                </div>
+                            </dd>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Phase Information -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-timeline"></i> Deal Phase Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Phase 1 -->
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-primary border-bottom pb-1">Phase 1: Customer PO</h6>
+                            <dl class="row small">
+                                <dt class="col-sm-6">PO Number:</dt>
+                                <dd class="col-sm-6">@(Model.CustomerPoNumber ?? "N/A")</dd>
+                                
+                                <dt class="col-sm-6">PO Date:</dt>
+                                <dd class="col-sm-6">@(Model.CustomerPoDate?.ToString("MM/dd/yyyy") ?? "N/A")</dd>
+                                
+                                <dt class="col-sm-6">Invoice Amount:</dt>
+                                <dd class="col-sm-6">@(Model.CustomerInvoiceAmount?.ToString("C") ?? "N/A")</dd>
+                                
+                                <dt class="col-sm-6">Payment Status:</dt>
+                                <dd class="col-sm-6">
+                                    @if (!string.IsNullOrEmpty(Model.CustomerPaymentStatus))
+                                    {
+                                        <span class="badge bg-@(Model.CustomerPaymentStatus == "Paid" ? "success" : "warning")">
+                                            @Model.CustomerPaymentStatus
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                        
+                        <!-- Phase 2 -->
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-info border-bottom pb-1">Phase 2: OEM Procurement</h6>
+                            <dl class="row small">
+                                <dt class="col-sm-6">Canarys PO:</dt>
+                                <dd class="col-sm-6">@(Model.CanarysPoNumber ?? "N/A")</dd>
+                                
+                                <dt class="col-sm-6">PO Date:</dt>
+                                <dd class="col-sm-6">@(Model.CanarysPoDate?.ToString("MM/dd/yyyy") ?? "N/A")</dd>
+                                
+                                <dt class="col-sm-6">OEM Quote:</dt>
+                                <dd class="col-sm-6">@(Model.OemQuoteAmount?.ToString("C") ?? "N/A")</dd>
+                                
+                                <dt class="col-sm-6">Est. Margin:</dt>
+                                <dd class="col-sm-6">@(Model.EstimatedMargin?.ToString("C") ?? "N/A")</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- License Status -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> License Status</h6>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <span class="badge @statusBadgeClass fs-5 px-3 py-2">
+                            @(Model.LicenseDeliveryStatus ?? "Unknown")
+                        </span>
+                    </div>
+                    
+                    @if (Model.LicenseEndDate.HasValue)
+                    {
+                        <div class="mb-3">
+                            @if (daysToExpiry <= 0)
+                            {
+                                <h4 class="text-danger">EXPIRED</h4>
+                                <p class="text-muted">@Math.Abs(daysToExpiry) days ago</p>
+                            }
+                            else if (daysToExpiry <= 30)
+                            {
+                                <h4 class="text-warning">@daysToExpiry</h4>
+                                <p class="text-muted">days remaining</p>
+                            }
+                            else
+                            {
+                                <h4 class="text-success">@daysToExpiry</h4>
+                                <p class="text-muted">days remaining</p>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        @if (User.IsInRole("Admin") || User.IsInRole("Sales"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.DealId" class="btn btn-outline-primary">
+                                <i class="fas fa-edit"></i> Edit License
+                            </a>
+                        }
+                        
+                        <a asp-controller="Deals" asp-action="Details" asp-route-id="@Model.DealId" class="btn btn-outline-info">
+                            <i class="fas fa-handshake"></i> View Full Deal
+                        </a>
+                        
+                        @if (Model.LicenseEndDate.HasValue && Model.LicenseEndDate.Value <= DateTime.Now.AddDays(90))
+                        {
+                            <a asp-controller="Renewal" asp-action="Create" asp-route-dealId="@Model.DealId" class="btn btn-outline-success">
+                                <i class="fas fa-sync-alt"></i> Renew License
+                            </a>
+                        }
+                        
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Licenses
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Company Information -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0"><i class="fas fa-building"></i> Customer Information</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.Company != null)
+                    {
+                        <dl class="row small">
+                            <dt class="col-sm-5">Company:</dt>
+                            <dd class="col-sm-7">@Model.Company.CompanyName</dd>
+                            
+                            <dt class="col-sm-5">Industry:</dt>
+                            <dd class="col-sm-7">@(Model.Company.Industry ?? "N/A")</dd>
+                            
+                            <dt class="col-sm-5">Size:</dt>
+                            <dd class="col-sm-7">@(Model.Company.CompanySize ?? "N/A")</dd>
+                            
+                            <dt class="col-sm-5">Contact:</dt>
+                            <dd class="col-sm-7">@(Model.Company.Email ?? "N/A")</dd>
+                        </dl>
+                        
+                        <div class="mt-2">
+                            <a asp-controller="Companies" asp-action="Details" asp-route-id="@Model.CompanyId" 
+                               class="btn btn-sm btn-outline-primary w-100">
+                                <i class="fas fa-building"></i> View Company Profile
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Company information not available</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

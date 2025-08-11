@@ -1,0 +1,236 @@
+@{
+    ViewData["Title"] = "Billing Dashboard";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-primary mb-4">
+                <i class="fas fa-credit-card"></i> Billing & Invoice Management
+            </h2>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Customer Invoices</h5>
+                            <h3 class="mb-0">@Model.TotalCustomerInvoices</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-file-invoice fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">OEM Invoices</h5>
+                            <h3 class="mb-0">@Model.TotalOemInvoices</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-receipt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Pending Customer</h5>
+                            <h3 class="mb-0">@Model.PendingCustomerAmount.ToString("C")</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Pending OEM</h5>
+                            <h3 class="mb-0">@Model.PendingOemAmount.ToString("C")</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overdue Alerts -->
+    @if (Model.OverdueCustomerInvoices > 0 || Model.OverdueOemInvoices > 0)
+    {
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="alert alert-danger">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Overdue Invoices Alert</h5>
+                    <div class="row">
+                        @if (Model.OverdueCustomerInvoices > 0)
+                        {
+                            <div class="col-md-6">
+                                <strong>Customer Invoices Overdue:</strong> @Model.OverdueCustomerInvoices
+                                <a asp-action="AgingSummary" asp-route-invoiceType="Customer"
+                                    class="btn btn-sm btn-outline-danger ms-2">
+                                    View Details
+                                </a>
+                            </div>
+                        }
+                        @if (Model.OverdueOemInvoices > 0)
+                        {
+                            <div class="col-md-6">
+                                <strong>OEM Invoices Overdue:</strong> @Model.OverdueOemInvoices
+                                <a asp-action="AgingSummary" asp-route-invoiceType="OEM"
+                                    class="btn btn-sm btn-outline-danger ms-2">
+                                    View Details
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a asp-action="GenerateInvoice" class="btn btn-primary w-100">
+                                <i class="fas fa-plus-circle"></i> Generate Invoice
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a asp-action="PaymentStatus" class="btn btn-success w-100">
+                                <i class="fas fa-list"></i> All Invoices
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a asp-action="AgingSummary" class="btn btn-warning w-100">
+                                <i class="fas fa-chart-bar"></i> Aging Summary
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a asp-controller="Report" asp-action="Index" class="btn btn-info w-100">
+                                <i class="fas fa-file-export"></i> Reports
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dual Invoice System Overview -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-users"></i> Customer Invoices (Revenue Tracking)
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Track revenue from customer sales and payments received.</p>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Customer Invoices:</span>
+                        <strong>@Model.TotalCustomerInvoices</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Pending Amount:</span>
+                        <strong class="text-danger">@Model.PendingCustomerAmount.ToString("C")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Overdue Invoices:</span>
+                        <strong class="text-warning">@Model.OverdueCustomerInvoices</strong>
+                    </div>
+                    <div class="mt-3">
+                        <a asp-action="PaymentStatus" asp-route-invoiceType="Customer" class="btn btn-primary btn-sm">
+                            View Customer Invoices
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-industry"></i> OEM Invoices (Cost Tracking)
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Track costs from OEM purchases and payments made.</p>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total OEM Invoices:</span>
+                        <strong>@Model.TotalOemInvoices</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Pending Amount:</span>
+                        <strong class="text-danger">@Model.PendingOemAmount.ToString("C")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Overdue Invoices:</span>
+                        <strong class="text-warning">@Model.OverdueOemInvoices</strong>
+                    </div>
+                    <div class="mt-3">
+                        <a asp-action="PaymentStatus" asp-route-invoiceType="OEM" class="btn btn-warning btn-sm">
+                            View OEM Invoices
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn {
+        border-radius: 6px;
+    }
+
+    .alert {
+        border-radius: 6px;
+    }
+</style>
+
+                                   
+                                         

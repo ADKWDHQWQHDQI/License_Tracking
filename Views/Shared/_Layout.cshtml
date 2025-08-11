@@ -1,0 +1,514 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CBMS B2B2B CRM</title>
+    
+    <!-- Google Fonts - Inter for modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5.x -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    
+    <!-- Font Awesome 6.x -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Site-specific styles -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-bigin">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-handshake"></i>
+                    <span>CBMS</span>
+                    <small class="text-muted ms-1" style="font-size: 0.75rem; font-weight: 400;">B2B2B CRM</small>
+                </a>
+                
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i>
+                                <span>Home</span>
+                            </a>
+                        </li>
+                        
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Dashboard" asp-action="Index">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+
+                            <!-- CRM & Customer Management -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="crmDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-users"></i>
+                                    <span>CRM</span>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="crmDropdown">
+                                    <li><h6 class="dropdown-header">Customer Management</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Companies" asp-action="Index">
+                                            <i class="fas fa-building"></i>
+                                            <span>Companies</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Companies" asp-action="Create">
+                                            <i class="fas fa-plus-circle"></i>
+                                            <span>Add New Company</span>
+                                        </a>
+                                    </li>
+                                    <li><div class="dropdown-divider"></div></li>
+                                    <li><h6 class="dropdown-header">Contact Management</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="showContactsModal()">
+                                            <i class="fas fa-address-book"></i>
+                                            <span>All Contacts</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <!-- Deal Management -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="dealsDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-handshake"></i>
+                                    <span>Deals</span>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="dealsDropdown">
+                                    <li><h6 class="dropdown-header">4-Phase Workflow</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Deals" asp-action="Index">
+                                            <i class="fas fa-list"></i>
+                                            <span>All Deals</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Deals" asp-action="Create">
+                                            <i class="fas fa-plus-circle"></i>
+                                            <span>Create New Deal</span>
+                                        </a>
+                                    </li>
+                                    <li><div class="dropdown-divider"></div></li>
+                                    <li><h6 class="dropdown-header">Phase Navigation</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="filterDealsByPhase(1)">
+                                            <i class="fas fa-file-invoice text-warning"></i>
+                                            <span>Phase 1: Customer PO</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="filterDealsByPhase(2)">
+                                            <i class="fas fa-shopping-cart text-primary"></i>
+                                            <span>Phase 2: OEM Procurement</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="filterDealsByPhase(3)">
+                                            <i class="fas fa-key text-success"></i>
+                                            <span>Phase 3: License Delivery</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="filterDealsByPhase(4)">
+                                            <i class="fas fa-credit-card text-info"></i>
+                                            <span>Phase 4: OEM Settlement</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <!-- Invoice Management -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="invoiceDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                    <span>Invoicing</span>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="invoiceDropdown">
+                                    <li><h6 class="dropdown-header">Multi-Invoice System</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="InvoiceManagement" asp-action="Index">
+                                            <i class="fas fa-list"></i>
+                                            <span>All Invoices</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Billing" asp-action="Index">
+                                            <i class="fas fa-chart-line"></i>
+                                            <span>Billing Dashboard</span>
+                                        </a>
+                                    </li>
+                                    <li><div class="dropdown-divider"></div></li>
+                                    <li><h6 class="dropdown-header">Phase-Specific</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="InvoiceManagement" asp-action="Index" asp-route-phase="phase1">
+                                            <i class="fas fa-user text-primary"></i>
+                                            <span>Customer Invoices</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="InvoiceManagement" asp-action="Index" asp-route-phase="phase4">
+                                            <i class="fas fa-industry text-info"></i>
+                                            <span>OEM Invoices</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+            <!-- Pipeline Management -->
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="ProjectPipeline" asp-action="Index">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Pipeline</span>
+                </a>
+            </li>
+
+            <!-- Activity Management - Week 9 Enhancement -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="activityDropdown" role="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Activities</span>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="activityDropdown">
+                    <li><h6 class="dropdown-header">CRM Activity Tracking</h6></li>
+                    <li>
+                        <a class="dropdown-item" asp-controller="Activity" asp-action="Index">
+                            <i class="fas fa-list"></i>
+                            <span>All Activities</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-controller="Activity" asp-action="Create">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>New Activity</span>
+                        </a>
+                    </li>
+                    <li><div class="dropdown-divider"></div></li>
+                    <li><h6 class="dropdown-header">Reports</h6></li>
+                    <li>
+                        <a class="dropdown-item" asp-controller="Activity" asp-action="WeeklyReport">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Weekly Report</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>                            <!-- Reference Data -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="referenceDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-database"></i>
+                                    <span>Reference Data</span>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="referenceDropdown">
+                                    <li><h6 class="dropdown-header">OEM & Product Management</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Oems" asp-action="Index">
+                                            <i class="fas fa-industry"></i>
+                                            <span>OEM Partners</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Products" asp-action="Index">
+                                            <i class="fas fa-box"></i>
+                                            <span>Product Catalog</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+
+                    <!-- Right-side Navigation -->
+                    <ul class="navbar-nav">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <!-- Quick Actions -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="quickActionsDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-bolt"></i>
+                                    <span>Quick Actions</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quickActionsDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Companies" asp-action="Create">
+                                            <i class="fas fa-building"></i>
+                                            <span>Add Company</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Deals" asp-action="Create">
+                                            <i class="fas fa-handshake"></i>
+                                            <span>Create Deal</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Products" asp-action="Create">
+                                            <i class="fas fa-cube"></i>
+                                            <span>Add Product</span>
+                                        </a>
+                                    </li>
+                                    <li><div class="dropdown-divider"></div></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Oems" asp-action="Create">
+                                            <i class="fas fa-industry"></i>
+                                            <span>Add OEM Partner</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Oems" asp-action="Index">
+                                            <i class="fas fa-building"></i>
+                                            <span>Manage OEMs</span>
+                                        </a>
+                                    </li>
+                                    <li><div class="dropdown-divider"></div></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="ProjectPipeline" asp-action="Create">
+                                            <i class="fas fa-project-diagram"></i>
+                                            <span>Add to Pipeline</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <!-- User Profile -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>@(User.Identity?.Name ?? "User")</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="fas fa-user"></i>
+                                            <span>Profile</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="fas fa-cog"></i>
+                                            <span>Settings</span>
+                                        </a>
+                                    </li>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="UserManagement" asp-action="Index">
+                                                <i class="fas fa-users-cog"></i>
+                                                <span>User Management</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    <li><div class="dropdown-divider"></div></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Auth" asp-action="Logout">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                            <span>Logout</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    <span>Login</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <main class="container-fluid mt-3">
+        @RenderBody()
+    </main>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <!-- Floating Quick Access Button -->
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+            <div class="dropdown dropup">
+                <button class="btn btn-primary rounded-circle p-3 shadow-lg" type="button" id="quickAccessDropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false" title="Quick Access">
+                    <i class="fas fa-bolt fa-lg"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end mb-2" aria-labelledby="quickAccessDropdown">
+                    <li>
+                        <h6 class="dropdown-header">
+                            <i class="fas fa-tachometer-alt"></i> Quick Access
+                        </h6>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="/Notification/Dashboard">
+                            <i class="fas fa-bell text-warning"></i> Notification Center
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="/Dashboard/Index">
+                            <i class="fas fa-chart-line text-info"></i> Analytics Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="/License/Index">
+                            <i class="fas fa-key text-primary"></i> Manage Licenses
+                        </a>
+                    </li>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Sales") || User.IsInRole("Management"))
+                    {
+                        <li>
+                            <a class="dropdown-item" href="/ProjectPipeline/Index">
+                                <i class="fas fa-project-diagram text-success"></i> Project Pipeline
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - License Tracking
+        </div>
+    </footer>
+    <!-- Bootstrap and jQuery -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Site scripts -->
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <script>
+            $(document).ready(function () {
+                loadNotificationCount();
+                loadRecentNotifications();
+
+                // Auto-refresh every 30 seconds
+                setInterval(function () {
+                    loadNotificationCount();
+                    loadRecentNotifications();
+                }, 30000);
+            });
+
+            function loadNotificationCount() {
+                $.get('@Url.Action("GetPendingCount", "Notification")')
+                    .done(function (data) {
+                        if (data.count > 0) {
+                            $('#notificationBadge').text(data.count).show();
+                        } else {
+                            $('#notificationBadge').hide();
+                        }
+                    })
+                    .fail(function () {
+                        $('#notificationBadge').hide();
+                    });
+            }
+
+            function loadRecentNotifications() {
+                $.get('@Url.Action("GetRecentAlerts", "Notification")', { take: 5 })
+                    .done(function (data) {
+                        var html = '';
+                        if (data.length > 0) {
+                            data.forEach(function (alert) {
+                                var icon = getAlertIcon(alert.AlertType);
+                                var priorityClass = getPriorityClass(alert.Priority);
+                                var timeAgo = getTimeAgo(alert.CreatedDate);
+
+                                html += `
+                                                            <li>
+                                                                <a class="dropdown-item" href="/Notification/Dashboard">
+                                                                    <div class="d-flex align-items-start">
+                                                                        <div class="me-2">
+                                                                            <i class="${icon} ${priorityClass}"></i>
+                                                                        </div>
+                                                                        <div class="flex-grow-1">
+                                                                            <div class="fw-bold">${alert.Title}</div>
+                                                                            <div class="text-muted small">${alert.AlertMessage.substring(0, 50)}...</div>
+                                                                            <div class="text-muted small">${timeAgo}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
+                                                            </li>`;
+                            });
+                        } else {
+                            html = '<li class="text-center py-2 text-muted">No recent notifications</li>';
+                        }
+                        $('#recentNotifications').html(html);
+                    })
+                    .fail(function () {
+                        $('#recentNotifications').html('<li class="text-center py-2 text-danger">Error loading notifications</li>');
+                    });
+            }
+
+            function getAlertIcon(alertType) {
+                switch (alertType) {
+                    case 1: return 'fas fa-calendar-alt'; // Renewal
+                    case 4: return 'fas fa-project-diagram'; // PipelineReminder  
+                    case 2: return 'fas fa-dollar-sign'; // Payment
+                    default: return 'fas fa-bell';
+                }
+            }
+
+            function getPriorityClass(priority) {
+                switch (priority) {
+                    case 3: return 'text-danger'; // Critical
+                    case 2: return 'text-warning'; // High
+                    case 1: return 'text-info'; // Medium
+                    default: return 'text-secondary'; // Low
+                }
+            }
+
+            function getTimeAgo(dateString) {
+                var date = new Date(dateString);
+                var now = new Date();
+                var diffMs = now - date;
+                var diffMins = Math.floor(diffMs / 60000);
+                var diffHours = Math.floor(diffMins / 60);
+                var diffDays = Math.floor(diffHours / 24);
+
+                if (diffMins < 1) return 'Just now';
+                if (diffMins < 60) return diffMins + 'm ago';
+                if (diffHours < 24) return diffHours + 'h ago';
+                if (diffDays < 7) return diffDays + 'd ago';
+                return date.toLocaleDateString();
+            }
+        </script>
+    }
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

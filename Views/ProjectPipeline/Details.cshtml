@@ -1,0 +1,344 @@
+@model License_Tracking.ViewModels.ProjectPipelineViewModel
+
+@{
+    ViewData["Title"] = "Project Pipeline Details";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="card-title mb-0">
+                                <i class="fas fa-project-diagram"></i> Project Pipeline Details
+                            </h3>
+                            <p class="mb-0 mt-1">@Model.ProductName - @Model.ClientName</p>
+                        </div>
+                        <div>
+                            <span class="badge bg-@(Model.ProjectStatus == "Confirmed" ? "success" : 
+                                                    Model.ProjectStatus == "Lost" ? "danger" :
+                                                    Model.ProjectStatus == "Negotiation" ? "warning" :
+                                                    Model.ProjectStatus == "Pending" ? "light" : "secondary") fs-6">
+                                @Model.ProjectStatus
+                            </span>
+                            @if (Model.IsConverted)
+                            {
+                                <span class="badge bg-success fs-6 ms-2">Converted to License</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Key Metrics -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h6>Success Probability</h6>
+                                    <h4>@Model.SuccessProbability%</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6>Projected Revenue</h6>
+                                    <h4>@Model.ProjectedRevenue.ToString("C")</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6>Projected Margin</h6>
+                                    <h4>@Model.ProjectedMargin.ToString("C")</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <h6>Profit Margin %</h6>
+                                    <h4>@Model.ProjectedProfitMargin.ToString("F1")%</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Basic Information -->
+                    <h5 class="text-primary mb-3">
+                        <i class="fas fa-info-circle"></i> Basic Information
+                    </h5>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Product Information</h6>
+                            <p class="mb-2"><strong>Product Name:</strong> @Model.ProductName</p>
+                            <p class="mb-2"><strong>OEM Name:</strong> @Model.OemName</p>
+                            <p><strong>Client Name:</strong> @Model.ClientName</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Contact Information</h6>
+                            @if (!string.IsNullOrEmpty(Model.ClientContactEmail))
+                            {
+                                <p class="mb-2">
+                                    <strong>Email:</strong> 
+                                    <a href="mailto:@Model.ClientContactEmail">@Model.ClientContactEmail</a>
+                                </p>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.ClientContactPhone))
+                            {
+                                <p class="mb-2">
+                                    <strong>Phone:</strong> 
+                                    <a href="tel:@Model.ClientContactPhone">@Model.ClientContactPhone</a>
+                                </p>
+                            }
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Timeline</h6>
+                            <p class="mb-2"><strong>Expected License Date:</strong> @Model.ExpectedLicenseDate.ToString("MMM dd, yyyy")</p>
+                            <p><strong>Expected Expiry Date:</strong> @Model.ExpectedExpiryDate.ToString("MMM dd, yyyy")</p>
+                        </div>
+                    </div>
+
+                    <!-- Financial Information -->
+                    <h5 class="text-primary mb-3">
+                        <i class="fas fa-dollar-sign"></i> Financial Information
+                    </h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Customer Purchase Order</h6>
+                            @if (!string.IsNullOrEmpty(Model.CustomerPoNumber))
+                            {
+                                <p class="mb-2"><strong>PO Number:</strong> @Model.CustomerPoNumber</p>
+                            }
+                            <p class="mb-2"><strong>Expected PO Amount:</strong> @Model.ExpectedCustomerPoAmount.ToString("C")</p>
+                            <p class="mb-2"><strong>Expected Amount to Receive:</strong> @Model.ExpectedAmountToReceive.ToString("C")</p>
+                            @if (!string.IsNullOrEmpty(Model.CustomerPoItemDescription))
+                            {
+                                <p class="mb-0"><strong>Description:</strong> @Model.CustomerPoItemDescription</p>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">OEM Purchase Order</h6>
+                            @if (!string.IsNullOrEmpty(Model.OemPoNumber))
+                            {
+                                <p class="mb-2"><strong>PO Number:</strong> @Model.OemPoNumber</p>
+                            }
+                            <p class="mb-2"><strong>Expected OEM Amount:</strong> @Model.ExpectedOemPoAmount.ToString("C")</p>
+                            <p class="mb-2"><strong>Expected Amount to Pay:</strong> @Model.ExpectedAmountToPay.ToString("C")</p>
+                            @if (!string.IsNullOrEmpty(Model.OemPoItemDescription))
+                            {
+                                <p class="mb-0"><strong>Description:</strong> @Model.OemPoItemDescription</p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Address Information -->
+                    @if (!string.IsNullOrEmpty(Model.ShipToAddress) || !string.IsNullOrEmpty(Model.BillToAddress))
+                    {
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-map-marker-alt"></i> Address Information
+                        </h5>
+                        <div class="row mb-4">
+                            @if (!string.IsNullOrEmpty(Model.ShipToAddress))
+                            {
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Ship To Address</h6>
+                                    <address>@Html.Raw(Model.ShipToAddress.Replace("\n", "<br />"))</address>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.BillToAddress))
+                            {
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Bill To Address</h6>
+                                    <address>@Html.Raw(Model.BillToAddress.Replace("\n", "<br />"))</address>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <!-- Project Settings -->
+                    <h5 class="text-primary mb-3">
+                        <i class="fas fa-cogs"></i> Project Settings
+                    </h5>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Alert Configuration</h6>
+                            <p class="mb-2"><strong>Alert Days Before:</strong> @Model.AlertDaysBefore days</p>
+                            <p class="mb-0">
+                                <strong>Alerts Enabled:</strong> 
+                                @if (Model.AlertsEnabled)
+                                {
+                                    <span class="badge bg-success">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">No</span>
+                                }
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Project Status</h6>
+                            <p class="mb-2"><strong>Current Status:</strong> @Model.ProjectStatus</p>
+                            <p class="mb-0"><strong>Success Probability:</strong> @Model.SuccessProbability%</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Tracking Information</h6>
+                            <p class="mb-2"><strong>Created By:</strong> @Model.CreatedBy</p>
+                            <p class="mb-2"><strong>Created Date:</strong> @Model.CreatedDate.ToString("MMM dd, yyyy")</p>
+                            @if (Model.LastUpdated.HasValue)
+                            {
+                                <p class="mb-0"><strong>Last Updated:</strong> @Model.LastUpdated.Value.ToString("MMM dd, yyyy HH:mm")</p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Phase 4.7 - Invoice & Payment Tracking -->
+                    <h5 class="text-primary mb-3">
+                        <i class="fas fa-file-invoice-dollar"></i> Invoice & Payment Tracking
+                    </h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Invoice Information</h6>
+                            <p class="mb-2"><strong>Expected Invoice Number:</strong> @(string.IsNullOrEmpty(Model.ExpectedInvoiceNumber) ? "Not specified" : Model.ExpectedInvoiceNumber)</p>
+                            <p class="mb-0">
+                                <strong>Payment Status:</strong> 
+                                @if (!string.IsNullOrEmpty(Model.PaymentStatus))
+                                {
+                                    <span class="badge bg-@(Model.PaymentStatus == "Paid" ? "success" : 
+                                                             Model.PaymentStatus == "Partial" ? "warning" :
+                                                             Model.PaymentStatus == "Overdue" ? "danger" : "secondary")">
+                                        @Model.PaymentStatus
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not specified</span>
+                                }
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Payment Amounts</h6>
+                            <p class="mb-2"><strong>Amount Received:</strong> @(Model.AmountReceived?.ToString("C") ?? "Not specified")</p>
+                            <p class="mb-0"><strong>Amount Paid:</strong> @(Model.AmountPaid?.ToString("C") ?? "Not specified")</p>
+                        </div>
+                    </div>
+
+                    <!-- Phase 4.7 - Enhanced Customer Profile -->
+                    <h5 class="text-primary mb-3">
+                        <i class="fas fa-user-tie"></i> Enhanced Customer Profile
+                    </h5>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Customer Classification</h6>
+                            <p class="mb-2"><strong>Customer Type:</strong> @(string.IsNullOrEmpty(Model.CustomerType) ? "Not specified" : Model.CustomerType)</p>
+                            <p class="mb-0"><strong>Industry:</strong> @(string.IsNullOrEmpty(Model.CustomerIndustry) ? "Not specified" : Model.CustomerIndustry)</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Company Size</h6>
+                            <p class="mb-0"><strong>Employee Count:</strong> @(Model.CustomerEmployeeCount?.ToString("N0") ?? "Not specified")</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">OEM Classification</h6>
+                            <p class="mb-0"><strong>OEM Type:</strong> @(string.IsNullOrEmpty(Model.OemType) ? "Not specified" : Model.OemType)</p>
+                        </div>
+                    </div>
+
+                    <!-- Phase 4.7 - OEM Relationship -->
+                    <h5 class="text-primary mb-3">
+                        <i class="fas fa-handshake"></i> OEM Relationship
+                    </h5>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Relationship Details</h6>
+                            <p class="mb-2"><strong>Relationship Type:</strong> @(string.IsNullOrEmpty(Model.OemRelationshipType) ? "Not specified" : Model.OemRelationshipType)</p>
+                            <p class="mb-0"><strong>Last Customer Contact:</strong> @(Model.LastCustomerContact?.ToString("MMM dd, yyyy") ?? "Not specified")</p>
+                        </div>
+                        <div class="col-md-8">
+                            <h6 class="text-muted">Customer Notes</h6>
+                            @if (!string.IsNullOrEmpty(Model.CustomerNotes))
+                            {
+                                <div class="bg-light p-3 rounded">
+                                    @Html.Raw(Model.CustomerNotes.Replace("\n", "<br />"))
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted mb-0">No customer notes available</p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Notes and Remarks -->
+                    @if (!string.IsNullOrEmpty(Model.MarginNotes) || !string.IsNullOrEmpty(Model.Remarks))
+                    {
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-sticky-note"></i> Notes and Remarks
+                        </h5>
+                        <div class="row mb-4">
+                            @if (!string.IsNullOrEmpty(Model.MarginNotes))
+                            {
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Margin Notes</h6>
+                                    <div class="alert alert-light">
+                                        @Html.Raw(Model.MarginNotes.Replace("\n", "<br />"))
+                                    </div>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Remarks))
+                            {
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">General Remarks</h6>
+                                    <div class="alert alert-light">
+                                        @Html.Raw(Model.Remarks.Replace("\n", "<br />"))
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <!-- Conversion Information -->
+                    @if (Model.IsConverted)
+                    {
+                        <div class="alert alert-success">
+                            <h6><i class="fas fa-check-circle"></i> Project Converted</h6>
+                            <p class="mb-0">
+                                This project has been successfully converted to License ID: @Model.ConvertedToLicenseId
+                                <a asp-controller="License" asp-action="Details" asp-route-id="@Model.ConvertedToLicenseId" class="btn btn-sm btn-success ms-2">
+                                    <i class="fas fa-external-link-alt"></i> View License
+                                </a>
+                            </p>
+                        </div>
+                    }
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Pipeline List
+                        </a>
+                        <div>
+                            <a asp-action="Edit" asp-route-id="@Model.ProjectPipelineId" class="btn btn-warning me-2">
+                                <i class="fas fa-edit"></i> Edit Project
+                            </a>
+                            @if (!Model.IsConverted && Model.ProjectStatus == "Confirmed")
+                            {
+                                <a asp-action="ConvertToLicense" asp-route-id="@Model.ProjectPipelineId" 
+                                   class="btn btn-success me-2"
+                                   onclick="return confirm('Are you sure you want to convert this project to an actual license? This action cannot be undone.')">
+                                    <i class="fas fa-exchange-alt"></i> Convert to License
+                                </a>
+                            }
+                            <a asp-action="Delete" asp-route-id="@Model.ProjectPipelineId" class="btn btn-danger"
+                               onclick="return confirm('Are you sure you want to delete this project? This action cannot be undone.')">
+                                <i class="fas fa-trash"></i> Delete Project
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

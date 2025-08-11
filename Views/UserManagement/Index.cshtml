@@ -1,0 +1,147 @@
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="container-fluid">
+    <div class="page-header">
+        <h1 class="page-title">User Management</h1>
+        <div class="page-options">
+            <button class="btn btn-primary" onclick="reseedDatabase()">
+                <i class="fas fa-sync-alt"></i> Re-seed Database
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">System Users</h4>
+                </div>
+                <div class="card-body">
+                    <div id="usersList">
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Database Integrity</h4>
+                </div>
+                <div class="card-body">
+                    <div id="integrityStatus">
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUsers();
+        checkIntegrity();
+    });
+
+    function loadUsers() {
+        fetch('/UserManagement/GetUsers')
+            .then(response => response.json())
+            .then(data => {
+                const usersList = document.getElementById('usersList');
+                if (data.length === 0) {
+                    usersList.innerHTML = '<p class="text-muted">No users found</p>';
+                    return;
+                }
+
+                let html = '<div class="list-group">';
+                data.forEach(user => {
+                    html += `
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">${user.userName}</h6>
+                                <small class="badge bg-primary">${user.roles}</small>
+                            </div>
+                            <p class="mb-1">${user.email}</p>
+                            <small>Last Login: ${user.lastLogin || 'Never'}</small>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                usersList.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error loading users:', error);
+                document.getElementById('usersList').innerHTML = '<p class="text-danger">Error loading users</p>';
+            });
+    }
+
+    function checkIntegrity() {
+        fetch('/UserManagement/CheckIntegrity')
+            .then(response => response.json())
+            .then(data => {
+                const integrityStatus = document.getElementById('integrityStatus');
+                let html = '';
+                
+                if (data.isValid) {
+                    html = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Database integrity verified</div>';
+                } else {
+                    html = '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> Database integrity issues found</div>';
+                }
+
+                html += '<div class="mt-3">';
+                html += `<p><strong>Total Users:</strong> ${data.totalUsers}</p>`;
+                html += `<p><strong>Total Roles:</strong> ${data.totalRoles}</p>`;
+                html += `<p><strong>Admin Users:</strong> ${data.adminUsers}</p>`;
+                html += '</div>';
+
+                integrityStatus.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error checking integrity:', error);
+                document.getElementById('integrityStatus').innerHTML = '<p class="text-danger">Error checking integrity</p>';
+            });
+    }
+
+    function reseedDatabase() {
+        if (!confirm('This will re-seed the database with default users and roles. Continue?')) {
+            return;
+        }
+
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Re-seeding...';
+        button.disabled = true;
+
+        fetch('/UserManagement/Reseed', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Database re-seeded successfully');
+                    loadUsers();
+                    checkIntegrity();
+                } else {
+                    alert('Error re-seeding database: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error re-seeding database:', error);
+                alert('Error re-seeding database');
+            })
+            .finally(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+    }
+</script>

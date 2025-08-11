@@ -1,0 +1,311 @@
+@using License_Tracking.ViewModels
+@model WeeklyActivityReportViewModel
+
+@{
+    ViewData["Title"] = "Weekly Activity Report";
+    ViewData["PageTitle"] = "Weekly Activity Report";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar"></i>
+                        Weekly Activity Report
+                        @if (Model.StartDate.HasValue && Model.EndDate.HasValue)
+                        {
+                            <small class="ms-2">
+                                (@Model.StartDate.Value.ToString("MMM dd") - @Model.EndDate.Value.ToString("MMM dd, yyyy"))
+                            </small>
+                        }
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Date Range Filter -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <form method="get" class="d-flex gap-3 align-items-end">
+                                <div class="form-group">
+                                    <label for="startDate" class="form-label">Start Date</label>
+                                    <input type="date" id="startDate" name="startDate" class="form-control" 
+                                           value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="endDate" class="form-label">End Date</label>
+                                    <input type="date" id="endDate" name="endDate" class="form-control" 
+                                           value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                    Generate Report
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button onclick="exportReport()" class="btn btn-success">
+                                <i class="fas fa-download"></i>
+                                Export to Excel
+                            </button>
+                        </div>
+                    </div>
+
+                    @if (Model.Activities?.Any() == true)
+                    {
+                        <!-- Summary Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <h3 class="card-title">@Model.TotalActivities</h3>
+                                        <p class="card-text">Total Activities</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h3 class="card-title">@Model.CompletedActivities</h3>
+                                        <p class="card-text">Completed</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body text-center">
+                                        <h3 class="card-title">@Model.PendingActivities</h3>
+                                        <p class="card-text">Pending</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-danger text-white">
+                                    <div class="card-body text-center">
+                                        <h3 class="card-title">@Model.OverdueActivities</h3>
+                                        <p class="card-text">Overdue</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Activity Type Breakdown -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">Activity Types</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="activityTypeChart" width="400" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">Status Distribution</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="statusChart" width="400" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Activities Table -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Activity Details</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="activitiesTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Subject</th>
+                                                <th>Status</th>
+                                                <th>Priority</th>
+                                                <th>Scheduled</th>
+                                                <th>Related Entity</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var activity in Model.Activities)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <span class="badge bg-primary">@activity.Type</span>
+                                                    </td>
+                                                    <td>
+                                                        <strong>@activity.Subject</strong>
+                                                        @if (!string.IsNullOrEmpty(activity.Description))
+                                                        {
+                                                            <br><small class="text-muted">@(activity.Description.Length > 50 ? activity.Description.Substring(0, 50) + "..." : activity.Description)</small>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            var statusClass = activity.Status switch {
+                                                                "Completed" => "bg-success",
+                                                                "In Progress" => "bg-warning",
+                                                                "Pending" => "bg-secondary",
+                                                                "Cancelled" => "bg-danger",
+                                                                "Deferred" => "bg-info",
+                                                                _ => "bg-secondary"
+                                                            };
+                                                        }
+                                                        <span class="badge @statusClass">@activity.Status</span>
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            var priorityClass = activity.Priority switch {
+                                                                "Urgent" => "bg-danger",
+                                                                "High" => "bg-warning",
+                                                                "Medium" => "bg-info",
+                                                                "Low" => "bg-secondary",
+                                                                _ => "bg-secondary"
+                                                            };
+                                                        }
+                                                        <span class="badge @priorityClass">@activity.Priority</span>
+                                                    </td>
+                                                    <td>
+                                                        @activity.ScheduledDate.ToString("MMM dd, yyyy")
+                                                        <br><small class="text-muted">@activity.ScheduledDate.ToString("hh:mm tt")</small>
+                                                    </td>
+                                                    <td>
+                                                        @if (!string.IsNullOrEmpty(activity.EntityType))
+                                                        {
+                                                            <span class="badge bg-outline-primary">@activity.EntityType</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">None</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group btn-group-sm">
+                                                            <a asp-action="Details" asp-route-id="@activity.ActivityId" class="btn btn-outline-info btn-sm">
+                                                                <i class="fas fa-eye"></i>
+                                                            </a>
+                                                            <a asp-action="Edit" asp-route-id="@activity.ActivityId" class="btn btn-outline-warning btn-sm">
+                                                                <i class="fas fa-edit"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No Activities Found</h5>
+                            <p class="text-muted">No activities found for the selected date range.</p>
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Create New Activity
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('#activitiesTable').DataTable({
+                "pageLength": 25,
+                "order": [[4, "desc"]], // Sort by scheduled date
+                "responsive": true
+            });
+
+            // Activity Type Chart
+            var activityTypes = @Html.Raw(Json.Serialize(Model.ActivitiesByType.Keys.ToArray()));
+            var activityTypeCounts = @Html.Raw(Json.Serialize(Model.ActivitiesByType.Values.ToArray()));
+
+            if (activityTypes.length > 0) {
+                var ctx1 = document.getElementById('activityTypeChart').getContext('2d');
+                new Chart(ctx1, {
+                    type: 'doughnut',
+                    data: {
+                        labels: activityTypes,
+                        datasets: [{
+                            data: activityTypeCounts,
+                            backgroundColor: [
+                                '#007bff', '#28a745', '#ffc107', '#dc3545',
+                                '#6f42c1', '#fd7e14', '#20c997', '#6c757d'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Status Chart
+            var statuses = @Html.Raw(Json.Serialize(Model.ActivitiesByStatus.Keys.ToArray()));
+            var statusCounts = @Html.Raw(Json.Serialize(Model.ActivitiesByStatus.Values.ToArray()));
+
+            if (statuses.length > 0) {
+                var ctx2 = document.getElementById('statusChart').getContext('2d');
+                new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: statuses,
+                        datasets: [{
+                            label: 'Activities',
+                            data: statusCounts,
+                            backgroundColor: [
+                                '#28a745', '#ffc107', '#6c757d', '#dc3545', '#17a2b8'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        function exportReport() {
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+            var params = new URLSearchParams();
+            
+            if (startDate) params.append('startDate', startDate);
+            if (endDate) params.append('endDate', endDate);
+            params.append('export', 'true');
+            
+            window.open('/Activity/WeeklyReport?' + params.toString(), '_blank');
+        }
+    </script>
+}

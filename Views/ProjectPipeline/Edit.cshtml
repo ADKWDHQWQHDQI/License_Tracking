@@ -1,0 +1,419 @@
+@model License_Tracking.ViewModels.ProjectPipelineViewModel
+
+@{
+    ViewData["Title"] = "Edit Project Pipeline";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-edit"></i> Edit Project Pipeline
+                    </h3>
+                    <p class="mb-0 mt-2">@Model.ProductName - @Model.ClientName</p>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="ProjectPipelineId" />
+
+                        <!-- Status and Conversion Info -->
+                        @if (Model.IsConverted)
+                        {
+                            <div class="alert alert-success mb-4">
+                                <h6><i class="fas fa-check-circle"></i> Project Already Converted</h6>
+                                <p class="mb-0">This project has been converted to License ID: @Model.ConvertedToLicenseId</p>
+                            </div>
+                        }
+
+                        <!-- Basic Information -->
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-info-circle"></i> Basic Information
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ProductName" class="form-label"></label>
+                                <input asp-for="ProductName" class="form-control" />
+                                <span asp-validation-for="ProductName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="OemName" class="form-label"></label>
+                                <input asp-for="OemName" class="form-control" />
+                                <span asp-validation-for="OemName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ClientName" class="form-label"></label>
+                                <input asp-for="ClientName" class="form-control" />
+                                <span asp-validation-for="ClientName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ClientContactEmail" class="form-label"></label>
+                                <input asp-for="ClientContactEmail" class="form-control" type="email" />
+                                <span asp-validation-for="ClientContactEmail" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ClientContactPhone" class="form-label"></label>
+                                <input asp-for="ClientContactPhone" class="form-control" type="tel" />
+                                <span asp-validation-for="ClientContactPhone" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Expected Dates -->
+                        <h5 class="text-primary mb-3 mt-4">
+                            <i class="fas fa-calendar-alt"></i> Expected Timeline
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ExpectedLicenseDate" class="form-label"></label>
+                                <input asp-for="ExpectedLicenseDate" class="form-control" type="date" />
+                                <span asp-validation-for="ExpectedLicenseDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ExpectedExpiryDate" class="form-label"></label>
+                                <input asp-for="ExpectedExpiryDate" class="form-control" type="date" />
+                                <span asp-validation-for="ExpectedExpiryDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Customer Purchase Order -->
+                        <h5 class="text-primary mb-3 mt-4">
+                            <i class="fas fa-file-invoice"></i> Customer Purchase Order Details
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CustomerPoNumber" class="form-label"></label>
+                                <input asp-for="CustomerPoNumber" class="form-control" />
+                                <span asp-validation-for="CustomerPoNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ExpectedCustomerPoAmount" class="form-label"></label>
+                                <input asp-for="ExpectedCustomerPoAmount" class="form-control" type="number" step="0.01" min="0" />
+                                <span asp-validation-for="ExpectedCustomerPoAmount" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="CustomerPoItemDescription" class="form-label"></label>
+                                <textarea asp-for="CustomerPoItemDescription" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="CustomerPoItemDescription" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- OEM Purchase Order -->
+                        <h5 class="text-primary mb-3 mt-4">
+                            <i class="fas fa-building"></i> OEM Purchase Order Details
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="OemPoNumber" class="form-label"></label>
+                                <input asp-for="OemPoNumber" class="form-control" />
+                                <span asp-validation-for="OemPoNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ExpectedOemPoAmount" class="form-label"></label>
+                                <input asp-for="ExpectedOemPoAmount" class="form-control" type="number" step="0.01" min="0" />
+                                <span asp-validation-for="ExpectedOemPoAmount" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="OemPoItemDescription" class="form-label"></label>
+                                <textarea asp-for="OemPoItemDescription" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="OemPoItemDescription" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Financial Projections -->
+                        <h5 class="text-primary mb-3 mt-4">
+                            <i class="fas fa-dollar-sign"></i> Financial Projections
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ExpectedAmountToReceive" class="form-label"></label>
+                                <input asp-for="ExpectedAmountToReceive" class="form-control" type="number" step="0.01" min="0" />
+                                <span asp-validation-for="ExpectedAmountToReceive" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ExpectedAmountToPay" class="form-label"></label>
+                                <input asp-for="ExpectedAmountToPay" class="form-control" type="number" step="0.01" min="0" />
+                                <span asp-validation-for="ExpectedAmountToPay" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ProjectedMarginInput" class="form-label"></label>
+                                <input asp-for="ProjectedMarginInput" class="form-control" type="number" step="0.01" min="0" />
+                                <span asp-validation-for="ProjectedMarginInput" class="text-danger"></span>
+                                <small class="form-text text-muted">Current: @Model.ProjectedMargin.ToString("C")</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SuccessProbability" class="form-label"></label>
+                                <input asp-for="SuccessProbability" class="form-control" type="number" min="0" max="100" />
+                                <span asp-validation-for="SuccessProbability" class="text-danger"></span>
+                                <small class="form-text text-muted">Projected Revenue: @Model.ProjectedRevenue.ToString("C")</small>
+                            </div>
+                        </div>
+
+                        <!-- Project Settings -->
+                        <h5 class="text-primary mb-3 mt-4">
+                            <i class="fas fa-cogs"></i> Project Settings
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="AlertDaysBefore" class="form-label"></label>
+                                <input asp-for="AlertDaysBefore" class="form-control" type="number" min="1" max="365" />
+                                <span asp-validation-for="AlertDaysBefore" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ProjectStatus" class="form-label"></label>
+                                <select asp-for="ProjectStatus" class="form-select" disabled="@Model.IsConverted">
+                                    <option value="Pipeline">Pipeline</option>
+                                    <option value="Negotiation">In Negotiation</option>
+                                    <option value="Pending">Pending Approval</option>
+                                    <option value="Confirmed">Confirmed</option>
+                                    <option value="Lost">Lost</option>
+                                </select>
+                                <span asp-validation-for="ProjectStatus" class="text-danger"></span>
+                                @if (Model.IsConverted)
+                                {
+                                    <small class="form-text text-muted">Status cannot be changed after conversion</small>
+                                }
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check mt-4">
+                                    <input asp-for="AlertsEnabled" class="form-check-input" type="checkbox" />
+                                    <label asp-for="AlertsEnabled" class="form-check-label">
+                                        Enable Alerts for this Project
+                                    </label>
+                                    <span asp-validation-for="AlertsEnabled" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Addresses -->
+                        <h5 class="text-primary mb-3 mt-4">
+                            <i class="fas fa-map-marker-alt"></i> Address Information
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ShipToAddress" class="form-label"></label>
+                                <textarea asp-for="ShipToAddress" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="ShipToAddress" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="BillToAddress" class="form-label"></label>
+                                <textarea asp-for="BillToAddress" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="BillToAddress" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MarginNotes" class="form-label"></label>
+                                <textarea asp-for="MarginNotes" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="MarginNotes" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Remarks" class="form-label"></label>
+                                <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="Remarks" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Phase 4.7 - Invoice & Payment Tracking -->
+                        <h5 class="text-primary mb-3 mt-4">
+                            <i class="fas fa-file-invoice-dollar"></i> Invoice & Payment Tracking
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ExpectedInvoiceNumber" class="form-label"></label>
+                                <input asp-for="ExpectedInvoiceNumber" class="form-control" />
+                                <span asp-validation-for="ExpectedInvoiceNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PaymentStatus" class="form-label"></label>
+                                <select asp-for="PaymentStatus" class="form-select">
+                                    <option value="">Select Payment Status</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Partial">Partial</option>
+                                    <option value="Paid">Paid</option>
+                                    <option value="Overdue">Overdue</option>
+                                </select>
+                                <span asp-validation-for="PaymentStatus" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AmountReceived" class="form-label"></label>
+                                <input asp-for="AmountReceived" class="form-control" type="number" step="0.01" min="0" />
+                                <span asp-validation-for="AmountReceived" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AmountPaid" class="form-label"></label>
+                                <input asp-for="AmountPaid" class="form-control" type="number" step="0.01" min="0" />
+                                <span asp-validation-for="AmountPaid" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Phase 4.7 - Enhanced Customer Profile -->
+                        <h5 class="text-primary mb-3 mt-4">
+                            <i class="fas fa-user-tie"></i> Enhanced Customer Profile
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="CustomerType" class="form-label"></label>
+                                <select asp-for="CustomerType" class="form-select">
+                                    <option value="">Select Customer Type</option>
+                                    <option value="Enterprise">Enterprise</option>
+                                    <option value="SMB">Small & Medium Business</option>
+                                    <option value="Government">Government</option>
+                                    <option value="Educational">Educational</option>
+                                    <option value="Non-Profit">Non-Profit</option>
+                                </select>
+                                <span asp-validation-for="CustomerType" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="CustomerIndustry" class="form-label"></label>
+                                <input asp-for="CustomerIndustry" class="form-control" placeholder="e.g., Healthcare, Finance, Manufacturing" />
+                                <span asp-validation-for="CustomerIndustry" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="CustomerEmployeeCount" class="form-label"></label>
+                                <input asp-for="CustomerEmployeeCount" class="form-control" type="number" min="1" />
+                                <span asp-validation-for="CustomerEmployeeCount" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Phase 4.7 - OEM Relationship -->
+                        <h5 class="text-primary mb-3 mt-4">
+                            <i class="fas fa-handshake"></i> OEM Relationship
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="OemType" class="form-label"></label>
+                                <select asp-for="OemType" class="form-select">
+                                    <option value="">Select OEM Type</option>
+                                    <option value="Direct">Direct OEM</option>
+                                    <option value="Distributor">Distributor</option>
+                                    <option value="Reseller">Reseller</option>
+                                    <option value="Partner">Partner</option>
+                                </select>
+                                <span asp-validation-for="OemType" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="OemRelationshipType" class="form-label"></label>
+                                <select asp-for="OemRelationshipType" class="form-select">
+                                    <option value="">Select Relationship Type</option>
+                                    <option value="Gold Partner">Gold Partner</option>
+                                    <option value="Silver Partner">Silver Partner</option>
+                                    <option value="Standard">Standard</option>
+                                    <option value="New">New</option>
+                                </select>
+                                <span asp-validation-for="OemRelationshipType" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastCustomerContact" class="form-label"></label>
+                                <input asp-for="LastCustomerContact" class="form-control" type="date" />
+                                <span asp-validation-for="LastCustomerContact" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CustomerNotes" class="form-label"></label>
+                                <textarea asp-for="CustomerNotes" class="form-control" rows="3" placeholder="Additional notes about customer relationship, preferences, or important details"></textarea>
+                                <span asp-validation-for="CustomerNotes" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tracking Information -->
+                        <div class="alert alert-info mt-4">
+                            <h6><i class="fas fa-info-circle"></i> Tracking Information</h6>
+                            <p class="mb-0">
+                                <strong>Created by:</strong> @Model.CreatedBy on @Model.CreatedDate.ToString("MMM dd, yyyy")
+                                @if (Model.LastUpdated.HasValue)
+                                {
+                                    <br><strong>Last updated:</strong> @Model.LastUpdated.Value.ToString("MMM dd, yyyy HH:mm")
+                                }
+                            </p>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Details" asp-route-id="@Model.ProjectPipelineId" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Details
+                            </a>
+                            <div>
+                                @if (!Model.IsConverted && Model.ProjectStatus == "Confirmed")
+                                {
+                                    <a asp-action="ConvertToLicense" asp-route-id="@Model.ProjectPipelineId" 
+                                       class="btn btn-success me-2"
+                                       onclick="return confirm('Convert this project to an actual license? This action cannot be undone.')">
+                                        <i class="fas fa-exchange-alt"></i> Convert to License
+                                    </a>
+                                }
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-save"></i> Update Project
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    
+    <script>
+        // Auto-calculate projected margin and revenue when values change
+        function updateProjections() {
+            const receiveAmount = parseFloat(document.getElementById('ExpectedAmountToReceive').value) || 0;
+            const payAmount = parseFloat(document.getElementById('ExpectedAmountToPay').value) || 0;
+            const successRate = parseFloat(document.getElementById('SuccessProbability').value) || 0;
+            
+            const margin = receiveAmount - payAmount;
+            const revenue = receiveAmount * (successRate / 100);
+            
+            // Update display elements if they exist
+            const marginDisplay = document.querySelector('small:contains("Current:")');
+            const revenueDisplay = document.querySelector('small:contains("Projected Revenue:")');
+            
+            console.log('Projected Margin:', margin.toLocaleString('en-US', {style: 'currency', currency: 'USD'}));
+            console.log('Projected Revenue:', revenue.toLocaleString('en-US', {style: 'currency', currency: 'USD'}));
+        }
+        
+        // Add event listeners for auto-calculation
+        ['ExpectedAmountToReceive', 'ExpectedAmountToPay', 'SuccessProbability'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updateProjections);
+            }
+        });
+    </script>
+}

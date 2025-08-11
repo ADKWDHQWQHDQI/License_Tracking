@@ -1,0 +1,380 @@
+@model License_Tracking.ViewModels.ProjectPipelineListViewModel
+
+@{
+    ViewData["Title"] = "Pipeline - Kanban Board";
+}
+
+<div class="container-fluid">
+    <!-- Header with View Switcher -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-project-diagram"></i> Project Pipeline - Kanban Board</h2>
+            <p class="text-muted mb-0">Drag and drop to change project status</p>
+        </div>
+        <div class="btn-group" role="group">
+            <a asp-action="Index" asp-route-view="list" class="btn btn-outline-primary">
+                <i class="fas fa-list"></i> List
+            </a>
+            <a asp-action="Index" asp-route-view="sheet" class="btn btn-outline-primary">
+                <i class="fas fa-table"></i> Sheet
+            </a>
+            <button type="button" class="btn btn-primary active">
+                <i class="fas fa-columns"></i> Kanban
+            </button>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h4>@Model.TotalCount</h4>
+                    <small>Total Projects</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h4>@Model.TotalProjectedRevenue.ToString("C")</h4>
+                    <small>Projected Revenue</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h4>@Model.TotalProjectedMargin.ToString("C")</h4>
+                    <small>Projected Margin</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h4>@Model.Projects.Where(p => p.ExpectedLicenseDate <= DateTime.Now.AddDays(30)).Count()</h4>
+                    <small>Due This Month</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="kanban-board">
+        <div class="row">
+            @{
+                var statuses = new[] { "Pipeline", "Qualified", "Proposal", "Negotiation", "Won", "Lost" };
+                var statusClasses = new Dictionary<string, string>
+                {
+                    {"Pipeline", "border-primary"},
+                    {"Qualified", "border-info"},
+                    {"Proposal", "border-warning"},
+                    {"Negotiation", "border-danger"},
+                    {"Won", "border-success"},
+                    {"Lost", "border-dark"}
+                };
+            }
+
+            @foreach (var status in statuses)
+            {
+                var projectsInStatus = Model.Projects.Where(p => p.ProjectStatus == status).ToList();
+                <div class="col-md-2">
+                    <div class="kanban-column card @statusClasses.GetValueOrDefault(status, "border-secondary")">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                @status 
+                                <span class="badge bg-secondary">@projectsInStatus.Count</span>
+                            </h6>
+                        </div>
+                        <div class="card-body p-2 kanban-column-body" 
+                             data-status="@status" 
+                             style="min-height: 600px; max-height: 600px; overflow-y: auto;">
+                            
+                            @foreach (var project in projectsInStatus)
+                            {
+                                <div class="kanban-card card mb-2" 
+                                     data-project-id="@project.ProjectPipelineId"
+                                     draggable="true">
+                                    <div class="card-body p-2">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title mb-1 text-truncate">@project.ProductName</h6>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                                        type="button" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" asp-action="Details" asp-route-id="@project.ProjectPipelineId">
+                                                        <i class="fas fa-eye"></i> View Details
+                                                    </a></li>
+                                                    <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@project.ProjectPipelineId">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><button class="dropdown-item" onclick="convertToDeal(@project.ProjectPipelineId)">
+                                                        <i class="fas fa-exchange-alt"></i> Convert to Deal
+                                                    </button></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="small text-muted mb-2">
+                                            <div><strong>Client:</strong> @project.ClientName</div>
+                                            <div><strong>OEM:</strong> @project.OemName</div>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-primary">@project.SuccessProbability%</span>
+                                            <small class="text-success">@project.ExpectedAmountToReceive.ToString("C0")</small>
+                                        </div>
+                                        
+                                        <div class="small text-muted">
+                                            <i class="fas fa-calendar"></i> @project.ExpectedLicenseDate.ToString("MMM dd, yyyy")
+                                        </div>
+                                        
+                                        @if (project.ExpectedLicenseDate <= DateTime.Now.AddDays(30))
+                                        {
+                                            <div class="mt-1">
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="fas fa-exclamation-triangle"></i> Due Soon
+                                                </span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            
+                            @if (!projectsInStatus.Any())
+                            {
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                                    <p>No projects in @status</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-4 d-flex gap-2">
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Project
+        </a>
+        <a asp-action="ExportToExcel" class="btn btn-success">
+            <i class="fas fa-file-excel"></i> Export to Excel
+        </a>
+        <button type="button" class="btn btn-info" onclick="refreshAnalytics()">
+            <i class="fas fa-chart-bar"></i> Refresh Analytics
+        </button>
+    </div>
+</div>
+
+<!-- Convert to Deal Modal -->
+<div class="modal fade" id="convertToDealModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Convert to Deal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to convert this pipeline project to an active deal?</p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    This will create a new deal with the project information and mark the pipeline project as converted.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="convertForm" method="post" asp-action="ConvertToDeal" style="display: inline;">
+                    <input type="hidden" id="convertProjectId" name="id" />
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-exchange-alt"></i> Convert to Deal
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .kanban-board {
+            overflow-x: auto;
+        }
+        
+        .kanban-column {
+            margin-bottom: 1rem;
+        }
+        
+        .kanban-card {
+            cursor: move;
+            transition: all 0.3s ease;
+            border: 1px solid #dee2e6;
+        }
+        
+        .kanban-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .kanban-card.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+        
+        .kanban-column-body.drag-over {
+            background-color: #f8f9fa;
+            border: 2px dashed #007bff;
+        }
+        
+        .card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .kanban-column-body {
+            background-color: #fafafa;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Drag and Drop functionality
+        let draggedCard = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDragAndDrop();
+        });
+        
+        function initializeDragAndDrop() {
+            // Add drag event listeners to cards
+            document.querySelectorAll('.kanban-card').forEach(card => {
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+            });
+            
+            // Add drop event listeners to columns
+            document.querySelectorAll('.kanban-column-body').forEach(column => {
+                column.addEventListener('dragover', handleDragOver);
+                column.addEventListener('drop', handleDrop);
+                column.addEventListener('dragenter', handleDragEnter);
+                column.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+        
+        function handleDragStart(e) {
+            draggedCard = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.outerHTML);
+        }
+        
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedCard = null;
+        }
+        
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+        
+        function handleDragEnter(e) {
+            this.classList.add('drag-over');
+        }
+        
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+        
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            
+            this.classList.remove('drag-over');
+            
+            if (draggedCard !== null) {
+                const newStatus = this.dataset.status;
+                const projectId = draggedCard.dataset.projectId;
+                
+                // Move the card visually
+                this.appendChild(draggedCard);
+                
+                // Update status via AJAX
+                updateProjectStatus(projectId, newStatus);
+            }
+            
+            return false;
+        }
+        
+        function updateProjectStatus(projectId, newStatus) {
+            fetch(`/ProjectPipeline/BulkUpdateStatus`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': document.querySelector('[name="__RequestVerificationToken"]').value
+                },
+                body: `selectedIds=${projectId}&newStatus=${newStatus}`
+            })
+            .then(response => {
+                if (response.ok) {
+                    showToast('Project status updated successfully', 'success');
+                } else {
+                    showToast('Error updating project status', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error updating project status', 'error');
+            });
+        }
+        
+        function convertToDeal(projectId) {
+            document.getElementById('convertProjectId').value = projectId;
+            new bootstrap.Modal(document.getElementById('convertToDealModal')).show();
+        }
+        
+        function refreshAnalytics() {
+            fetch('/ProjectPipeline/GetPipelineAnalytics')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Analytics updated:', data);
+                    showToast('Analytics refreshed successfully', 'success');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error refreshing analytics', 'error');
+                });
+        }
+        
+        function showToast(message, type) {
+            // Simple toast notification
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${message}
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+            `;
+            document.body.appendChild(toast);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 3000);
+        }
+    </script>
+}

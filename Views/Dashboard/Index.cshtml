@@ -1,0 +1,459 @@
+@model License_Tracking.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "CBMS Dashboard - B2B2B Workflow Overview";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-tachometer-alt"></i> CBMS B2B2B Dashboard
+                    </h2>
+                    <p class="text-muted mb-0">Real-time overview of your 4-phase workflow</p>
+                </div>
+                <div class="text-end">
+                    <span class="text-muted">Welcome, <strong>@Model.UserEmail</strong></span>
+                    <div class="mt-1">
+                        @foreach (var role in Model.UserRoles)
+                        {
+                            <span
+                                class="badge bg-@(role == "Admin" ? "danger" : role == "Sales" ? "primary" : role == "Finance" ? "success" : role == "Operations" ? "warning" : "info") ms-1">@role</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bolt text-warning"></i> Quick Actions
+                        </h5>
+                        <small class="text-muted">Frequently used actions for your role</small>
+                    </div>
+                </div>
+                <div class="card-body py-3">
+                    <div class="row g-2">
+                        @if (User.IsInRole("Admin") || User.IsInRole("Sales"))
+                        {
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                                <a asp-controller="Companies" asp-action="Create" class="btn btn-primary w-100 d-flex flex-column align-items-center py-2">
+                                    <i class="fas fa-building fa-lg mb-1"></i>
+                                    <small>Add Company</small>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                                <a asp-controller="Deals" asp-action="Create" class="btn btn-success w-100 d-flex flex-column align-items-center py-2">
+                                    <i class="fas fa-handshake fa-lg mb-1"></i>
+                                    <small>Create Deal</small>
+                                </a>
+                            </div>
+                        }
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("Sales") || User.IsInRole("Management"))
+                        {
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                                <a asp-controller="ProjectPipeline" asp-action="Create" class="btn btn-info w-100 d-flex flex-column align-items-center py-2">
+                                    <i class="fas fa-project-diagram fa-lg mb-1"></i>
+                                    <small>Add Pipeline</small>
+                                </a>
+                            </div>
+                        }
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("Operations") || User.IsInRole("Management"))
+                        {
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                                <a asp-controller="Renewal" asp-action="Index" class="btn btn-warning w-100 d-flex flex-column align-items-center py-2">
+                                    <i class="fas fa-calendar-alt fa-lg mb-1"></i>
+                                    <small>Renewals</small>
+                                </a>
+                            </div>
+                        }
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("Finance"))
+                        {
+                            <div class="col-lg-2 col-md-3 col-sm-6">
+                                <a asp-controller="Billing" asp-action="GenerateInvoice" class="btn btn-success w-100 d-flex flex-column align-items-center py-2">
+                                    <i class="fas fa-file-invoice-dollar fa-lg mb-1"></i>
+                                    <small>Generate Invoice</small>
+                                </a>
+                            </div>
+                        }
+
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <a asp-controller="Notification" asp-action="Dashboard" class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-2">
+                                <i class="fas fa-bell fa-lg mb-1"></i>
+                                <small>Notifications</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4-Phase Workflow Overview -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white border-bottom-0">
+                    <h5 class="mb-0 text-white">
+                        <i class="fas fa-sitemap"></i> 4-Phase B2B2B Workflow Status
+                    </h5>
+                    <small class="text-white-50">Track your deals through each phase of the workflow</small>
+                </div>
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-md-3">
+                            <div class="text-center p-4 border-end">
+                                <div class="mb-3">
+                                    <i class="fas fa-search fa-3x text-primary mb-2"></i>
+                                    <h6 class="fw-bold text-primary">Phase 1: Customer PO</h6>
+                                </div>
+                                <div class="h3 text-primary mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Lead") == true ? Model.DealsByStage["Lead"] : 0)</div>
+                                <small class="text-muted d-block mb-3">Customer → Canarys Invoice</small>
+                                <a asp-controller="Deals" asp-action="Index" asp-route-stage="Lead"
+                                    class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View Deals
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="text-center p-4 border-end">
+                                <div class="mb-3">
+                                    <i class="fas fa-shopping-cart fa-3x text-warning mb-2"></i>
+                                    <h6 class="fw-bold text-warning">Phase 2: OEM Procurement</h6>
+                                </div>
+                                <div class="h3 text-warning mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Quoted") == true ? Model.DealsByStage["Quoted"] : 0)</div>
+                                <small class="text-muted d-block mb-3">Canarys → OEM Purchase</small>
+                                <a asp-controller="Deals" asp-action="Index" asp-route-stage="Quoted"
+                                    class="btn btn-sm btn-outline-warning">
+                                    <i class="fas fa-eye"></i> View Deals
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="text-center p-4 border-end">
+                                <div class="mb-3">
+                                    <i class="fas fa-key fa-3x text-info mb-2"></i>
+                                    <h6 class="fw-bold text-info">Phase 3: License Delivery</h6>
+                                </div>
+                                <div class="h3 text-info mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Negotiation") == true ? Model.DealsByStage["Negotiation"] : 0)</div>
+                                <small class="text-muted d-block mb-3">OEM → Customer Delivery</small>
+                                <a asp-controller="Deals" asp-action="Index" asp-route-stage="Negotiation"
+                                    class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-eye"></i> View Deals
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="text-center p-4">
+                                <div class="mb-3">
+                                    <i class="fas fa-credit-card fa-3x text-success mb-2"></i>
+                                    <h6 class="fw-bold text-success">Phase 4: OEM Settlement</h6>
+                                </div>
+                                <div class="h3 text-success mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Won") == true ? Model.DealsByStage["Won"] : 0)</div>
+                                <small class="text-muted d-block mb-3">Settlement & Completion</small>
+                                <a asp-controller="Deals" asp-action="Index" asp-route-stage="Won"
+                                    class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-eye"></i> View Deals
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Business Metrics -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="text-primary mb-3">
+                <i class="fas fa-chart-bar"></i> Key Business Metrics
+            </h5>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card border-start border-primary border-4">
+                <div class="stats-card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="stats-label text-primary">Total Deals</div>
+                            <div class="stats-value">@Model.TotalLicenses</div>
+                            <div class="stats-description">Active B2B2B workflows</div>
+                        </div>
+                        <div class="stats-icon text-primary">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card border-start border-success border-4">
+                <div class="stats-card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="stats-label text-success">Active Licenses</div>
+                            <div class="stats-value">@Model.ActiveLicenses</div>
+                            <div class="stats-description">Currently deployed</div>
+                        </div>
+                        <div class="stats-icon text-success">
+                            <i class="fas fa-key"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card border-start border-warning border-4">
+                <div class="stats-card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="stats-label text-warning">Companies</div>
+                            <div class="stats-value">@Model.TotalLicenses</div>
+                            <div class="stats-description">Customers & prospects</div>
+                        </div>
+                        <div class="stats-icon text-warning">
+                            <i class="fas fa-building"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card border-start border-info border-4">
+                <div class="stats-card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="stats-label text-info">This Month Revenue</div>
+                            <div class="stats-value">@Model.MonthlyRevenue.ToString("C")</div>
+                            <div class="stats-description">Invoiced amount</div>
+                        </div>
+                        <div class="stats-icon text-info">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Metrics Row -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card border-start border-danger border-4">
+                <div class="stats-card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="stats-label text-danger">Expiring Soon</div>
+                            <div class="stats-value">@Model.ExpiringLicenses</div>
+                            <div class="stats-description">Licenses expiring soon</div>
+                        </div>
+                        <div class="stats-icon text-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card border-start border-success border-4">
+                <div class="stats-card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="stats-label text-success">Total Revenue</div>
+                            <div class="stats-value">@Model.TotalRevenue.ToString("C")</div>
+                            <div class="stats-description">All-time revenue</div>
+                        </div>
+                        <div class="stats-icon text-success">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Pipeline Metrics Row (for Sales, Admin, Management) -->
+    @if (User.IsInRole("Admin") || User.IsInRole("Sales") || User.IsInRole("Management"))
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <h5 class="text-primary mb-3">
+                    <i class="fas fa-project-diagram"></i> Project Pipeline Overview
+                </h5>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card border-start border-info border-4">
+                    <div class="stats-card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="stats-label text-info">Total Pipeline Projects</div>
+                                <div class="stats-value">@Model.TotalPipelineProjects</div>
+                                <div class="stats-description">All pipeline projects</div>
+                            </div>
+                            <div class="stats-icon text-info">
+                                <i class="fas fa-project-diagram"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card border-start border-primary border-4">
+                    <div class="stats-card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="stats-label text-primary">Active Projects</div>
+                                <div class="stats-value">@Model.ActivePipelineProjects</div>
+                                <div class="stats-description">Currently active</div>
+                            </div>
+                            <div class="stats-icon text-primary">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card border-start border-success border-4">
+                    <div class="stats-card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="stats-label text-success">Projected Revenue</div>
+                                <div class="stats-value">@Model.ProjectedPipelineRevenue.ToString("C")</div>
+                                <div class="stats-description">Expected revenue</div>
+                            </div>
+                            <div class="stats-icon text-success">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card border-start border-warning border-4">
+                    <div class="stats-card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="stats-label text-warning">Projected Margin</div>
+                                <div class="stats-value">@Model.ProjectedPipelineMargin.ToString("C")</div>
+                                <div class="stats-description">Expected margin</div>
+                            </div>
+                            <div class="stats-icon text-warning">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Admin Panel (for Admins only) -->
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0 text-white">
+                            <i class="fas fa-shield-alt"></i> Admin Panel
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="stats-card border-start border-danger border-4">
+                                    <div class="stats-card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1">
+                                                <div class="stats-label text-danger">Total Users</div>
+                                                <div class="stats-value">@Model.TotalUsers</div>
+                                                <div class="stats-description">System users</div>
+                                            </div>
+                                            <div class="stats-icon text-danger">
+                                                <i class="fas fa-users"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <a asp-action="Users" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-cog"></i> Manage Users
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="stats-card border-start border-warning border-4">
+                                    <div class="stats-card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1">
+                                                <div class="stats-label text-warning">Pending Payments</div>
+                                                <div class="stats-value">@Model.PendingPayments</div>
+                                                <div class="stats-description">Awaiting payment</div>
+                                            </div>
+                                            <div class="stats-icon text-warning">
+                                                <i class="fas fa-clock"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <a asp-controller="License" asp-action="Index" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-eye"></i> View Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="stats-card border-start border-success border-4">
+                                    <div class="stats-card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1">
+                                                <div class="stats-label text-success">Total Margin</div>
+                                                <div class="stats-value">@Model.TotalMargin.ToString("C")</div>
+                                                <div class="stats-description">Total profit margin</div>
+                                            </div>
+                                            <div class="stats-icon text-success">
+                                                <i class="fas fa-chart-pie"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <a asp-action="Financial" class="btn btn-sm btn-success">
+                                                <i class="fas fa-chart-line"></i> View Report
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

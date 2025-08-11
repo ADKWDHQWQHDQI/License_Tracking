@@ -1,0 +1,199 @@
+@model License_Tracking.Models.Report
+
+@{
+    ViewData["Title"] = "View Report";
+}
+
+<div class="container">
+    <h2><i class="fas fa-chart-pie"></i> @ViewBag.Report.ReportType Report</h2>
+    <p class="text-muted">Generated on @ViewBag.Report.GeneratedDate.ToString("yyyy-MM-dd HH:mm"). Use the canvas below
+        to visualize data.</p>
+
+    <p><strong>Data:</strong> @ViewBag.Report.Data</p>
+
+    <button class="btn btn-primary" onclick="openCanvasPanel()">Visualize Data</button>
+
+    <a asp-action="Index" class="btn btn-secondary mt-3" title="Return to report list">
+        <i class="fas fa-arrow-left"></i> Back to Reports
+    </a>
+
+    <a asp-action="ExportExcel" asp-route-id="@ViewBag.Report.ReportId" class="btn btn-success mt-3"
+        title="Export to Excel">
+        <i class="fas fa-file-excel"></i> Export Excel
+    </a>
+    <a asp-action="ExportPdf" asp-route-id="@ViewBag.Report.ReportId" class="btn btn-danger mt-3" title="Export to PDF">
+        <i class="fas fa-file-pdf"></i> Export PDF
+    </a>
+</div>
+
+@section Scripts {
+    <script>
+        function openCanvasPanel() {
+            const reportData = @Html.Raw(ViewBag.Report.Data);
+            let chartConfig = {};
+
+            switch ('@ViewBag.Report.ReportType') {
+                case 'CustomerSummary':
+                    chartConfig = {
+                        type: 'bar',
+                        data: {
+                            labels: reportData.map(item => item.ClientName),
+                            datasets: [{
+                                label: 'License Count',
+                                data: reportData.map(item => item.LicenseCount),
+                                backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF'],
+                                borderColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF'],
+                                borderWidth: 1
+                            }, {
+                                label: 'Total Margin',
+                                data: reportData.map(item => item.TotalAmount),
+                                backgroundColor: ['#36A2EB80', '#FF638480', '#FFCE5680', '#4BC0C080', '#9966FF80'],
+                                borderColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    };
+                    break;
+
+                case 'ProductBusiness':
+                    chartConfig = {
+                        type: 'bar',
+                        data: {
+                            labels: reportData.map(item => item.ProductName),
+                            datasets: [{
+                                label: 'License Count',
+                                data: reportData.map(item => item.LicenseCount),
+                                backgroundColor: '#4BC0C0',
+                                borderColor: '#4BC0C0',
+                                borderWidth: 1
+                            }, {
+                                label: 'Total Margin',
+                                data: reportData.map(item => item.TotalMargin),
+                                backgroundColor: '#FFCE56',
+                                borderColor: '#FFCE56',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    };
+                    break;
+
+                case 'OemProcurementCost':
+                    chartConfig = {
+                        type: 'bar',
+                        data: {
+                            labels: reportData.map(item => item.OemName),
+                            datasets: [{
+                                label: 'Total Cost',
+                                data: reportData.map(item => item.TotalCost),
+                                backgroundColor: '#FF6384',
+                                borderColor: '#FF6384',
+                                borderWidth: 1
+                            }, {
+                                label: 'Purchase Count',
+                                data: reportData.map(item => item.PurchaseCount),
+                                backgroundColor: '#36A2EB',
+                                borderColor: '#36A2EB',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    };
+                    break;
+
+                case 'FinancialSummary_Monthly':
+                case 'FinancialSummary_Quarterly':
+                case 'FinancialSummary_Yearly':
+                    chartConfig = {
+                        type: 'line',
+                        data: {
+                            labels: reportData.map(item => item.Period),
+                            datasets: [{
+                                label: 'Total Revenue',
+                                data: reportData.map(item => item.TotalRevenue),
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 2,
+                                fill: true
+                            }, {
+                                label: 'Total Paid',
+                                data: reportData.map(item => item.TotalPaid),
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 2,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    };
+                    break;
+
+                case 'ExpiryRenewal':
+                    chartConfig = {
+                        type: 'pie',
+                        data: {
+                            labels: reportData.map(item => item.DealStatus),
+                            datasets: [{
+                                label: 'Renewal Count',
+                                data: reportData.map(item => item.RenewalCount),
+                                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                                borderColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                                borderWidth: 1
+                            }, {
+                                label: 'Upcoming Renewals',
+                                data: reportData.map(item => item.UpcomingRenewals),
+                                backgroundColor: ['#FF638480', '#36A2EB80', '#FFCE5680'],
+                                borderColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true
+                        }
+                    };
+                    break;
+
+                case 'MarginAnalysis':
+                    chartConfig = {
+                        type: 'bar',
+                        data: {
+                            labels: reportData.map(item => item.ClientName),
+                            datasets: [{
+                                label: 'Total Margin',
+                                data: reportData.map(item => item.TotalMargin),
+                                backgroundColor: '#4BC0C0',
+                                borderColor: '#4BC0C0',
+                                borderWidth: 1
+                            }, {
+                                label: 'Average Margin',
+                                data: reportData.map(item => item.AverageMargin),
+                                backgroundColor: '#9966FF',
+                                borderColor: '#9966FF',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    };
+                    break;
+            }
+
+            window.xaiCanvasPanel.open({
+                content: {
+                    type: "chartjs",
+                    config: chartConfig
+                }
+            });
+        }
+    </script>
+}

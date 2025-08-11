@@ -1,0 +1,268 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Financial Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    decimal totalRevenue = 0;
+    decimal totalMargin = 0;
+    int totalLicenses = 0;
+    
+    if (Model != null)
+    {
+        totalRevenue = Model.Sum(x => (decimal)x.TotalAmount);
+        totalMargin = Model.Sum(x => (decimal)x.TotalMargin);
+        totalLicenses = Model.Sum(x => (int)x.Count);
+    }
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-dollar-sign"></i> Financial Dashboard</h2>
+                <div class="btn-group" role="group">
+                    <a href="@Url.Action("Index", "Billing")" class="btn btn-outline-primary">
+                        <i class="fas fa-file-invoice"></i> Billing Management
+                    </a>
+                    <a href="@Url.Action("Index", "Report")" class="btn btn-outline-success">
+                        <i class="fas fa-chart-line"></i> Financial Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Financial Metrics -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="card-title">@totalRevenue.ToString("C")</h3>
+                            <p class="card-text">Total Revenue</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-money-bill-wave fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="card-title">@totalMargin.ToString("C")</h3>
+                            <p class="card-text">Total Margin</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-line fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="card-title">@totalLicenses</h3>
+                            <p class="card-text">Total Licenses</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-list fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-warning text-dark h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 class="card-title">@((totalMargin / (totalRevenue > 0 ? totalRevenue : 1)) * 100).ToString("F1")%</h3>
+                            <p class="card-text">Average Margin</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-percentage fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Status Breakdown -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Payment Status Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="paymentStatusChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-table"></i> Payment Summary</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Count</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (item.Status == "Completed")
+                                                {
+                                                    <span class="badge badge-success">@item.Status</span>
+                                                }
+                                                else if (item.Status == "Pending")
+                                                {
+                                                    <span class="badge badge-warning">@item.Status</span>
+                                                }
+                                                else if (item.Status == "Overdue")
+                                                {
+                                                    <span class="badge badge-danger">@item.Status</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-secondary">@item.Status</span>
+                                                }
+                                            </td>
+                                            <td>@item.Count</td>
+                                            <td>@((decimal)item.TotalAmount).ToString("C")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            <p>No financial data available</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-tasks"></i> Financial Operations</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <a href="@Url.Action("Index", "Billing")" class="btn btn-primary btn-lg btn-block">
+                                <i class="fas fa-file-invoice"></i><br>
+                                Manage Invoices
+                            </a>
+                        </div>
+                        <!-- Business Analytics moved to Phase 6 implementation -->
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <a href="@Url.Action("Index", "Report")" class="btn btn-warning btn-lg btn-block">
+                                <i class="fas fa-chart-pie"></i><br>
+                                Financial Reports
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <a href="@Url.Action("Index", "Procurement")" class="btn btn-info btn-lg btn-block">
+                                <i class="fas fa-shopping-cart"></i><br>
+                                Procurement
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Payment Status Chart
+        @if (Model != null && Model.Any())
+        {
+            <text>
+            const paymentCtx = document.getElementById('paymentStatusChart').getContext('2d');
+            const paymentChart = new Chart(paymentCtx, {
+                type: 'bar',
+                data: {
+                    labels: [@Html.Raw(string.Join(",", Model.Select(x => $"'{x.Status}'")))],
+                    datasets: [{
+                        label: 'Total Amount',
+                        data: [@Html.Raw(string.Join(",", Model.Select(x => x.TotalAmount)))],
+                        backgroundColor: [
+                            @Html.Raw(string.Join(",", Model.Select(x => 
+                                x.Status == "Completed" ? "'#28a745'" :
+                                x.Status == "Pending" ? "'#ffc107'" :
+                                x.Status == "Overdue" ? "'#dc3545'" : "'#6c757d'")))
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return '$' + value.toLocaleString('en-US', {
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0
+                                    });
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Amount: $' + context.parsed.y.toLocaleString('en-US', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            </text>
+        }
+    </script>
+}

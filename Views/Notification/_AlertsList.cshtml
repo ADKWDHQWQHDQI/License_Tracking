@@ -1,0 +1,96 @@
+@using License_Tracking.Models
+@model List<License_Tracking.Models.Alert>
+
+@if (Model.Any())
+{
+    @foreach (var alert in Model)
+    {
+        <div class="card alert-card mb-3 priority-@alert.Priority.ToString().ToLower() @(alert.IsOverdue ? "alert-overdue" : "")" 
+             data-alert-id="@alert.AlertId">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center mb-2">
+                            @switch (alert.AlertType)
+                            {
+                                case AlertType.Renewal:
+                                    <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                    break;
+                                case AlertType.PipelineReminder:
+                                    <i class="fas fa-project-diagram text-success me-2"></i>
+                                    break;
+                                case AlertType.Payment:
+                                    <i class="fas fa-dollar-sign text-warning me-2"></i>
+                                    break;
+                                default:
+                                    <i class="fas fa-bell text-info me-2"></i>
+                                    break;
+                            }
+                            <h5 class="card-title mb-0">@alert.Title</h5>
+                            <span class="badge bg-@GetPriorityBadgeClass(alert.Priority) ms-2">@alert.Priority</span>
+                            @if (alert.IsOverdue)
+                            {
+                                <span class="badge bg-danger ms-1">Overdue</span>
+                            }
+                        </div>
+                        <p class="card-text">@alert.AlertMessage</p>
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i> Created: @alert.CreatedDate.ToString("MMM dd, yyyy HH:mm")
+                            @if (alert.AlertDate != alert.CreatedDate)
+                            {
+                                <span class="ms-3"><i class="fas fa-calendar"></i> Alert Date: @alert.AlertDate.ToString("MMM dd, yyyy")</span>
+                            }
+                        </small>
+                    </div>
+                    
+                    <div class="col-md-4 text-end">
+                        <div class="btn-group" role="group">
+                            @if (alert.License != null)
+                            {
+                                <a asp-controller="License" asp-action="Details" asp-route-id="@alert.License.LicenseId" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye"></i> View License
+                                </a>
+                            }
+                            @if (alert.ProjectPipeline != null)
+                            {
+                                <a asp-controller="ProjectPipeline" asp-action="Details" asp-route-id="@alert.ProjectPipeline.ProjectPipelineId" 
+                                   class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-eye"></i> View Project
+                                </a>
+                            }
+                            <button class="btn btn-outline-secondary btn-sm" onclick="markAsRead(@alert.AlertId)">
+                                <i class="fas fa-check"></i> Mark Read
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="dismissAlert(@alert.AlertId)">
+                                <i class="fas fa-times"></i> Dismiss
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="text-center py-5">
+        <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No alerts found</h4>
+        <p class="text-muted">No alerts match the current filter.</p>
+    </div>
+}
+
+@functions {
+    string GetPriorityBadgeClass(License_Tracking.Models.AlertPriority priority)
+    {
+        return priority switch
+        {
+            License_Tracking.Models.AlertPriority.Critical => "danger",
+            License_Tracking.Models.AlertPriority.High => "warning",
+            License_Tracking.Models.AlertPriority.Medium => "info",
+            License_Tracking.Models.AlertPriority.Low => "secondary",
+            _ => "secondary"
+        };
+    }
+}

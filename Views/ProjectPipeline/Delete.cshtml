@@ -1,0 +1,124 @@
+@model License_Tracking.ViewModels.ProjectPipelineViewModel
+
+@{
+    ViewData["Title"] = "Delete Project Pipeline";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Delete Project Pipeline
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-warning"></i> Confirm Deletion</h5>
+                        <p class="mb-0">Are you sure you want to delete this project pipeline? This action cannot be undone.</p>
+                    </div>
+
+                    <!-- Project Summary -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Project Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Product:</strong> @Model.ProductName</p>
+                                    <p><strong>OEM:</strong> @Model.OemName</p>
+                                    <p><strong>Customer:</strong> @Model.ClientName</p>
+                                    <p><strong>Status:</strong> 
+                                        <span class="badge bg-@(Model.ProjectStatus == "Confirmed" ? "success" : 
+                                                                Model.ProjectStatus == "Lost" ? "danger" :
+                                                                Model.ProjectStatus == "Negotiation" ? "warning" :
+                                                                Model.ProjectStatus == "Pending" ? "info" : "secondary")">
+                                            @Model.ProjectStatus
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Expected License Date:</strong> @Model.ExpectedLicenseDate.ToString("MMM dd, yyyy")</p>
+                                    <p><strong>Projected Revenue:</strong> @Model.ProjectedRevenue.ToString("C")</p>
+                                    <p><strong>Projected Margin:</strong> @Model.ProjectedMargin.ToString("C")</p>
+                                    <p><strong>Success Probability:</strong> @Model.SuccessProbability%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.IsConverted)
+                    {
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-exclamation-triangle"></i> Warning: Converted Project</h6>
+                            <p class="mb-0">
+                                This project has been converted to License ID: @Model.ConvertedToLicenseId. 
+                                Deleting this project will not affect the existing license record.
+                            </p>
+                        </div>
+                    }
+
+                    <!-- Contact Information -->
+                    @if (!string.IsNullOrEmpty(Model.ClientContactEmail) || !string.IsNullOrEmpty(Model.ClientContactPhone))
+                    {
+                        <div class="mb-3">
+                            <h6>Contact Information that will be lost:</h6>
+                            @if (!string.IsNullOrEmpty(Model.ClientContactEmail))
+                            {
+                                <p class="mb-1"><strong>Email:</strong> @Model.ClientContactEmail</p>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.ClientContactPhone))
+                            {
+                                <p class="mb-1"><strong>Phone:</strong> @Model.ClientContactPhone</p>
+                            }
+                        </div>
+                    }
+
+                    <!-- Notes that will be lost -->
+                    @if (!string.IsNullOrEmpty(Model.MarginNotes) || !string.IsNullOrEmpty(Model.Remarks))
+                    {
+                        <div class="mb-3">
+                            <h6>Notes that will be lost:</h6>
+                            @if (!string.IsNullOrEmpty(Model.MarginNotes))
+                            {
+                                <p class="mb-1"><strong>Margin Notes:</strong> @Model.MarginNotes</p>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Remarks))
+                            {
+                                <p class="mb-1"><strong>Remarks:</strong> @Model.Remarks</p>
+                            }
+                        </div>
+                    }
+
+                    <!-- Deletion Form -->
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="ProjectPipelineId" />
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Details" asp-route-id="@Model.ProjectPipelineId" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                            
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Confirm Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Add confirmation dialog as an extra safety measure
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!confirm('Are you absolutely sure you want to delete this project? This action is permanent and cannot be undone.')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

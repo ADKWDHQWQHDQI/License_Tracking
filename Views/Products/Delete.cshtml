@@ -1,0 +1,235 @@
+@model License_Tracking.Models.Product
+
+@{
+    ViewData["Title"] = $"Archive Product - {Model.ProductName}";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="text-danger mb-1">
+                        <i class="fas fa-archive"></i> Archive Product
+                    </h2>
+                    <p class="text-muted mb-0">Phase 2 Week 5: Archive product from catalog (soft delete with reference preservation)</p>
+                </div>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+
+            <!-- Confirmation Card -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-danger text-white border-bottom-0">
+                    <h5 class="mb-0 text-white">
+                        <i class="fas fa-exclamation-triangle"></i> Confirm Product Archive
+                    </h5>
+                    <small class="text-white-50">This action will archive the product but preserve all historical data</small>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Warning Alert -->
+                    <div class="alert alert-warning" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle"></i> Important Notice
+                        </h5>
+                        <p class="mb-0">
+                            You are about to archive <strong>@Model.ProductName</strong>. This product will no longer be available for new deals, 
+                            but all existing deals and historical data will be preserved.
+                        </p>
+                    </div>
+
+                    <!-- Product Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <h6 class="text-primary mb-3">Product Summary</h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-item mb-3">
+                                        <label class="fw-bold text-muted">Product Name:</label>
+                                        <p class="mb-0">@Model.ProductName</p>
+                                    </div>
+                                    
+                                    <div class="info-item mb-3">
+                                        <label class="fw-bold text-muted">OEM Partner:</label>
+                                        <p class="mb-0">
+                                            @if (Model.Oem != null)
+                                            {
+                                                <span class="badge bg-primary">@Model.Oem.OemName</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">No OEM assigned</span>
+                                            }
+                                        </p>
+                                    </div>
+
+                                    <div class="info-item mb-3">
+                                        <label class="fw-bold text-muted">Category:</label>
+                                        <p class="mb-0">
+                                            @if (!string.IsNullOrEmpty(Model.ProductCategory))
+                                            {
+                                                <span class="badge bg-secondary">@Model.ProductCategory</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Not categorized</span>
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="info-item mb-3">
+                                        <label class="fw-bold text-muted">License Type:</label>
+                                        <p class="mb-0">
+                                            @if (!string.IsNullOrEmpty(Model.LicenseType))
+                                            {
+                                                <span class="badge badge-@(Model.LicenseType switch 
+                                                {
+                                                    "Subscription" => "success",
+                                                    "Perpetual" => "primary",
+                                                    "Trial" => "warning",
+                                                    _ => "secondary"
+                                                })">@Model.LicenseType</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Not specified</span>
+                                            }
+                                        </p>
+                                    </div>
+
+                                    <div class="info-item mb-3">
+                                        <label class="fw-bold text-muted">Unit Price:</label>
+                                        <p class="mb-0">
+                                            @if (Model.UnitPrice.HasValue)
+                                            {
+                                                <span class="h6 text-success">@Model.UnitPrice.Value.ToString("C")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Price not set</span>
+                                            }
+                                        </p>
+                                    </div>
+
+                                    <div class="info-item mb-3">
+                                        <label class="fw-bold text-muted">Created Date:</label>
+                                        <p class="mb-0">@Model.CreatedDate.ToString("MMMM dd, yyyy")</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Impact Summary -->
+                        <div class="col-md-4">
+                            <h6 class="text-warning mb-3">Impact Assessment</h6>
+                            
+                            <div class="card border-warning">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <h4 class="text-primary">@(Model.Deals?.Count ?? 0)</h4>
+                                        <small class="text-muted">Active Deals</small>
+                                    </div>
+                                    
+                                    @if (Model.Deals?.Any() == true)
+                                    {
+                                        <hr>
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle"></i>
+                                            Existing deals will continue to function normally after archiving.
+                                        </small>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.ProductDescription))
+                    {
+                        <div class="info-item mb-4">
+                            <label class="fw-bold text-muted">Description:</label>
+                            <p class="mb-0 text-muted">@Model.ProductDescription</p>
+                        </div>
+                    }
+
+                    <!-- Archive Effects -->
+                    <div class="card border-info mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 text-info">
+                                <i class="fas fa-info-circle"></i> What happens when you archive this product?
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-success">
+                                        <i class="fas fa-check"></i> Will Continue Working:
+                                    </h6>
+                                    <ul class="text-muted small">
+                                        <li>All existing deals remain active</li>
+                                        <li>Historical reports and analytics</li>
+                                        <li>Invoice and payment tracking</li>
+                                        <li>Deal progression through phases</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-warning">
+                                        <i class="fas fa-exclamation-triangle"></i> Will Stop Working:
+                                    </h6>
+                                    <ul class="text-muted small">
+                                        <li>Product won't appear in new deal creation</li>
+                                        <li>Product dropdown selections for new deals</li>
+                                        <li>Product catalog searches (unless filtered for archived)</li>
+                                        <li>Product assignment to new customers</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Form -->
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="ProductId" />
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted">
+                                    <i class="fas fa-shield-alt"></i>
+                                    This is a soft delete operation - data can be recovered if needed
+                                </small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                                <a asp-action="Details" asp-route-id="@Model.ProductId" class="btn btn-outline-info">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to archive this product?')">
+                                    <i class="fas fa-archive"></i> Archive Product
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Recovery Information -->
+            <div class="card border-0 bg-light mt-4">
+                <div class="card-body">
+                    <h6 class="text-info">
+                        <i class="fas fa-undo"></i> Recovery Options
+                    </h6>
+                    <p class="mb-0 small text-muted">
+                        If you need to restore this product later, contact your system administrator. 
+                        Archived products can be reactivated while preserving all historical data and relationships.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

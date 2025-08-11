@@ -1,0 +1,304 @@
+@model License_Tracking.Models.Company
+
+@{
+    ViewData["Title"] = $"Contact Management - {Model.CompanyName}";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-users"></i> Contact Management
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Manage contacts for <strong>@Model.CompanyName</strong>
+                    </p>
+                </div>
+                <div>
+                    <a asp-action="CustomerProfile" asp-route-id="@Model.CompanyId" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left mr-1"></i>Back to Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Contact Form -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-plus text-success"></i> Add New Contact
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AddContact" method="post">
+                        <input type="hidden" name="CompanyId" value="@Model.CompanyId" />
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="Name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="Name" required 
+                                           placeholder="Enter full name" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="Email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" name="Email" 
+                                           placeholder="Enter email address" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="Number" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" name="Number" 
+                                           placeholder="Enter phone number" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="Designation" class="form-label">Designation</label>
+                                    <input type="text" class="form-control" name="Designation" 
+                                           placeholder="Job title" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="Department" class="form-label">Department</label>
+                                    <select class="form-control" name="Department">
+                                        <option value="">Select Department</option>
+                                        <option value="IT">IT</option>
+                                        <option value="Finance">Finance</option>
+                                        <option value="Operations">Operations</option>
+                                        <option value="Management">Management</option>
+                                        <option value="Sales">Sales</option>
+                                        <option value="HR">HR</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="DecisionMakerLevel" class="form-label">Decision Maker Level</label>
+                                    <select class="form-control" name="DecisionMakerLevel">
+                                        <option value="">Select Level</option>
+                                        <option value="Primary">Primary Decision Maker</option>
+                                        <option value="Secondary">Secondary Decision Maker</option>
+                                        <option value="Influencer">Influencer</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="IsPrimaryContact" class="form-label">Primary Contact</label>
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="IsPrimaryContact" id="IsPrimaryContact" />
+                                        <label class="form-check-label" for="IsPrimaryContact">
+                                            Set as primary contact
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-plus"></i> Add Contact
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Existing Contacts -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-address-book text-primary"></i> Existing Contacts (@(Model.ContactPersons?.Count ?? 0))
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.ContactPersons?.Any() == true)
+                    {
+                        <div class="row">
+                            @foreach (var contact in Model.ContactPersons)
+                            {
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card h-100 @(contact.IsPrimaryContact ? "border-success" : "")">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title mb-0">@contact.Name</h6>
+                                                @if (contact.IsPrimaryContact)
+                                                {
+                                                    <span class="badge badge-success">Primary</span>
+                                                }
+                                            </div>
+                                            
+                                            @if (!string.IsNullOrEmpty(contact.Designation))
+                                            {
+                                                <p class="text-muted mb-1">
+                                                    <i class="fas fa-briefcase"></i> @contact.Designation
+                                                </p>
+                                            }
+                                            
+                                            @if (!string.IsNullOrEmpty(contact.Department))
+                                            {
+                                                <p class="text-muted mb-1">
+                                                    <i class="fas fa-building"></i> @contact.Department
+                                                </p>
+                                            }
+                                            
+                                            @if (!string.IsNullOrEmpty(contact.DecisionMakerLevel))
+                                            {
+                                                <span class="badge badge-@(contact.DecisionMakerLevel switch 
+                                                {
+                                                    "Primary" => "success",
+                                                    "Secondary" => "warning",
+                                                    "Influencer" => "info",
+                                                    _ => "secondary"
+                                                }) mb-2">
+                                                    @contact.DecisionMakerLevel
+                                                </span>
+                                            }
+                                            
+                                            <div class="contact-actions mt-3">
+                                                @if (!string.IsNullOrEmpty(contact.Email))
+                                                {
+                                                    <a href="mailto:@contact.Email" class="btn btn-sm btn-outline-primary" title="Send Email">
+                                                        <i class="fas fa-envelope"></i>
+                                                    </a>
+                                                }
+                                                
+                                                @if (!string.IsNullOrEmpty(contact.Number))
+                                                {
+                                                    <a href="tel:@contact.Number" class="btn btn-sm btn-outline-success" title="Call">
+                                                        <i class="fas fa-phone"></i>
+                                                    </a>
+                                                }
+                                                
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                                        onclick="editContact(@contact.ContactId)" title="Edit Contact">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                
+                                                @if (!contact.IsPrimaryContact)
+                                                {
+                                                    <button type="button" class="btn btn-sm btn-outline-warning" 
+                                                            onclick="setPrimary(@contact.ContactId)" title="Set as Primary">
+                                                        <i class="fas fa-star"></i>
+                                                    </button>
+                                                }
+                                            </div>
+                                            
+                                            @if (!string.IsNullOrEmpty(contact.Email) || !string.IsNullOrEmpty(contact.Number))
+                                            {
+                                                <div class="contact-details mt-2">
+                                                    @if (!string.IsNullOrEmpty(contact.Email))
+                                                    {
+                                                        <small class="text-muted d-block">
+                                                            <i class="fas fa-envelope"></i> @contact.Email
+                                                        </small>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(contact.Number))
+                                                    {
+                                                        <small class="text-muted d-block">
+                                                            <i class="fas fa-phone"></i> @contact.Number
+                                                        </small>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="card-footer text-muted">
+                                            <small>
+                                                <i class="fas fa-calendar"></i> Added @contact.CreatedDate.ToString("MMM dd, yyyy")
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        
+                        <!-- Contact Statistics -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6>Contact Statistics</h6>
+                                        <div class="row text-center">
+                                            <div class="col-md-3">
+                                                <div class="stat-item">
+                                                    <h4 class="text-primary">@Model.ContactPersons.Count</h4>
+                                                    <small>Total Contacts</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="stat-item">
+                                                    <h4 class="text-success">@Model.ContactPersons.Count(c => c.DecisionMakerLevel == "Primary")</h4>
+                                                    <small>Decision Makers</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="stat-item">
+                                                    <h4 class="text-info">@Model.ContactPersons.Count(c => c.DecisionMakerLevel == "Influencer")</h4>
+                                                    <small>Influencers</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="stat-item">
+                                                    <h4 class="text-warning">@Model.ContactPersons.Count(c => c.IsPrimaryContact)</h4>
+                                                    <small>Primary Contacts</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No Contacts Added</h5>
+                            <p class="text-muted">Start building your contact network by adding key decision makers above.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function editContact(contactId) {
+            alert('Contact editing will be fully implemented in Phase 2 - Contact ID: ' + contactId);
+        }
+        
+        function setPrimary(contactId) {
+            if (confirm('Set this contact as the primary contact for this company?')) {
+                // This will be implemented with AJAX in Phase 2
+                alert('Primary contact functionality will be implemented in Phase 2 - Contact ID: ' + contactId);
+            }
+        }
+        
+        // Auto-hide success messages
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.alert').fadeOut();
+            }, 5000);
+        });
+    </script>
+}

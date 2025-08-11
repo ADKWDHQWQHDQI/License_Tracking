@@ -1,0 +1,75 @@
+@model License_Tracking.Models.RegisterModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <h2 class="card-title">
+                            <i class="fas fa-user-plus text-success"></i>
+                            Create Account
+                        </h2>
+                        <p class="text-muted">Register for License Tracking System</p>
+                    </div>
+
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="All" class="alert alert-danger d-none"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">
+                                <i class="fas fa-envelope"></i> Email Address
+                            </label>
+                            <input asp-for="Email" class="form-control" placeholder="Enter your email address" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label">
+                                <i class="fas fa-lock"></i> Password
+                            </label>
+                            <input asp-for="Password" class="form-control" placeholder="Enter a strong password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                            <div class="form-text">Password must be at least 6 characters long with uppercase, lowercase, digit, and special character.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Role" class="form-label">
+                                <i class="fas fa-user-tag"></i> Role
+                            </label>
+                            <select asp-for="Role" class="form-select">
+                                <option value="">Select your role</option>
+                                <option value="Admin">Admin (Full Access)</option>
+                                <option value="Sales">Sales (Create/Edit Licenses)</option>
+                                <option value="Finance">Finance (View Financial Data)</option>
+                                <option value="Operations">Operations (View Operations Data)</option>
+                                <option value="Management">Management (View Reports)</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-user-plus"></i> Create Account
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center">
+                        <p class="text-muted">Already have an account? 
+                            <a asp-action="Login" class="text-primary">Sign in here</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,328 @@
+@{
+    ViewData["Title"] = "All Purchase Orders";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-primary mb-4">
+                <i class="fas fa-list"></i> All Purchase Orders
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Procurement</a></li>
+                    <li class="breadcrumb-item active">Purchase Orders</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Filters and Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-filter"></i> Filters & Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" asp-action="PurchaseOrders">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">Search</label>
+                                <input type="text" class="form-control" name="search" placeholder="PO Number, Product, OEM..." value="@ViewBag.CurrentSearch" />
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Payment Status</label>
+                                <select class="form-select" name="paymentStatus">
+                                    <option value="">All Statuses</option>
+                                    <option value="Paid" selected="@(ViewBag.CurrentPaymentStatus == "Paid")">Paid</option>
+                                    <option value="Pending" selected="@(ViewBag.CurrentPaymentStatus == "Pending")">Pending</option>
+                                    <option value="Partial" selected="@(ViewBag.CurrentPaymentStatus == "Partial")">Partial</option>
+                                    <option value="Overdue" selected="@(ViewBag.CurrentPaymentStatus == "Overdue")">Overdue</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">OEM Partner</label>
+                                <select class="form-select" name="oemFilter">
+                                    <option value="">All OEMs</option>
+                                    @if (ViewBag.AvailableOems != null)
+                                    {
+                                        @foreach (var oem in (List<string>)ViewBag.AvailableOems)
+                                        {
+                                            <option value="@oem" selected="@(ViewBag.CurrentOem == oem)">@oem</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Date Range</label>
+                                <select class="form-select" name="dateRange">
+                                    <option value="">All Dates</option>
+                                    <option value="30days" selected="@(ViewBag.CurrentDateRange == "30days")">Last 30 Days</option>
+                                    <option value="90days" selected="@(ViewBag.CurrentDateRange == "90days")">Last 90 Days</option>
+                                    <option value="12months" selected="@(ViewBag.CurrentDateRange == "12months")">Last 12 Months</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary d-block w-100">
+                                    <i class="fas fa-search"></i> Filter
+                                </button>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">&nbsp;</label>
+                                <a asp-action="TrackPayment" class="btn btn-success d-block w-100" title="Add New Purchase Order">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Orders Summary -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Total POs</h5>
+                            <h3 class="mb-0">@ViewBag.Summary.TotalPOs</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-file-invoice fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Total Amount</h5>
+                            <h3 class="mb-0">@ViewBag.Summary.TotalAmount.ToString("C")</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Pending Amount</h5>
+                            <h3 class="mb-0">@ViewBag.Summary.PendingAmount.ToString("C")</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Avg PO Size</h5>
+                            <h3 class="mb-0">@ViewBag.Summary.AverageAmount.ToString("C")</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-bar fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Orders Table -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-table"></i> Purchase Orders
+                        @if (ViewBag.TotalCount != null)
+                        {
+                            <span class="badge bg-primary ms-2">@ViewBag.TotalCount results</span>
+                        }
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.PurchaseOrders != null && ((List<License_Tracking.Models.PurchaseOrder>)ViewBag.PurchaseOrders).Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>
+                                            <a asp-action="PurchaseOrders" asp-route-sortBy="OemPoNumber" asp-route-sortOrder="@(ViewBag.SortBy == "OemPoNumber" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" class="text-decoration-none">
+                                                PO Number
+                                                @if (ViewBag.SortBy == "OemPoNumber")
+                                                {
+                                                    <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down")"></i>
+                                                }
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a asp-action="PurchaseOrders" asp-route-sortBy="OemName" asp-route-sortOrder="@(ViewBag.SortBy == "OemName" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" class="text-decoration-none">
+                                                OEM Partner
+                                                @if (ViewBag.SortBy == "OemName")
+                                                {
+                                                    <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down")"></i>
+                                                }
+                                            </a>
+                                        </th>
+                                        <th>Product</th>
+                                        <th>
+                                            <a asp-action="PurchaseOrders" asp-route-sortBy="OemPoAmount" asp-route-sortOrder="@(ViewBag.SortBy == "OemPoAmount" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" class="text-decoration-none">
+                                                Amount
+                                                @if (ViewBag.SortBy == "OemPoAmount")
+                                                {
+                                                    <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down")"></i>
+                                                }
+                                            </a>
+                                        </th>
+                                        <th>Status</th>
+                                        <th>Payment Terms</th>
+                                        <th>
+                                            <a asp-action="PurchaseOrders" asp-route-sortBy="CreatedDate" asp-route-sortOrder="@(ViewBag.SortBy == "CreatedDate" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" class="text-decoration-none">
+                                                Date Created
+                                                @if (ViewBag.SortBy == "CreatedDate")
+                                                {
+                                                    <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down")"></i>
+                                                }
+                                            </a>
+                                        </th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var po in (List<License_Tracking.Models.PurchaseOrder>)ViewBag.PurchaseOrders)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@po.OemPoNumber</strong>
+                                                @if (!string.IsNullOrEmpty(po.OemInvoiceNumber))
+                                                {
+                                                    <br><small class="text-muted">Invoice: @po.OemInvoiceNumber</small>
+                                                }
+                                            </td>
+                                            <td>@(po.Deal?.Oem?.OemName ?? "N/A")</td>
+                                            <td>
+                                                <strong>@(po.Deal?.Product?.ProductName ?? "N/A")</strong>
+                                            </td>
+                                            <td>
+                                                <strong>@po.OemPoAmount.ToString("C")</strong>
+                                                @if (po.AmountPaid > 0 && po.AmountPaid < po.OemPoAmount)
+                                                {
+                                                    <br><small class="text-success">Paid: @po.AmountPaid.ToString("C")</small>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge @(po.PaymentStatus == "Paid" ? "bg-success" : po.PaymentStatus == "Partial" ? "bg-warning" : po.PaymentStatus == "Overdue" ? "bg-danger" : "bg-secondary")">
+                                                    @po.PaymentStatus
+                                                </span>
+                                                @if (po.PaymentDate.HasValue)
+                                                {
+                                                    <br><small class="text-muted">@po.PaymentDate.Value.ToString("MMM dd, yyyy")</small>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(po.PaymentTerms))
+                                                {
+                                                    <span class="badge @(po.PaymentTerms.Contains("30") ? "bg-success" : po.PaymentTerms.Contains("60") ? "bg-warning" : "bg-info")">
+                                                        @po.PaymentTerms
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>@po.CreatedDate.ToString("MMM dd, yyyy")</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a asp-action="TrackPayment" asp-route-id="@po.PurchaseOrderId" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#detailModal-@po.PurchaseOrderId" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination would go here if needed -->
+                        @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+                        {
+                            <nav class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                            <a class="page-link" asp-action="PurchaseOrders" asp-route-page="@i">@i</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info text-center">
+                            <h5><i class="fas fa-info-circle"></i> No Purchase Orders Found</h5>
+                            <p>@(ViewBag.CurrentSearch != null ? "No purchase orders match your search criteria." : "Start by tracking your first OEM purchase order.")</p>
+                            <a asp-action="TrackPayment" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Track New Purchase Order
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .table th a {
+        color: inherit;
+    }
+    
+    .table th a:hover {
+        color: #0d6efd;
+    }
+    
+    .btn-group .btn {
+        border-radius: 6px;
+    }
+</style>

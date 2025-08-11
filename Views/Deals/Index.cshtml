@@ -1,0 +1,524 @@
+@model IEnumerable<License_Tracking.Models.Deal>
+
+@{
+    ViewData["Title"] = "Deal Management";
+    var currentStage = ViewData["CurrentStage"]?.ToString();
+
+    string GetPhaseFromStage(string? stage)
+    {
+        return stage switch
+        {
+            "Lead" or "Qualified" => "Phase 1: Customer PO",
+            "Quoted" => "Phase 2: OEM Procurement",
+            "Negotiation" => "Phase 3: License Delivery",
+            "Won" => "Phase 4: OEM Settlement",
+            "Lost" => "Deal Lost",
+            _ => "Phase 1: Customer PO"
+        };
+    }
+}
+
+<div class="container-fluid">
+    <!-- Header with Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="fas fa-handshake"></i> Deal Management</h1>
+                    <p class="text-muted mb-0">Comprehensive 4-Phase B2B2B Workflow Management System</p>
+                </div>
+                <div class="btn-group">
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create New Deal
+                    </a>
+                    <a asp-controller="InvoiceManagement" asp-action="Index" class="btn btn-success">
+                        <i class="fas fa-file-invoice-dollar"></i> Invoice Management
+                    </a>
+                    <button type="button" class="btn btn-info" onclick="exportDeals()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h4 class="mb-0" id="totalDeals">@Model.Count()</h4>
+                            <small>Total Deals</small>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-handshake fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h4 class="mb-0" id="activeDeals">@Model.Count(d => d.DealStage != "Won" && d.DealStage !=
+                                                                "Lost")</h4>
+                            <small>Active Deals</small>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-chart-line fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h4 class="mb-0" id="wonDeals">@Model.Count(d => d.DealStage == "Won")</h4>
+                            <small>Won Deals</small>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-trophy fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h4 class="mb-0" id="totalRevenue">@(Model.Where(d =>
+                                                                d.CustomerInvoiceAmount.HasValue).Sum(d =>
+                                                                d.CustomerInvoiceAmount!.Value).ToString("C0"))</h4>
+                            <small>Total Revenue</small>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4-Phase Workflow Overview -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-project-diagram"></i> 4-Phase B2B2B Workflow Overview</h5>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <div class="phase-summary p-3 border rounded">
+                        <i class="fas fa-user-friends fa-2x text-primary mb-2"></i>
+                        <h6>Phase 1</h6>
+                        <small>Customer PO</small>
+                        <div class="h4 text-primary mt-2">@Model.Count(d => d.DealStage == "Lead" || d.DealStage ==
+                                                        "Qualified") deals</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="phase-summary p-3 border rounded">
+                        <i class="fas fa-shopping-cart fa-2x text-info mb-2"></i>
+                        <h6>Phase 2</h6>
+                        <small>OEM Procurement</small>
+                        <div class="h4 text-info mt-2">@Model.Count(d => d.DealStage == "Quoted") deals</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="phase-summary p-3 border rounded">
+                        <i class="fas fa-key fa-2x text-warning mb-2"></i>
+                        <h6>Phase 3</h6>
+                        <small>License Delivery</small>
+                        <div class="h4 text-warning mt-2">@Model.Count(d => d.DealStage == "Negotiation") deals</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="phase-summary p-3 border rounded">
+                        <i class="fas fa-handshake fa-2x text-success mb-2"></i>
+                        <h6>Phase 4</h6>
+                        <small>OEM Settlement</small>
+                        <div class="h4 text-success mt-2">@Model.Count(d => d.DealStage == "Won") deals</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Search Deals</label>
+                    <input type="text" name="searchString" class="form-control"
+                        placeholder="Deal name, customer, product..." value="@ViewData["CurrentFilter"]" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Stage</label>
+                    <select name="stage" class="form-select">
+                        <option value="">All Stages</option>
+                        <option value="Lead" selected="@(currentStage == "Lead")">Lead</option>
+                        <option value="Qualified" selected="@(currentStage == "Qualified")">Qualified</option>
+                        <option value="Quoted" selected="@(currentStage == "Quoted")">Quoted</option>
+                        <option value="Negotiation" selected="@(currentStage == "Negotiation")">Negotiation</option>
+                        <option value="Won" selected="@(currentStage == "Won")">Won</option>
+                        <option value="Lost" selected="@(currentStage == "Lost")">Lost</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Assigned To</label>
+                    <select name="assignedTo" class="form-select">
+                        <option value="">All Assignees</option>
+                        <option value="@(User.Identity?.Name ?? "")">My Deals</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Deals Data Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Deal Information</th>
+                            <th>Phase & Stage</th>
+                            <th>Company Details</th>
+                            <th>Financial Info</th>
+                            <th>Timeline</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var deal in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                @{
+                                                    var stageIcon = deal.DealStage switch
+                                                    {
+                                                        "Lead" => "fas fa-user-plus text-primary",
+                                                        "Qualified" => "fas fa-check-circle text-info",
+                                                        "Quoted" => "fas fa-file-invoice text-warning",
+                                                        "Negotiation" => "fas fa-handshake text-info",
+                                                        "Won" => "fas fa-trophy text-success",
+                                                        "Lost" => "fas fa-times-circle text-danger",
+                                                        _ => "fas fa-circle text-secondary"
+                                                    };
+                                                }
+                                                <i class="@stageIcon fa-lg"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">
+                                                    <a asp-action="Details" asp-route-id="@deal.DealId"
+                                                        class="text-decoration-none">
+                                                        @deal.DealName
+                                                    </a>
+                                                </h6>
+                                                <small class="text-muted">ID: #@deal.DealId</small>
+                                                <br><small class="text-muted">@deal.DealType</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="mb-2">
+                                            @{
+                                                var phaseText = GetPhaseFromStage(deal.DealStage);
+                                                var phaseClass = deal.DealStage switch
+                                                {
+                                                    "Lead" or "Qualified" => "badge bg-primary",
+                                                    "Quoted" => "badge bg-warning",
+                                                    "Negotiation" => "badge bg-info",
+                                                    "Won" => "badge bg-success",
+                                                    "Lost" => "badge bg-danger",
+                                                    _ => "badge bg-secondary"
+                                                };
+                                            }
+                                            <span class="@phaseClass">@phaseText</span>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-light text-dark">@deal.DealStage</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>@deal.Company?.CompanyName</strong>
+                                            @if (deal.ContactPerson != null)
+                                            {
+                                                <br>
+                                    
+                                                <small class="text-muted">Contact: @deal.ContactPerson.Name</small>
+                                            }
+                                            @if (deal.Oem != null)
+                                            {
+                                                <br>
+                                    
+                                                <small class="text-muted">OEM: @deal.Oem.OemName</small>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (deal.CustomerInvoiceAmount.HasValue)
+                                        {
+                                            <strong class="text-success">@deal.CustomerInvoiceAmount.Value.ToString("C0")</strong>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Pending</span>
+                                        }
+                                        @if (deal.Quantity > 0)
+                                        {
+                                            <br>
+                                
+                                            <small class="text-muted">@deal.Quantity licenses</small>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <small class="text-muted">Created:</small>
+                                            <br>@deal.CreatedDate.ToString("MMM dd, yyyy")
+                                        </div>
+                                        @if (deal.ExpectedCloseDate.HasValue)
+                                        {
+                                            <div class="mt-1">
+                                                <small class="text-muted">Expected Close:</small>
+                                                <br>@deal.ExpectedCloseDate.Value.ToString("MMM dd, yyyy")
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="btn-group-vertical btn-group-sm">
+                                            <a asp-action="Details" asp-route-id="@deal.DealId"
+                                                class="btn btn-outline-primary btn-sm" title="View Details">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                            @if (User.IsInRole("Admin") || User.IsInRole("Sales"))
+                                            {
+                                                <a asp-action="Edit" asp-route-id="@deal.DealId"
+                                                    class="btn btn-outline-warning btn-sm" title="Edit Deal">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="fas fa-handshake fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No Deals Found</h5>
+                                    <p class="text-muted">Start by creating your first deal to begin tracking your B2B2B
+                                        workflow</p>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Sales"))
+                                    {
+                                        <a asp-action="Create" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Create Your First Deal
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kanban View (Hidden by default) -->
+    <div id="kanbanView" style="display: none;">
+        <div class="row">
+            <!-- Phase 1: Customer PO -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-user-friends"></i> Phase 1: Customer PO
+                        <span class="badge bg-light text-dark ms-2">@(Model?.Count(d => d.DealStage == "Lead" ||
+                                                        d.DealStage == "Qualified") ?? 0)</span>
+                    </div>
+                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                        @if (Model != null)
+                        {
+                            @foreach (var deal in Model.Where(d => d.DealStage == "Lead" || d.DealStage == "Qualified"))
+                            {
+                                <div class="card mb-2 shadow-sm" style="cursor: pointer;"
+                                    onclick="window.location.href='@Url.Action("Details", new { id = deal.DealId })'">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title mb-1">@deal.DealName</h6>
+                                        <small class="text-muted">@deal.Company?.CompanyName</small>
+                                        <div class="mt-1">
+                                            <span class="badge bg-primary">@deal.DealStage</span>
+                                            @if (deal.Quantity > 0)
+                                            {
+                                                <small class="text-muted ms-2">@deal.Quantity licenses</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 2: OEM Procurement -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-warning text-white">
+                        <i class="fas fa-shopping-cart"></i> Phase 2: OEM Procurement
+                        <span class="badge bg-light text-dark ms-2">@(Model?.Count(d => d.DealStage == "Quoted") ??
+                                                        0)</span>
+                    </div>
+                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                        @if (Model != null)
+                        {
+                            @foreach (var deal in Model.Where(d => d.DealStage == "Quoted"))
+                            {
+                                <div class="card mb-2 shadow-sm" style="cursor: pointer;"
+                                    onclick="window.location.href='@Url.Action("Details", new { id = deal.DealId })'">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title mb-1">@deal.DealName</h6>
+                                        <small class="text-muted">@deal.Company?.CompanyName</small>
+                                        <div class="mt-1">
+                                            <span class="badge bg-warning">@deal.DealStage</span>
+                                            @if (deal.Quantity > 0)
+                                            {
+                                                <small class="text-muted ms-2">@deal.Quantity licenses</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 3: License Delivery -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <i class="fas fa-key"></i> Phase 3: License Delivery
+                        <span class="badge bg-light text-dark ms-2">@(Model?.Count(d => d.DealStage == "Negotiation") ??
+                                                        0)</span>
+                    </div>
+                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                        @if (Model != null)
+                        {
+                            @foreach (var deal in Model.Where(d => d.DealStage == "Negotiation"))
+                            {
+                                <div class="card mb-2 shadow-sm" style="cursor: pointer;"
+                                    onclick="window.location.href='@Url.Action("Details", new { id = deal.DealId })'">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title mb-1">@deal.DealName</h6>
+                                        <small class="text-muted">@deal.Company?.CompanyName</small>
+                                        <div class="mt-1">
+                                            <span class="badge bg-info">@deal.DealStage</span>
+                                            @if (deal.Quantity > 0)
+                                            {
+                                                <small class="text-muted ms-2">@deal.Quantity licenses</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 4: OEM Settlement -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <i class="fas fa-handshake"></i> Phase 4: OEM Settlement
+                        <span class="badge bg-light text-dark ms-2">@(Model?.Count(d => d.DealStage == "Won") ??
+                                                        0)</span>
+                    </div>
+                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                        @if (Model != null)
+                        {
+                            @foreach (var deal in Model.Where(d => d.DealStage == "Won"))
+                            {
+                                <div class="card mb-2 shadow-sm" style="cursor: pointer;"
+                                    onclick="window.location.href='@Url.Action("Details", new { id = deal.DealId })'">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title mb-1">@deal.DealName</h6>
+                                        <small class="text-muted">@deal.Company?.CompanyName</small>
+                                        <div class="mt-1">
+                                            <span class="badge bg-success">@deal.DealStage</span>
+                                            @if (deal.Quantity > 0)
+                                            {
+                                                <small class="text-muted ms-2">@deal.Quantity licenses</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchView(viewType) {
+        const dealsTable = document.querySelector('.table-responsive').parentElement.parentElement;
+        const kanbanView = document.getElementById('kanbanView');
+        const viewButtons = document.querySelectorAll('[data-view]');
+
+        // Update button states
+        viewButtons.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.onclick && btn.onclick.toString().includes(viewType)) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Toggle views
+        if (viewType === 'kanban') {
+            dealsTable.style.display = 'none';
+            kanbanView.style.display = 'block';
+        } else {
+            dealsTable.style.display = 'block';
+            kanbanView.style.display = 'none';
+        }
+    }
+
+    function exportDeals() {
+        window.location.href = '@Url.Action("Export", "Deals")';
+    }
+
+    function refreshDashboard() {
+        location.reload();
+    }
+</script>
+</script>

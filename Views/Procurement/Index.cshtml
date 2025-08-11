@@ -1,0 +1,177 @@
+@{
+    ViewData["Title"] = "Procurement Dashboard";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-primary mb-4">
+                <i class="fas fa-shopping-cart"></i> Procurement & OEM Management
+            </h2>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Total Purchase Orders</h5>
+                            <h3 class="mb-0">@ViewBag.OemSummary.TotalPurchaseOrders</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-file-invoice fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Total Cost</h5>
+                            <h3 class="mb-0">@ViewBag.OemSummary.TotalCost.ToString("C")</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Pending Payments</h5>
+                            <h3 class="mb-0">@ViewBag.OemSummary.PendingPayments.ToString("C")</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Active OEMs</h5>
+                            <h3 class="mb-0">@ViewBag.OemSummary.UniqueOems</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-handshake fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Purchase Orders -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history"></i> Recent Purchase Orders
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.RecentPurchaseOrders != null &&
+                                        ((List<License_Tracking.Models.PurchaseOrder>)ViewBag.RecentPurchaseOrders).Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>PO Number</th>
+                                        <th>OEM</th>
+                                        <th>Product</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var po in
+                                                                    (List<License_Tracking.Models.PurchaseOrder>)ViewBag.RecentPurchaseOrders)
+                                    {
+                                        <tr>
+                                            <td><strong>@po.OemPoNumber</strong></td>
+                                            <td>@(po.Deal?.Oem?.OemName ?? "N/A")</td>
+                                            <td>@(po.Deal?.Product?.ProductName ?? "N/A")</td>
+                                            <td>@po.OemPoAmount.ToString("C")</td>
+                                            <td>
+                                                <span
+                                                    class="badge @(po.PaymentStatus == "Paid" ? "bg-success" : po.PaymentStatus == "Partial" ? "bg-warning" : "bg-secondary")">
+                                                    @po.PaymentStatus
+                                                </span>
+                                            </td>
+                                            <td>@po.CreatedDate.ToString("MMM dd, yyyy")</td>
+                                            <td>
+                                                <a asp-action="TrackPayment" asp-route-id="@po.PurchaseOrderId"
+                                                    class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a asp-action="PurchaseOrders" class="btn btn-primary">
+                                <i class="fas fa-list"></i> View All Purchase Orders
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info text-center">
+                            <h5><i class="fas fa-info-circle"></i> No Purchase Orders Found</h5>
+                            <p>Start by tracking your first OEM purchase order.</p>
+                            <a asp-action="TrackPayment" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Track First Payment
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn {
+        border-radius: 6px;
+    }
+
+    .alert {
+        border-radius: 6px;
+    }
+
+    .border-primary {
+        border: 2px solid #0d6efd !important;
+    }
+</style>

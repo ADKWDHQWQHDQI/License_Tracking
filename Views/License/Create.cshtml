@@ -1,0 +1,328 @@
+@model License_Tracking.Models.Deal
+
+@{
+    ViewData["Title"] = "License Delivery Setup - Phase 3";
+}
+
+<div class="container-fluid">
+    <!-- CBMS B2B2B Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1"><i class="fas fa-certificate text-success"></i> License Delivery Setup</h2>
+                    <p class="text-muted mb-0">Phase 3: Configure License Details & Delivery Information</p>
+                </div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a asp-controller="Deals" asp-action="Index">Deals</a></li>
+                        <li class="breadcrumb-item active">License Setup</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4-Phase Workflow Progress -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-light border-0">
+                <div class="card-body py-3">
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="p-2 border-end">
+                                <i class="fas fa-check-circle fa-lg text-success"></i>
+                                <p class="mb-0 mt-1 fw-bold text-success">Phase 1</p>
+                                <small class="text-muted">Customer PO ✓</small>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="p-2 border-end">
+                                <i class="fas fa-check-circle fa-lg text-success"></i>
+                                <p class="mb-0 mt-1 fw-bold text-success">Phase 2</p>
+                                <small class="text-muted">OEM Procurement ✓</small>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="p-2 border-end bg-success text-white rounded">
+                                <i class="fas fa-certificate fa-lg"></i>
+                                <p class="mb-0 mt-1 fw-bold">Phase 3</p>
+                                <small>License Delivery</small>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="p-2">
+                                <i class="fas fa-clock fa-lg text-muted"></i>
+                                <p class="mb-0 mt-1 fw-bold text-muted">Phase 4</p>
+                                <small class="text-muted">OEM Settlement</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form asp-action="Create" method="post">
+        <div class="row">
+            <!-- Main License Configuration -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-cogs"></i> License Configuration</h5>
+                    </div>
+                    <div class="card-body">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <!-- Deal Selection -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-success border-bottom pb-2">
+                                    <i class="fas fa-handshake"></i> Deal Information
+                                </h6>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="DealName" class="form-label">Deal Name</label>
+                                <input asp-for="DealName" class="form-control" readonly />
+                                <span asp-validation-for="DealName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="DealStage" class="form-label">Deal Stage</label>
+                                <select asp-for="DealStage" class="form-select">
+                                    <option value="License Setup">License Setup</option>
+                                    <option value="License Delivery">License Delivery</option>
+                                    <option value="Active">Active</option>
+                                </select>
+                                <span asp-validation-for="DealStage" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Customer & OEM Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-success border-bottom pb-2">
+                                    <i class="fas fa-users"></i> Parties Information
+                                </h6>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Customer</label>
+                                <input value="@(Model?.Company?.CompanyName ?? "")" class="form-control" readonly />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">OEM Partner</label>
+                                <input value="@(Model?.Oem?.OemName ?? "")" class="form-control" readonly />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Product</label>
+                                <input value="@(Model?.Product?.ProductName ?? "")" class="form-control" readonly />
+                                <small class="text-muted">Quantity: @(Model?.Quantity ?? 0)</small>
+                            </div>
+                        </div>
+
+                        <!-- License Details -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-success border-bottom pb-2">
+                                    <i class="fas fa-certificate"></i> License Details
+                                </h6>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="LicenseStartDate" class="form-label">License Start Date</label>
+                                <input asp-for="LicenseStartDate" class="form-control" type="date" />
+                                <span asp-validation-for="LicenseStartDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="LicenseEndDate" class="form-label">License End Date</label>
+                                <input asp-for="LicenseEndDate" class="form-control" type="date" />
+                                <span asp-validation-for="LicenseEndDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="LicenseDeliveryStatus" class="form-label">Delivery Status</label>
+                                <select asp-for="LicenseDeliveryStatus" class="form-select">
+                                    <option value="Pending">Pending Delivery</option>
+                                    <option value="Delivered">Delivered to Customer</option>
+                                    <option value="Active">Active License</option>
+                                    <option value="Expired">Expired</option>
+                                </select>
+                                <span asp-validation-for="LicenseDeliveryStatus" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">License Duration (Days)</label>
+                                <input type="number" class="form-control" id="licenseDuration" readonly />
+                                <small class="text-muted">Calculated automatically</small>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-success border-bottom pb-2">
+                                    <i class="fas fa-info-circle"></i> Additional Information
+                                </h6>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="AssignedTo" class="form-label">Assigned BA/Sales Person</label>
+                                <input asp-for="AssignedTo" class="form-control" />
+                                <span asp-validation-for="AssignedTo" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">License Type</label>
+                                <input value="@(Model?.Product?.LicenseType ?? "")" class="form-control" readonly />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <label asp-for="Notes" class="form-label">License Notes & Instructions</label>
+                                <textarea asp-for="Notes" class="form-control" rows="4"
+                                    placeholder="Add any special instructions, license configuration details, or delivery notes..."></textarea>
+                                <span asp-validation-for="Notes" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- License Summary & Actions -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-chart-pie"></i> License Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Phase 1 & 2 Summary -->
+                        <div class="mb-3">
+                            <h6 class="text-info">Deal Progress</h6>
+                            <div class="d-flex justify-content-between">
+                                <span>Customer PO:</span>
+                                <span class="fw-bold">@(Model?.CustomerPoNumber ?? "N/A")</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>OEM PO:</span>
+                                <span class="fw-bold">@(Model?.CanarysPoNumber ?? "N/A")</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Invoice Amount:</span>
+                                <span class="fw-bold text-success">@(Model?.CustomerInvoiceAmount?.ToString("C") ??
+                                                                        "$0.00")</span>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <!-- License Quick Info -->
+                        <div class="mb-3">
+                            <h6 class="text-info">License Info</h6>
+                            <div class="d-flex justify-content-between">
+                                <span>Product:</span>
+                                <span class="fw-bold">@(Model?.Product?.ProductName ?? "N/A")</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Quantity:</span>
+                                <span class="fw-bold">@(Model?.Quantity ?? 0)</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>License Type:</span>
+                                <span class="fw-bold">@(Model?.Product?.LicenseType ?? "N/A")</span>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <!-- Next Steps -->
+                        <div class="mb-3">
+                            <h6 class="text-info">Next Steps</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> Configure license dates</li>
+                                <li><i class="fas fa-check text-success"></i> Set delivery status</li>
+                                <li><i class="fas fa-clock text-warning"></i> Coordinate with OEM</li>
+                                <li><i class="fas fa-clock text-warning"></i> Deliver to customer</li>
+                                <li><i class="fas fa-clock text-muted"></i> Monitor license usage</li>
+                            </ul>
+                        </div>
+
+                        <!-- Alerts -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Tip:</strong> Set accurate license dates to enable automatic renewal alerts.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card shadow-sm mt-3">
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save"></i> Save License Configuration
+                            </button>
+                            <a asp-controller="Deals" asp-action="Details" asp-route-id="@Model?.DealId"
+                                class="btn btn-outline-info">
+                                <i class="fas fa-eye"></i> View Deal Details
+                            </a>
+                            <a asp-controller="License" asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to License Management
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Calculate license duration automatically
+        function calculateDuration() {
+            const startDate = document.querySelector('input[name="LicenseStartDate"]').value;
+            const endDate = document.querySelector('input[name="LicenseEndDate"]').value;
+
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const timeDiff = end.getTime() - start.getTime();
+                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+                document.getElementById('licenseDuration').value = daysDiff > 0 ? daysDiff : 0;
+            }
+        }
+
+        // Add event listeners for date changes
+        document.addEventListener('DOMContentLoaded', function () {
+            const startDateInput = document.querySelector('input[name="LicenseStartDate"]');
+            const endDateInput = document.querySelector('input[name="LicenseEndDate"]');
+
+            if (startDateInput) startDateInput.addEventListener('change', calculateDuration);
+            if (endDateInput) endDateInput.addEventListener('change', calculateDuration);
+
+            // Calculate on page load if dates exist
+            calculateDuration();
+        });
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const startDate = document.querySelector('input[name="LicenseStartDate"]').value;
+            const endDate = document.querySelector('input[name="LicenseEndDate"]').value;
+
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+
+                if (end <= start) {
+                    e.preventDefault();
+                    alert('License end date must be after start date.');
+                    return false;
+                }
+            }
+        });
+    </script>
+}

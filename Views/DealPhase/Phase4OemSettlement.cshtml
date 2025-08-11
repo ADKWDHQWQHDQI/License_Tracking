@@ -1,0 +1,324 @@
+@model License_Tracking.Models.Deal
+
+@{
+    ViewData["Title"] = "Phase 4 - OEM Settlement";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-credit-card"></i> Phase 4 - OEM Settlement</h2>
+                    <p class="text-muted">Manage OEM invoice and payment settlement for @Model.DealName</p>
+                </div>
+                <a asp-controller="Deals" asp-action="Details" asp-route-id="@Model.DealId" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Deal
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deal Financial Summary -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Financial Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Customer Invoice:</strong><br>
+                            <span class="text-success">@((Model.CustomerInvoiceAmount ?? 0).ToString("C"))</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>OEM Quote:</strong><br>
+                            <span class="text-primary">@((Model.OemQuoteAmount ?? 0).ToString("C"))</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Estimated Margin:</strong><br>
+                            <span class="text-info">@((Model.EstimatedMargin ?? 0).ToString("C"))</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Payment Status:</strong><br>
+                            <span class="badge bg-warning">@(Model.CustomerPaymentStatus ?? "Pending")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OEM Settlement Form -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-file-invoice-dollar"></i> OEM Invoice & Payment</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Phase4OemSettlement" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- OEM Invoice Details -->
+                        <h6 class="mb-3"><i class="fas fa-receipt"></i> OEM Invoice Information</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">OEM Invoice Number *</label>
+                                    <input name="OemInvoiceNumber" type="text" class="form-control"
+                                        value="@Model.OemInvoiceNumber" placeholder="OEM-INV-XXXX" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">OEM Invoice Amount *</label>
+                                    <input name="OemInvoiceAmount" type="number" step="0.01" class="form-control"
+                                        value="@Model.OemInvoiceAmount" placeholder="0.00" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Invoice Date</label>
+                                    <input name="OemInvoiceDate" type="date" class="form-control"
+                                        value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Payment Due Date</label>
+                                    <input name="PaymentDueDate" type="date" class="form-control"
+                                        value="@DateTime.Now.AddDays(30).ToString("yyyy-MM-dd")" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Details -->
+                        <hr>
+                        <h6 class="mb-3"><i class="fas fa-money-check-alt"></i> Payment Details</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Payment Status *</label>
+                                    <select name="OemPaymentStatus" class="form-select" required>
+                                        <option value="Pending" selected="@(Model.OemPaymentStatus == "Pending")">
+                                            Pending</option>
+                                        <option value="Processing" selected="@(Model.OemPaymentStatus == "Processing")">
+                                            Processing</option>
+                                        <option value="Paid" selected="@(Model.OemPaymentStatus == "Paid")">Paid
+                                        </option>
+                                        <option value="Partial" selected="@(Model.OemPaymentStatus == "Partial")">
+                                            Partial Payment</option>
+                                        <option value="Overdue" selected="@(Model.OemPaymentStatus == "Overdue")">
+                                            Overdue</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Payment Date</label>
+                                    <input name="OemPaymentDate" type="date" class="form-control"
+                                        value="@Model.OemPaymentDate?.ToString("yyyy-MM-dd")" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Payment Method</label>
+                                    <select name="PaymentMethod" class="form-select">
+                                        <option value="Bank Transfer">Bank Transfer</option>
+                                        <option value="Wire Transfer">Wire Transfer</option>
+                                        <option value="Check">Check</option>
+                                        <option value="Credit Card">Credit Card</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Payment Reference</label>
+                                    <input name="PaymentReference" type="text" class="form-control"
+                                        placeholder="Transaction ID or Reference Number" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Settlement Notes</label>
+                            <textarea name="Notes" class="form-control" rows="4"
+                                placeholder="Add details about OEM settlement, payment terms, or any issues...">@Model.Notes</textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-controller="Deals" asp-action="Details" asp-route-id="@Model.DealId"
+                                class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Update OEM Settlement
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settlement Status Sidebar -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Settlement Timeline</h6>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item completed">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6>Customer Payment</h6>
+                                <small>@(Model.CustomerPaymentDate?.ToString("MMM dd, yyyy") ?? "Pending")</small>
+                            </div>
+                        </div>
+                        <div
+                            class="timeline-item @(Model.LicenseDeliveryStatus == "Delivered" ? "completed" : "active")">
+                            <div
+                                class="timeline-marker @(Model.LicenseDeliveryStatus == "Delivered" ? "bg-success" : "bg-warning")">
+                            </div>
+                            <div class="timeline-content">
+                                <h6>License Delivered</h6>
+                                <small>@(Model.LicenseStartDate?.ToString("MMM dd, yyyy") ?? "Pending")</small>
+                            </div>
+                        </div>
+                        <div class="timeline-item @(Model.OemPaymentStatus == "Paid" ? "completed" : "active")">
+                            <div class="timeline-marker @(Model.OemPaymentStatus == "Paid" ? "bg-success" : "bg-info")">
+                            </div>
+                            <div class="timeline-content">
+                                <h6>OEM Settlement</h6>
+                                <small>@(Model.OemPaymentDate?.ToString("MMM dd, yyyy") ?? "In Progress")</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Calculator -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Margin Calculator</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <small>Customer Amount:</small>
+                        <div class="text-success fw-bold" id="customerAmount">@((Model.CustomerInvoiceAmount ??
+                                                        0).ToString("C"))</div>
+                    </div>
+                    <div class="mb-2">
+                        <small>OEM Amount:</small>
+                        <div class="text-danger fw-bold" id="oemAmount">@((Model.OemInvoiceAmount ?? 0).ToString("C"))
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-2">
+                        <small>Net Margin:</small>
+                        <div class="text-primary fw-bold" id="netMargin">@(((Model.CustomerInvoiceAmount ?? 0) -
+                                                        (Model.OemInvoiceAmount ?? 0)).ToString("C"))</div>
+                    </div>
+                    <div>
+                        <small>Margin %:</small>
+                        <div class="text-info fw-bold" id="marginPercent">
+                            @{
+                                var marginPercent = Model.CustomerInvoiceAmount > 0 ?
+                                ((Model.CustomerInvoiceAmount - Model.OemInvoiceAmount) / Model.CustomerInvoiceAmount * 100)
+                                : 0;
+                            }
+                            @(marginPercent?.ToString("F1") ?? "0")%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -23px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+
+        .timeline-content h6 {
+            margin-bottom: 2px;
+            font-size: 0.9rem;
+        }
+
+        .timeline-content small {
+            color: #6c757d;
+        }
+    </style>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            // Auto-calculate margin when OEM amount changes
+            $('input[name="OemInvoiceAmount"]').on('input', function () {
+                var customerAmount = @(Model.CustomerInvoiceAmount ?? 0);
+                var oemAmount = parseFloat($(this).val()) || 0;
+                var margin = customerAmount - oemAmount;
+                var marginPercent = customerAmount > 0 ? (margin / customerAmount * 100) : 0;
+
+                $('#oemAmount').text('$' + oemAmount.toFixed(2));
+                $('#netMargin').text('$' + margin.toFixed(2));
+                $('#marginPercent').text(marginPercent.toFixed(1) + '%');
+
+                // Color coding for margins
+                if (marginPercent < 10) {
+                    $('#marginPercent').removeClass('text-success text-warning').addClass('text-danger');
+                } else if (marginPercent < 20) {
+                    $('#marginPercent').removeClass('text-success text-danger').addClass('text-warning');
+                } else {
+                    $('#marginPercent').removeClass('text-danger text-warning').addClass('text-success');
+                }
+            });
+
+            // Auto-fill payment date when status is set to "Paid"
+            $('select[name="OemPaymentStatus"]').change(function () {
+                if ($(this).val() === 'Paid') {
+                    $('input[name="OemPaymentDate"]').val(new Date().toISOString().split('T')[0]);
+                }
+            });
+        });
+    </script>
+}
