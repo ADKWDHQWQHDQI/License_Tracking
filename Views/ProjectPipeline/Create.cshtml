@@ -154,20 +154,96 @@
                             </div>
                         </div>
 
+                        <!-- Week 10 Enhancement: Advanced Revenue and Margin Calculations -->
+                        <h6 class="text-secondary mb-3 mt-3">
+                            <i class="fas fa-chart-line"></i>Enhanced Estimations
+                        </h6>
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="ProjectedMarginInput" class="form-label"></label>
-                                <input asp-for="ProjectedMarginInput" class="form-control" type="number" step="0.01"
+                                <label asp-for="EstimatedRevenue" class="form-label"></label>
+                                <input asp-for="EstimatedRevenue" class="form-control" type="number" step="0.01"
                                     min="0" />
-                                <span asp-validation-for="ProjectedMarginInput" class="text-danger"></span>
-                                <small class="form-text text-muted">Leave empty for automatic calculation</small>
+                                <span asp-validation-for="EstimatedRevenue" class="text-danger"></span>
+                                <small class="form-text text-muted">Projected revenue for this pipeline project</small>
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label asp-for="EstimatedCost" class="form-label"></label>
+                                <input asp-for="EstimatedCost" class="form-control" type="number" step="0.01" min="0" />
+                                <span asp-validation-for="EstimatedCost" class="text-danger"></span>
+                                <small class="form-text text-muted">Expected total cost</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="PipelineStage" class="form-label"></label>
+                                <select asp-for="PipelineStage" class="form-select">
+                                    <option value="Lead">Lead</option>
+                                    <option value="Qualified">Qualified</option>
+                                    <option value="Proposal">Proposal</option>
+                                    <option value="Negotiation">Negotiation</option>
+                                    <option value="Closed Won">Closed Won</option>
+                                    <option value="Closed Lost">Closed Lost</option>
+                                </select>
+                                <span asp-validation-for="PipelineStage" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label asp-for="SuccessProbability" class="form-label"></label>
                                 <input asp-for="SuccessProbability" class="form-control" type="number" min="0" max="100"
                                     value="50" />
                                 <span asp-validation-for="SuccessProbability" class="text-danger"></span>
                                 <small class="form-text text-muted">Probability of project success (0-100%)</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="StageConfidenceLevel" class="form-label"></label>
+                                <select asp-for="StageConfidenceLevel" class="form-select">
+                                    <option value="1">1 - Very Low</option>
+                                    <option value="2">2 - Low</option>
+                                    <option value="3" selected>3 - Medium</option>
+                                    <option value="4">4 - High</option>
+                                    <option value="5">5 - Very High</option>
+                                </select>
+                                <span asp-validation-for="StageConfidenceLevel" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ExpectedCloseDate" class="form-label"></label>
+                                <input asp-for="ExpectedCloseDate" class="form-control" type="date" />
+                                <span asp-validation-for="ExpectedCloseDate" class="text-danger"></span>
+                                <small class="form-text text-muted">Expected deal closure date</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ProjectedMarginInput" class="form-label"></label>
+                                <input asp-for="ProjectedMarginInput" class="form-control" type="number" step="0.01"
+                                    min="0" />
+                                <span asp-validation-for="ProjectedMarginInput" class="text-danger"></span>
+                                <small class="form-text text-muted">Manual margin override (legacy)</small>
+                            </div>
+                        </div>
+
+                        <!-- Calculated Values Display -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <h6><i class="fas fa-calculator"></i> Calculated Values</h6>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong>Weighted Revenue:</strong>
+                                            <span id="weightedRevenue">$0.00</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Margin Percentage:</strong>
+                                            <span id="marginPercentage">0.00%</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Risk Adjusted Value:</strong>
+                                            <span id="riskAdjustedValue">$0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -395,31 +471,88 @@
     }
 
     <script>
-        // Auto-calculate projected margin when amounts change
-        function updateProjectedMargin() {
-            const receiveAmount = parseFloat(document.getElementById('ExpectedAmountToReceive').value) || 0;
-            const payAmount = parseFloat(document.getElementById('ExpectedAmountToPay').value) || 0;
-            const margin = receiveAmount - payAmount;
+        // Week 10 Enhancement: Real-time calculations for enhanced pipeline features
+        function updateCalculatedValues() {
+            const estimatedRevenue = parseFloat(document.getElementById('EstimatedRevenue')?.value) || 0;
+            const estimatedCost = parseFloat(document.getElementById('EstimatedCost')?.value) || 0;
+            const successProbability = parseFloat(document.getElementById('SuccessProbability')?.value) || 0;
+            const stageConfidence = parseFloat(document.getElementById('StageConfidenceLevel')?.value) || 3;
 
-            // Update any margin display if needed
-            console.log('Projected Margin:', margin);
+            // Calculate Week 10 metrics
+            const estimatedMargin = estimatedRevenue - estimatedCost;
+            const weightedRevenue = estimatedRevenue * (successProbability / 100);
+            const marginPercentage = estimatedRevenue > 0 ? (estimatedMargin / estimatedRevenue) * 100 : 0;
+            const riskAdjustedValue = weightedRevenue * (stageConfidence / 5);
+
+            // Update display
+            document.getElementById('weightedRevenue').textContent = '$' + weightedRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('marginPercentage').textContent = marginPercentage.toFixed(2) + '%';
+            document.getElementById('riskAdjustedValue').textContent = '$' + riskAdjustedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        document.getElementById('ExpectedAmountToReceive').addEventListener('input', updateProjectedMargin);
-        document.getElementById('ExpectedAmountToPay').addEventListener('input', updateProjectedMargin);
+        // Auto-calculate projected margin when amounts change (legacy support)
+        function updateProjectedMargin() {
+            const receiveAmount = parseFloat(document.getElementById('ExpectedAmountToReceive')?.value) || 0;
+            const payAmount = parseFloat(document.getElementById('ExpectedAmountToPay')?.value) || 0;
+            const margin = receiveAmount - payAmount;
 
-        // Set default dates
+            // Auto-populate EstimatedRevenue and EstimatedCost if they're empty
+            const estimatedRevenue = document.getElementById('EstimatedRevenue');
+            const estimatedCost = document.getElementById('EstimatedCost');
+
+            if (estimatedRevenue && !estimatedRevenue.value) {
+                estimatedRevenue.value = receiveAmount;
+            }
+            if (estimatedCost && !estimatedCost.value) {
+                estimatedCost.value = payAmount;
+            }
+
+            updateCalculatedValues();
+        }
+
+        // Event listeners for real-time calculations
         document.addEventListener('DOMContentLoaded', function () {
+            // Legacy fields
+            const receiveAmount = document.getElementById('ExpectedAmountToReceive');
+            const payAmount = document.getElementById('ExpectedAmountToPay');
+
+            if (receiveAmount) receiveAmount.addEventListener('input', updateProjectedMargin);
+            if (payAmount) payAmount.addEventListener('input', updateProjectedMargin);
+
+            // Week 10 enhanced fields
+            const estimatedRevenue = document.getElementById('EstimatedRevenue');
+            const estimatedCost = document.getElementById('EstimatedCost');
+            const successProbability = document.getElementById('SuccessProbability');
+            const stageConfidence = document.getElementById('StageConfidenceLevel');
+
+            if (estimatedRevenue) estimatedRevenue.addEventListener('input', updateCalculatedValues);
+            if (estimatedCost) estimatedCost.addEventListener('input', updateCalculatedValues);
+            if (successProbability) successProbability.addEventListener('input', updateCalculatedValues);
+            if (stageConfidence) stageConfidence.addEventListener('change', updateCalculatedValues);
+
+            // Set default dates
             const today = new Date();
             const futureDate = new Date();
             futureDate.setFullYear(futureDate.getFullYear() + 1);
+            const closeDate = new Date();
+            closeDate.setMonth(closeDate.getMonth() + 3); // Default close date 3 months from now
 
-            if (!document.getElementById('ExpectedLicenseDate').value) {
-                document.getElementById('ExpectedLicenseDate').value = today.toISOString().split('T')[0];
+            const expectedLicenseDate = document.getElementById('ExpectedLicenseDate');
+            const expectedExpiryDate = document.getElementById('ExpectedExpiryDate');
+            const expectedCloseDate = document.getElementById('ExpectedCloseDate');
+
+            if (expectedLicenseDate && !expectedLicenseDate.value) {
+                expectedLicenseDate.value = today.toISOString().split('T')[0];
             }
-            if (!document.getElementById('ExpectedExpiryDate').value) {
-                document.getElementById('ExpectedExpiryDate').value = futureDate.toISOString().split('T')[0];
+            if (expectedExpiryDate && !expectedExpiryDate.value) {
+                expectedExpiryDate.value = futureDate.toISOString().split('T')[0];
             }
+            if (expectedCloseDate && !expectedCloseDate.value) {
+                expectedCloseDate.value = closeDate.toISOString().split('T')[0];
+            }
+
+            // Initial calculation
+            updateCalculatedValues();
         });
     </script>
 }

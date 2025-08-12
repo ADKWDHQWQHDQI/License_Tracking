@@ -35,7 +35,8 @@
                 <div class="card-body py-3">
                     <div class="row text-center">
                         <div class="col-3">
-                            <a asp-controller="Deals" asp-action="Index" asp-route-phase="1" class="text-decoration-none">
+                            <a asp-controller="Deals" asp-action="Index" asp-route-phase="1"
+                                class="text-decoration-none">
                                 <div class="p-2 border-end">
                                     <i class="fas fa-user-check fa-lg text-primary"></i>
                                     <p class="mb-0 mt-1 fw-bold text-primary">Phase 1</p>
@@ -44,7 +45,8 @@
                             </a>
                         </div>
                         <div class="col-3">
-                            <a asp-controller="Deals" asp-action="Index" asp-route-phase="2" class="text-decoration-none">
+                            <a asp-controller="Deals" asp-action="Index" asp-route-phase="2"
+                                class="text-decoration-none">
                                 <div class="p-2 border-end">
                                     <i class="fas fa-shopping-cart fa-lg text-info"></i>
                                     <p class="mb-0 mt-1 fw-bold text-info">Phase 2</p>
@@ -60,7 +62,8 @@
                             </div>
                         </div>
                         <div class="col-3">
-                            <a asp-controller="Deals" asp-action="Index" asp-route-phase="4" class="text-decoration-none">
+                            <a asp-controller="Deals" asp-action="Index" asp-route-phase="4"
+                                class="text-decoration-none">
                                 <div class="p-2">
                                     <i class="fas fa-money-check-alt fa-lg text-warning"></i>
                                     <p class="mb-0 mt-1 fw-bold text-warning">Phase 4</p>
@@ -103,7 +106,8 @@
         <div class="col-md-3">
             <div class="card bg-danger text-white">
                 <div class="card-body text-center">
-                    <h3 class="mb-1">@Model.Count(d => d.LicenseEndDate.HasValue && d.LicenseEndDate.Value <= DateTime.Now.AddDays(30))</h3>
+                    <h3 class="mb-1">@Model.Count(d => d.LicenseEndDate.HasValue && d.LicenseEndDate.Value <=
+                                                DateTime.Now.AddDays(30))</h3>
                     <p class="mb-0">Expiring Soon</p>
                 </div>
             </div>
@@ -119,7 +123,8 @@
             <!-- Search and Filter Options -->
             <div class="row mb-3">
                 <div class="col-md-4">
-                    <input type="text" class="form-control" placeholder="Search by Deal Name, Customer, or Product..." id="searchInput">
+                    <input type="text" class="form-control" placeholder="Search by Deal Name, Customer, or Product..."
+                        id="searchInput">
                 </div>
                 <div class="col-md-3">
                     <select class="form-select" id="statusFilter">
@@ -164,8 +169,10 @@
                         {
                             @foreach (var deal in Model.Where(d => !string.IsNullOrEmpty(d.DealName)))
                             {
-                                var daysToExpiry = deal.LicenseEndDate.HasValue ? (deal.LicenseEndDate.Value - DateTime.Now).Days : 0;
-                                var expiryClass = daysToExpiry <= 0 ? "text-danger" : daysToExpiry <= 30 ? "text-warning" : "text-success";
+                                var daysToExpiry = deal.LicenseEndDate.HasValue ? (deal.LicenseEndDate.Value -
+                                DateTime.Now).Days : 0;
+                                var expiryClass = daysToExpiry <= 0 ? "text-danger" : daysToExpiry <= 30 ? "text-warning" :
+                                "text-success";
                                 var statusBadge = deal.LicenseDeliveryStatus switch
                                 {
                                     "Pending" => "badge bg-warning",
@@ -195,8 +202,12 @@
                                         @if (deal.LicenseStartDate.HasValue && deal.LicenseEndDate.HasValue)
                                         {
                                             <strong>@deal.LicenseStartDate.Value.ToString("MM/dd/yyyy")</strong>
-                                            <br><span class="text-muted">to</span>
-                                            <br><strong>@deal.LicenseEndDate.Value.ToString("MM/dd/yyyy")</strong>
+                                            <br>
+
+                                            <span class="text-muted">to</span>
+                                            <br>
+
+                                            <strong>@deal.LicenseEndDate.Value.ToString("MM/dd/yyyy")</strong>
                                         }
                                         else
                                         {
@@ -212,12 +223,16 @@
                                             if (daysToExpiry <= 0)
                                             {
                                                 <strong>EXPIRED</strong>
-                                                <br><small>@Math.Abs(daysToExpiry) days ago</small>
+                                                <br>
+
+                                                <small>@Math.Abs(daysToExpiry) days ago</small>
                                             }
                                             else if (daysToExpiry <= 30)
                                             {
                                                 <strong>@daysToExpiry days</strong>
-                                                <br><small class="text-warning">Expiring Soon!</small>
+                                                <br>
+
+                                                <small class="text-warning">Expiring Soon!</small>
                                             }
                                             else
                                             {
@@ -231,21 +246,22 @@
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a asp-controller="Deals" asp-action="Details" asp-route-id="@deal.DealId" 
-                                               class="btn btn-outline-info" title="View Details">
+                                            <a asp-controller="Deals" asp-action="Details" asp-route-id="@deal.DealId"
+                                                class="btn btn-outline-info" title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             @if (User.IsInRole("Admin") || User.IsInRole("Sales"))
                                             {
-                                                <a asp-controller="Deals" asp-action="Edit" asp-route-id="@deal.DealId" 
-                                                   class="btn btn-outline-primary" title="Edit License">
+                                                <a asp-controller="Deals" asp-action="Edit" asp-route-id="@deal.DealId"
+                                                    class="btn btn-outline-primary" title="Edit License">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                             }
-                                            @if (deal.LicenseEndDate.HasValue && deal.LicenseEndDate.Value <= DateTime.Now.AddDays(60))
+                                            @if (deal.LicenseEndDate.HasValue && deal.LicenseEndDate.Value <=
+                                                                                DateTime.Now.AddDays(60))
                                             {
-                                                <a asp-controller="Renewal" asp-action="Create" asp-route-dealId="@deal.DealId" 
-                                                   class="btn btn-outline-success" title="Renew License">
+                                                <a asp-controller="Renewal" asp-action="Create" asp-route-dealId="@deal.DealId"
+                                                    class="btn btn-outline-success" title="Renew License">
                                                     <i class="fas fa-sync-alt"></i>
                                                 </a>
                                             }
@@ -283,13 +299,14 @@
                     <h6 class="card-title"><i class="fas fa-rocket"></i> Quick Actions</h6>
                     <div class="row">
                         <div class="col-md-3">
-                            <a asp-controller="Deals" asp-action="Index" asp-route-phase="3" asp-route-status="Pending" 
-                               class="btn btn-outline-warning w-100 mb-2">
+                            <a asp-controller="Deals" asp-action="Index" asp-route-phase="3" asp-route-status="Pending"
+                                class="btn btn-outline-warning w-100 mb-2">
                                 <i class="fas fa-clock"></i> Pending Deliveries
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a asp-controller="Report" asp-action="ExpiringLicenses" class="btn btn-outline-danger w-100 mb-2">
+                            <a asp-controller="Report" asp-action="ExpiringLicenses"
+                                class="btn btn-outline-danger w-100 mb-2">
                                 <i class="fas fa-exclamation-triangle"></i> Expiring Licenses
                             </a>
                         </div>
@@ -299,7 +316,8 @@
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a asp-controller="Report" asp-action="LicenseReport" class="btn btn-outline-primary w-100 mb-2">
+                            <a asp-controller="Report" asp-action="LicenseReport"
+                                class="btn btn-outline-primary w-100 mb-2">
                                 <i class="fas fa-chart-bar"></i> License Reports
                             </a>
                         </div>
@@ -313,15 +331,15 @@
 @section Scripts {
     <script>
         // Search and Filter Functionality
-        document.getElementById('searchInput').addEventListener('keyup', function() {
+        document.getElementById('searchInput').addEventListener('keyup', function () {
             filterTable();
         });
 
-        document.getElementById('statusFilter').addEventListener('change', function() {
+        document.getElementById('statusFilter').addEventListener('change', function () {
             filterTable();
         });
 
-        document.getElementById('expiryFilter').addEventListener('change', function() {
+        document.getElementById('expiryFilter').addEventListener('change', function () {
             filterTable();
         });
 
@@ -335,7 +353,7 @@
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
                 const cells = row.getElementsByTagName('td');
-                
+
                 if (cells.length === 1) continue; // Skip empty message row
 
                 let showRow = true;
@@ -345,7 +363,7 @@
                     const dealName = cells[0].textContent.toLowerCase();
                     const customer = cells[1].textContent.toLowerCase();
                     const product = cells[3].textContent.toLowerCase();
-                    
+
                     if (!dealName.includes(searchTerm) && !customer.includes(searchTerm) && !product.includes(searchTerm)) {
                         showRow = false;
                     }
@@ -363,7 +381,7 @@
                 if (expiryFilter && showRow) {
                     const expiryCell = cells[6];
                     const expiryText = expiryCell.textContent.toLowerCase();
-                    
+
                     if (expiryFilter === 'expiring' && !expiryText.includes('expiring soon')) {
                         showRow = false;
                     } else if (expiryFilter === 'expired' && !expiryText.includes('expired')) {
@@ -385,7 +403,7 @@
         }
 
         // Initialize tooltips
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);

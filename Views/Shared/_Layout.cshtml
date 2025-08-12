@@ -154,9 +154,15 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Billing" asp-action="Index">
+                                        <a class="dropdown-item" asp-controller="InvoiceManagement" asp-action="BillingDashboard">
                                             <i class="fas fa-chart-line"></i>
                                             <span>Billing Dashboard</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="InvoiceManagement" asp-action="AgingSummary">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            <span>Aging Summary</span>
                                         </a>
                                     </li>
                                     <li><div class="dropdown-divider"></div></li>
@@ -181,6 +187,22 @@
                 <a class="nav-link" asp-controller="ProjectPipeline" asp-action="Index">
                     <i class="fas fa-project-diagram"></i>
                     <span>Pipeline</span>
+                </a>
+            </li>
+
+            <!-- Analytics Dashboard - Week 11 Bigin.com Style -->
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Analytics" asp-action="Index">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </li>
+
+            <!-- Reports & Analytics -->
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Report" asp-action="Index">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
                 </a>
             </li>
 

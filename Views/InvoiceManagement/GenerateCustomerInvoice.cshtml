@@ -1,0 +1,147 @@
+@model License_Tracking.ViewModels.InvoiceGenerationViewModel
+
+@{
+    ViewData["Title"] = "Generate Customer Invoice";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        Generate Customer Invoice
+                    </h3>
+                    <div class="card-tools">
+                        <a asp-action="Index" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Back to Invoices
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.Deal != null)
+                    {
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-primary">
+                                        <i class="fas fa-building"></i>
+                                    </span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Customer</span>
+                                        <span class="info-box-number">@Model.Deal.Company?.CompanyName</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-success">
+                                        <i class="fas fa-box"></i>
+                                    </span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Product</span>
+                                        <span class="info-box-number">@Model.Deal.Product?.ProductName</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <form asp-action="GenerateCustomerInvoice" method="post" class="row">
+                        <input type="hidden" asp-for="DealId" />
+                        <input type="hidden" asp-for="InvoiceType" />
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Amount" class="form-label">Invoice Amount (INR)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₹</span>
+                                    <input asp-for="Amount" class="form-control" step="0.01" />
+                                </div>
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="InvoiceDate" class="form-label">Invoice Date</label>
+                                <input asp-for="InvoiceDate" class="form-control" type="date" />
+                                <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="DueDate" class="form-label">Due Date</label>
+                                <input asp-for="DueDate" class="form-control" type="date" />
+                                <span asp-validation-for="DueDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="PaymentStatus" class="form-label">Payment Status</label>
+                                <select asp-for="PaymentStatus" class="form-control">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Paid">Paid</option>
+                                    <option value="Overdue">Overdue</option>
+                                    <option value="Partial">Partial</option>
+                                </select>
+                                <span asp-validation-for="PaymentStatus" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="PaymentDate" class="form-label">Payment Date</label>
+                                <input asp-for="PaymentDate" class="form-control" type="date" />
+                                <span asp-validation-for="PaymentDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="Notes" class="form-label">Notes</label>
+                                <textarea asp-for="Notes" class="form-control" rows="3"
+                                    placeholder="Additional notes or payment terms..."></textarea>
+                                <span asp-validation-for="Notes" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-group text-center">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save"></i> Generate Invoice
+                                </button>
+                                <a asp-action="Index" class="btn btn-secondary btn-lg ml-2">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // Remove validation from InvoiceNumber field since it's auto-generated
+            $('#InvoiceNumber').rules('remove');
+
+            // Custom form validation
+            $('form').on('submit', function (e) {
+                // Set a temporary value for InvoiceNumber before validation
+                if ($('#InvoiceNumber').val() === 'TEMP-INVOICE' || $('#InvoiceNumber').val() === '') {
+                    $('#InvoiceNumber').val('TEMP-' + Date.now());
+                }
+            });
+        });
+    </script>
+}

@@ -30,7 +30,6 @@ namespace License_Tracking.Data
         public DbSet<CustomerOemProduct> CustomerOemProducts { get; set; }
         public DbSet<Deal> Deals { get; set; }
         public DbSet<CbmsInvoice> CbmsInvoices { get; set; }
-        public DbSet<BATarget> BATargets { get; set; } // Updated from Target
         public DbSet<Activity> Activities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -362,10 +361,6 @@ namespace License_Tracking.Data
             builder.Entity<Activity>()
                 .HasIndex(a => a.DueDate)
                 .HasDatabaseName("IX_Activity_DueDate");
-
-            builder.Entity<BATarget>()
-                .HasIndex(t => new { t.AssignedTo, t.TargetPeriod })
-                .HasDatabaseName("IX_BATarget_AssignedTo_Period");
         }
     }
 }

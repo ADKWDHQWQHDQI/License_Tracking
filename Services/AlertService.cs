@@ -41,8 +41,8 @@ namespace License_Tracking.Services
             var licensesNeedingAlerts = await _context.Deals
                 .Include(l => l.AlertConfiguration)
                 .Where(l => l.LicenseDeliveryStatus == "Active" &&
-                           l.AlertsEnabled &&
-                           !l.IsProjectPipeline)
+                           l.AlertsEnabled == true &&
+                           l.IsProjectPipeline != true)
                 .ToListAsync();
 
             // Get default alert configuration if none exists

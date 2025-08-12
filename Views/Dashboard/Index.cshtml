@@ -46,13 +46,15 @@
                         @if (User.IsInRole("Admin") || User.IsInRole("Sales"))
                         {
                             <div class="col-lg-2 col-md-3 col-sm-6">
-                                <a asp-controller="Companies" asp-action="Create" class="btn btn-primary w-100 d-flex flex-column align-items-center py-2">
+                                <a asp-controller="Companies" asp-action="Create"
+                                    class="btn btn-primary w-100 d-flex flex-column align-items-center py-2">
                                     <i class="fas fa-building fa-lg mb-1"></i>
                                     <small>Add Company</small>
                                 </a>
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-6">
-                                <a asp-controller="Deals" asp-action="Create" class="btn btn-success w-100 d-flex flex-column align-items-center py-2">
+                                <a asp-controller="Deals" asp-action="Create"
+                                    class="btn btn-success w-100 d-flex flex-column align-items-center py-2">
                                     <i class="fas fa-handshake fa-lg mb-1"></i>
                                     <small>Create Deal</small>
                                 </a>
@@ -62,7 +64,8 @@
                         @if (User.IsInRole("Admin") || User.IsInRole("Sales") || User.IsInRole("Management"))
                         {
                             <div class="col-lg-2 col-md-3 col-sm-6">
-                                <a asp-controller="ProjectPipeline" asp-action="Create" class="btn btn-info w-100 d-flex flex-column align-items-center py-2">
+                                <a asp-controller="ProjectPipeline" asp-action="Create"
+                                    class="btn btn-info w-100 d-flex flex-column align-items-center py-2">
                                     <i class="fas fa-project-diagram fa-lg mb-1"></i>
                                     <small>Add Pipeline</small>
                                 </a>
@@ -72,7 +75,8 @@
                         @if (User.IsInRole("Admin") || User.IsInRole("Operations") || User.IsInRole("Management"))
                         {
                             <div class="col-lg-2 col-md-3 col-sm-6">
-                                <a asp-controller="Renewal" asp-action="Index" class="btn btn-warning w-100 d-flex flex-column align-items-center py-2">
+                                <a asp-controller="Renewal" asp-action="Index"
+                                    class="btn btn-warning w-100 d-flex flex-column align-items-center py-2">
                                     <i class="fas fa-calendar-alt fa-lg mb-1"></i>
                                     <small>Renewals</small>
                                 </a>
@@ -82,7 +86,8 @@
                         @if (User.IsInRole("Admin") || User.IsInRole("Finance"))
                         {
                             <div class="col-lg-2 col-md-3 col-sm-6">
-                                <a asp-controller="Billing" asp-action="GenerateInvoice" class="btn btn-success w-100 d-flex flex-column align-items-center py-2">
+                                <a asp-controller="Billing" asp-action="GenerateInvoice"
+                                    class="btn btn-success w-100 d-flex flex-column align-items-center py-2">
                                     <i class="fas fa-file-invoice-dollar fa-lg mb-1"></i>
                                     <small>Generate Invoice</small>
                                 </a>
@@ -90,7 +95,8 @@
                         }
 
                         <div class="col-lg-2 col-md-3 col-sm-6">
-                            <a asp-controller="Notification" asp-action="Dashboard" class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-2">
+                            <a asp-controller="Notification" asp-action="Dashboard"
+                                class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-2">
                                 <i class="fas fa-bell fa-lg mb-1"></i>
                                 <small>Notifications</small>
                             </a>
@@ -119,7 +125,8 @@
                                     <i class="fas fa-search fa-3x text-primary mb-2"></i>
                                     <h6 class="fw-bold text-primary">Phase 1: Customer PO</h6>
                                 </div>
-                                <div class="h3 text-primary mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Lead") == true ? Model.DealsByStage["Lead"] : 0)</div>
+                                <div class="h3 text-primary mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Lead") ==
+                                                                        true ? Model.DealsByStage["Lead"] : 0)</div>
                                 <small class="text-muted d-block mb-3">Customer → Canarys Invoice</small>
                                 <a asp-controller="Deals" asp-action="Index" asp-route-stage="Lead"
                                     class="btn btn-sm btn-outline-primary">
@@ -127,14 +134,15 @@
                                 </a>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-3">
                             <div class="text-center p-4 border-end">
                                 <div class="mb-3">
                                     <i class="fas fa-shopping-cart fa-3x text-warning mb-2"></i>
                                     <h6 class="fw-bold text-warning">Phase 2: OEM Procurement</h6>
                                 </div>
-                                <div class="h3 text-warning mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Quoted") == true ? Model.DealsByStage["Quoted"] : 0)</div>
+                                <div class="h3 text-warning mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Quoted") ==
+                                                                        true ? Model.DealsByStage["Quoted"] : 0)</div>
                                 <small class="text-muted d-block mb-3">Canarys → OEM Purchase</small>
                                 <a asp-controller="Deals" asp-action="Index" asp-route-stage="Quoted"
                                     class="btn btn-sm btn-outline-warning">
@@ -142,14 +150,15 @@
                                 </a>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-3">
                             <div class="text-center p-4 border-end">
                                 <div class="mb-3">
                                     <i class="fas fa-key fa-3x text-info mb-2"></i>
                                     <h6 class="fw-bold text-info">Phase 3: License Delivery</h6>
                                 </div>
-                                <div class="h3 text-info mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Negotiation") == true ? Model.DealsByStage["Negotiation"] : 0)</div>
+                                <div class="h3 text-info mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Negotiation")
+                                                                        == true ? Model.DealsByStage["Negotiation"] : 0)</div>
                                 <small class="text-muted d-block mb-3">OEM → Customer Delivery</small>
                                 <a asp-controller="Deals" asp-action="Index" asp-route-stage="Negotiation"
                                     class="btn btn-sm btn-outline-info">
@@ -157,14 +166,15 @@
                                 </a>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-3">
                             <div class="text-center p-4">
                                 <div class="mb-3">
                                     <i class="fas fa-credit-card fa-3x text-success mb-2"></i>
                                     <h6 class="fw-bold text-success">Phase 4: OEM Settlement</h6>
                                 </div>
-                                <div class="h3 text-success mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Won") == true ? Model.DealsByStage["Won"] : 0)</div>
+                                <div class="h3 text-success mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Won") ==
+                                                                        true ? Model.DealsByStage["Won"] : 0)</div>
                                 <small class="text-muted d-block mb-3">Settlement & Completion</small>
                                 <a asp-controller="Deals" asp-action="Index" asp-route-stage="Won"
                                     class="btn btn-sm btn-outline-success">
@@ -185,7 +195,7 @@
                 <i class="fas fa-chart-bar"></i> Key Business Metrics
             </h5>
         </div>
-        
+
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="stats-card border-start border-primary border-4">
                 <div class="stats-card-body">
@@ -301,7 +311,7 @@
                     <i class="fas fa-project-diagram"></i> Project Pipeline Overview
                 </h5>
             </div>
-            
+
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card border-start border-info border-4">
                     <div class="stats-card-body">
@@ -406,7 +416,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="col-md-4">
                                 <div class="stats-card border-start border-warning border-4">
                                     <div class="stats-card-body">
@@ -428,23 +438,23 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="col-md-4">
                                 <div class="stats-card border-start border-success border-4">
                                     <div class="stats-card-body">
                                         <div class="d-flex align-items-center">
                                             <div class="flex-grow-1">
-                                                <div class="stats-label text-success">Total Margin</div>
-                                                <div class="stats-value">@Model.TotalMargin.ToString("C")</div>
-                                                <div class="stats-description">Total profit margin</div>
+                                                <div class="stats-label text-success">Current Projects Analytics</div>
+                                                <div class="stats-value" id="currentProjectsMargin">Loading...</div>
+                                                <div class="stats-description">Pipeline margin & revenue</div>
                                             </div>
                                             <div class="stats-icon text-success">
-                                                <i class="fas fa-chart-pie"></i>
+                                                <i class="fas fa-project-diagram"></i>
                                             </div>
                                         </div>
                                         <div class="mt-3">
-                                            <a asp-action="Financial" class="btn btn-sm btn-success">
-                                                <i class="fas fa-chart-line"></i> View Report
+                                            <a asp-controller="Report" asp-action="Index" class="btn btn-sm btn-success">
+                                                <i class="fas fa-chart-area"></i> View Analytics
                                             </a>
                                         </div>
                                     </div>
@@ -457,3 +467,52 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        // Load current projects analytics for dashboard
+        document.addEventListener('DOMContentLoaded', function () {
+            loadCurrentProjectsAnalytics();
+        });
+
+
+        async function loadCurrentProjectsAnalytics() {
+            try {
+                const response = await fetch('@Url.Action("GetPipelineAnalyticsSummary", "ProjectPipeline")');
+                if (!response.ok) throw new Error('Failed to load analytics');
+
+                const data = await response.json();
+                updateCurrentProjectsDisplay(data);
+            } catch (error) {
+                console.error('Error loading current projects analytics:', error);
+                document.getElementById('currentProjectsMargin').textContent = 'Error loading';
+            }
+        }
+
+        function updateCurrentProjectsDisplay(data) {
+            const marginElement = document.getElementById('currentProjectsMargin');
+            if (data && typeof data.TotalEstimatedMargin !== 'undefined') {
+                // Show margin and project count
+                const marginText = formatCurrency(data.TotalEstimatedMargin) +
+                    ' (' + data.ActiveProjectsCount + ' projects)';
+                marginElement.textContent = marginText;
+                marginElement.title =
+                    'Estimated Revenue: ' + formatCurrency(data.TotalEstimatedRevenue) + '\n' +
+                    'Weighted Revenue: ' + formatCurrency(data.TotalWeightedRevenue) + '\n' +
+                    'Estimated Margin: ' + formatCurrency(data.TotalEstimatedMargin) + '\n' +
+                    'Active Projects: ' + data.ActiveProjectsCount;
+            } else {
+                marginElement.textContent = 'No data';
+            }
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount || 0);
+        }
+    </script>
+}

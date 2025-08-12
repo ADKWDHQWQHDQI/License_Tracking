@@ -1,0 +1,179 @@
+@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Invoice Aging Summary";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-chart-line"></i> Invoice Aging Summary</h2>
+                    <p class="text-muted">Outstanding invoices by aging categories</p>
+                </div>
+                <div>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Invoices
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Controls -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Filter by Invoice Type</h6>
+                    <form method="get" asp-action="AgingSummary">
+                        <div class="input-group">
+                            <select name="invoiceType" class="form-select">
+                                @foreach (var option in ViewBag.InvoiceTypes as SelectList)
+                                {
+                                    <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Aging Categories</h6>
+                    <div class="row text-center">
+                        <div class="col">
+                            <span class="badge bg-success fs-6">Current</span>
+                            <small class="d-block text-muted">Not due yet</small>
+                        </div>
+                        <div class="col">
+                            <span class="badge bg-warning text-dark fs-6">1-30 Days</span>
+                            <small class="d-block text-muted">Recently overdue</small>
+                        </div>
+                        <div class="col">
+                            <span class="badge bg-orange fs-6">31-60 Days</span>
+                            <small class="d-block text-muted">Moderately overdue</small>
+                        </div>
+                        <div class="col">
+                            <span class="badge bg-danger fs-6">61-90 Days</span>
+                            <small class="d-block text-muted">Significantly overdue</small>
+                        </div>
+                        <div class="col">
+                            <span class="badge bg-dark fs-6">90+ Days</span>
+                            <small class="d-block text-muted">Severely overdue</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aging Summary Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-alt"></i> Outstanding Invoices by Age
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Invoice #</th>
+                                        <th>Type</th>
+                                        <th>Client Name</th>
+                                        <th>Product</th>
+                                        <th>Amount</th>
+                                        <th>Received</th>
+                                        <th>Outstanding</th>
+                                        <th>Due Date</th>
+                                        <th>Days Overdue</th>
+                                        <th>Status</th>
+                                        <th>Aging Category</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        var outstanding = item.Amount - item.AmountReceived;
+                                        <tr class="@(item.DaysOverdue > 90 ? "table-dark" : item.DaysOverdue > 60 ? "table-danger" : item.DaysOverdue > 30 ? "table-warning" : item.DaysOverdue > 0 ? "table-warning" : "")">
+                                            <td>
+                                                <strong>@item.InvoiceNumber</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge @(item.InvoiceType == "Customer" ? "bg-primary" : "bg-warning text-dark")">
+                                                    @item.InvoiceType
+                                                </span>
+                                            </td>
+                                            <td>@item.ClientName</td>
+                                            <td>@item.ProductName</td>
+                                            <td><strong>@item.Amount.ToString("C")</strong></td>
+                                            <td>@item.AmountReceived.ToString("C")</td>
+                                            <td>
+                                                <strong class="text-danger">@outstanding.ToString("C")</strong>
+                                            </td>
+                                            <td>@item.DueDate.ToString("MMM dd, yyyy")</td>
+                                            <td>
+                                                @if (item.DaysOverdue > 0)
+                                                {
+                                                    <span class="badge bg-danger">@item.DaysOverdue days</span>
+                                                }
+                                                else if (item.DaysOverdue > -7)
+                                                {
+                                                    <span class="badge bg-warning text-dark">Due soon</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">@Math.Abs(item.DaysOverdue) days remaining</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge @(item.PaymentStatus == "Completed" ? "bg-success" : item.PaymentStatus == "Partial" ? "bg-warning text-dark" : "bg-secondary")">
+                                                    @item.PaymentStatus
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge @(item.AgingCategory == "Current" ? "bg-success" : item.AgingCategory == "1-30 Days" ? "bg-warning text-dark" : item.AgingCategory == "31-60 Days" ? "bg-orange" : item.AgingCategory == "61-90 Days" ? "bg-danger" : "bg-dark")">
+                                                    @item.AgingCategory
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h5>No Outstanding Invoices</h5>
+                            <p class="text-muted">All invoices are fully paid or no invoices match the current filter.</p>
+                            <a asp-action="Index" class="btn btn-primary">
+                                <i class="fas fa-list"></i> View All Invoices
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-orange {
+        background-color: #fd7e14 !important;
+        color: white !important;
+    }
+</style>

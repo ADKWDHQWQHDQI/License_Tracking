@@ -256,7 +256,7 @@ namespace License_Tracking.Controllers
             {
                 // Test basic license query
                 var licenseData = await _context.Deals
-                    .Where(l => l.LicenseDeliveryStatus == "Active" && !l.IsProjectPipeline)
+                    .Where(l => l.LicenseDeliveryStatus == "Active" && l.IsProjectPipeline != true)
                     .Select(l => new
                     {
                         l.ProductName,
@@ -285,7 +285,7 @@ namespace License_Tracking.Controllers
             {
                 // Test OEM grouping
                 var oemData = await _context.Deals
-                    .Where(l => l.LicenseDeliveryStatus == "Active" && !l.IsProjectPipeline)
+                    .Where(l => l.LicenseDeliveryStatus == "Active" && l.IsProjectPipeline != true)
                     .GroupBy(l => l.OemName)
                     .Select(g => new
                     {

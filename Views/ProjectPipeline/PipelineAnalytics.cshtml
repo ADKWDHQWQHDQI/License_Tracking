@@ -1,0 +1,482 @@
+@{
+    ViewData["Title"] = "Pipeline Analytics";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-chart-area"></i> Pipeline Analytics Dashboard</h2>
+            <p class="text-muted mb-0">Comprehensive pipeline performance insights and metrics</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Pipeline
+            </a>
+            <button class="btn btn-primary" onclick="refreshAnalytics()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i> @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="text-center my-4" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading analytics...</span>
+        </div>
+        <p class="mt-2">Loading pipeline analytics...</p>
+    </div>
+
+    <!-- Week 10 Enhanced Analytics Summary Cards -->
+    <div class="row mb-4" id="analyticsCards">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Total Estimated Revenue</h6>
+                            <h4 class="mb-0" id="totalEstimatedRevenue">$0</h4>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Total Weighted Revenue</h6>
+                            <h4 class="mb-0" id="totalWeightedRevenue">$0</h4>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-chart-line fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Total Estimated Margin</h6>
+                            <h4 class="mb-0" id="totalEstimatedMargin">$0</h4>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-percentage fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Active Projects</h6>
+                            <h4 class="mb-0" id="activeProjects">0</h4>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-project-diagram fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Metrics Row -->
+    <div class="row mb-4" id="advancedMetrics">
+        <div class="col-lg-2 col-md-4 mb-3">
+            <div class="card border-secondary h-100">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-muted">Avg Success Rate</h6>
+                    <h5 class="text-primary mb-0" id="avgSuccessRate">0%</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 mb-3">
+            <div class="card border-secondary h-100">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-muted">Avg Margin %</h6>
+                    <h5 class="text-success mb-0" id="avgMarginPercentage">0%</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 mb-3">
+            <div class="card border-secondary h-100">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-muted">Avg Confidence</h6>
+                    <h5 class="text-info mb-0" id="avgConfidence">0/5</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 mb-3">
+            <div class="card border-secondary h-100">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-muted">High Value</h6>
+                    <h5 class="text-warning mb-0" id="highValueProjects">0</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 mb-3">
+            <div class="card border-secondary h-100">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-muted">High Probability</h6>
+                    <h5 class="text-dark mb-0" id="highProbabilityProjects">0</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 mb-3">
+            <div class="card border-secondary h-100">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-muted">Upcoming Closures</h6>
+                    <h5 class="text-danger mb-0" id="upcomingClosures">0</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Detailed Analytics -->
+    <div class="row">
+        <!-- Pipeline by Status -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-pie"></i> Projects by Status
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="statusChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pipeline by Stage -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-bar"></i> Projects by Pipeline Stage
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="stageChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- OEM Performance -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-bar"></i> Revenue by OEM
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="oemChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Trend -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-line"></i> Monthly Pipeline Trend
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="trendChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- High-Value Deals Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-gem"></i> High-Value Pipeline Deals (≥$50,000)
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="highValueDealsTable">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Client</th>
+                                    <th>Estimated Revenue</th>
+                                    <th>Weighted Revenue</th>
+                                    <th>Success Probability</th>
+                                    <th>Pipeline Stage</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be populated via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let analyticsData = null;
+        let charts = {};
+
+        // Initialize analytics dashboard
+        document.addEventListener('DOMContentLoaded', function () {
+            loadPipelineAnalytics();
+        });
+
+        async function loadPipelineAnalytics() {
+            showLoading(true);
+            try {
+                const response = await fetch('@Url.Action("GetPipelineAnalytics")');
+                if (!response.ok) throw new Error('Failed to load analytics');
+                
+                analyticsData = await response.json();
+                updateAnalyticsDisplay();
+                createCharts();
+                populateHighValueDeals();
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                showError('Failed to load pipeline analytics: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function updateAnalyticsDisplay() {
+            if (!analyticsData) return;
+
+            // Update main cards
+            document.getElementById('totalEstimatedRevenue').textContent = 
+                formatCurrency(analyticsData.TotalEstimatedRevenue);
+            document.getElementById('totalWeightedRevenue').textContent = 
+                formatCurrency(analyticsData.TotalWeightedRevenue);
+            document.getElementById('totalEstimatedMargin').textContent = 
+                formatCurrency(analyticsData.TotalEstimatedMargin);
+            document.getElementById('activeProjects').textContent = 
+                analyticsData.ActiveProjects;
+
+            // Update advanced metrics
+            document.getElementById('avgSuccessRate').textContent = 
+                analyticsData.AverageSuccessProbability.toFixed(1) + '%';
+            document.getElementById('avgMarginPercentage').textContent = 
+                analyticsData.AverageMarginPercentage.toFixed(1) + '%';
+            document.getElementById('avgConfidence').textContent = 
+                analyticsData.AverageConfidenceLevel.toFixed(1) + '/5';
+            document.getElementById('highValueProjects').textContent = 
+                analyticsData.PipelineHealth?.HighProbabilityDeals || 0;
+            document.getElementById('highProbabilityProjects').textContent = 
+                analyticsData.PipelineHealth?.HighProbabilityDeals || 0;
+            document.getElementById('upcomingClosures').textContent = 
+                analyticsData.UpcomingClosures || 0;
+        }
+
+        function createCharts() {
+            if (!analyticsData) return;
+
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => chart.destroy());
+            charts = {};
+
+            // Status Chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            charts.status = new Chart(statusCtx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(analyticsData.ProjectsByStatus || {}),
+                    datasets: [{
+                        data: Object.values(analyticsData.ProjectsByStatus || {}).map(s => s.Count),
+                        backgroundColor: [
+                            '#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Stage Chart
+            const stageCtx = document.getElementById('stageChart').getContext('2d');
+            charts.stage = new Chart(stageCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(analyticsData.ProjectsByStage || {}),
+                    datasets: [{
+                        label: 'Projects',
+                        data: Object.values(analyticsData.ProjectsByStage || {}).map(s => s.Count),
+                        backgroundColor: '#007bff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // OEM Chart
+            const oemCtx = document.getElementById('oemChart').getContext('2d');
+            charts.oem = new Chart(oemCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(analyticsData.ProjectsByOem || {}),
+                    datasets: [{
+                        label: 'Estimated Revenue',
+                        data: Object.values(analyticsData.ProjectsByOem || {}).map(o => o.EstimatedRevenue),
+                        backgroundColor: '#28a745'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Trend Chart
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            charts.trend = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: (analyticsData.MonthlyTrend || []).map(t => t.Month),
+                    datasets: [{
+                        label: 'Estimated Revenue',
+                        data: (analyticsData.MonthlyTrend || []).map(t => t.EstimatedRevenue),
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        fill: true
+                    }, {
+                        label: 'Weighted Revenue',
+                        data: (analyticsData.MonthlyTrend || []).map(t => t.WeightedRevenue),
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function populateHighValueDeals() {
+            const tbody = document.querySelector('#highValueDealsTable tbody');
+            tbody.innerHTML = '';
+
+            (analyticsData.HighValueDeals || []).forEach(deal => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td><strong>${deal.ProductName}</strong></td>
+                    <td>${deal.ClientName}</td>
+                    <td>${formatCurrency(deal.EstimatedRevenue)}</td>
+                    <td>${formatCurrency(deal.WeightedRevenue)}</td>
+                    <td>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-${deal.SuccessProbability >= 75 ? 'success' : 
+                                deal.SuccessProbability >= 50 ? 'info' : 
+                                deal.SuccessProbability >= 25 ? 'warning' : 'danger'}" 
+                                style="width: ${deal.SuccessProbability}%">
+                                ${deal.SuccessProbability}%
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-${deal.PipelineStage === 'Closed Won' ? 'success' : 
+                            deal.PipelineStage === 'Negotiation' ? 'warning' : 
+                            deal.PipelineStage === 'Proposal' ? 'info' : 'secondary'}">
+                            ${deal.PipelineStage}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="@Url.Action("Details")/${deal.ProjectPipelineId}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
+                `;
+            });
+
+            if ((analyticsData.HighValueDeals || []).length === 0) {
+                const row = tbody.insertRow();
+                row.innerHTML = '<td colspan="7" class="text-center text-muted">No high-value deals found</td>';
+            }
+        }
+
+        function refreshAnalytics() {
+            loadPipelineAnalytics();
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.row'));
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount || 0);
+        }
+    </script>
+}

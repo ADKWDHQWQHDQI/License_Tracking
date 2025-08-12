@@ -129,8 +129,8 @@ namespace License_Tracking.Models
         public string? Notes { get; set; }
 
         // Alert Configuration  
-        public bool AlertsEnabled { get; set; } = true;
-        public bool IsProjectPipeline { get; set; } = false;
+        public bool? AlertsEnabled { get; set; } = true;
+        public bool? IsProjectPipeline { get; set; } = false;
 
         // System Fields
         public DateTime CreatedDate { get; set; } = DateTime.Now;

@@ -1,4 +1,4 @@
-@model License_Tracking.ViewModels.ProjectPipelineViewModel
+@model License_Tracking.Models.ProjectPipeline
 
 @{
     ViewData["Title"] = "Delete Project Pipeline";
@@ -29,34 +29,40 @@
                                 <div class="col-md-6">
                                     <p><strong>Product:</strong> @Model.ProductName</p>
                                     <p><strong>OEM:</strong> @Model.OemName</p>
-                                    <p><strong>Customer:</strong> @Model.ClientName</p>
+                                    <p><strong>Client:</strong> @Model.ClientName</p>
                                     <p><strong>Status:</strong> 
-                                        <span class="badge bg-@(Model.ProjectStatus == "Confirmed" ? "success" : 
-                                                                Model.ProjectStatus == "Lost" ? "danger" :
+                                        <span class="badge bg-@(Model.ProjectStatus == "Active" ? "success" : 
+                                                                Model.ProjectStatus == "Closed Lost" ? "danger" :
                                                                 Model.ProjectStatus == "Negotiation" ? "warning" :
-                                                                Model.ProjectStatus == "Pending" ? "info" : "secondary")">
+                                                                Model.ProjectStatus == "Pipeline" ? "info" : "secondary")">
                                             @Model.ProjectStatus
+                                        </span>
+                                    </p>
+                                    <p><strong>Pipeline Stage:</strong> 
+                                        <span class="badge bg-@(Model.PipelineStage == "Closed Won" ? "success" : 
+                                            Model.PipelineStage == "Negotiation" ? "warning" : 
+                                            Model.PipelineStage == "Proposal" ? "info" : "secondary")">
+                                            @Model.PipelineStage
                                         </span>
                                     </p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong>Expected License Date:</strong> @Model.ExpectedLicenseDate.ToString("MMM dd, yyyy")</p>
-                                    <p><strong>Projected Revenue:</strong> @Model.ProjectedRevenue.ToString("C")</p>
-                                    <p><strong>Projected Margin:</strong> @Model.ProjectedMargin.ToString("C")</p>
+                                    <p><strong>Expected Close Date:</strong> @Model.ExpectedCloseDate?.ToString("MMM dd, yyyy")</p>
+                                    <p><strong>Estimated Revenue:</strong> @Model.EstimatedRevenue.ToString("C")</p>
+                                    <p><strong>Estimated Margin:</strong> @Model.EstimatedMargin.ToString("C")</p>
+                                    <p><strong>Weighted Revenue:</strong> @Model.WeightedRevenue.ToString("C")</p>
                                     <p><strong>Success Probability:</strong> @Model.SuccessProbability%</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    @if (Model.IsConverted)
+                    <!-- Week 10 Enhanced Project Details -->
+                    @if (!string.IsNullOrEmpty(Model.Remarks))
                     {
-                        <div class="alert alert-warning">
-                            <h6><i class="fas fa-exclamation-triangle"></i> Warning: Converted Project</h6>
-                            <p class="mb-0">
-                                This project has been converted to License ID: @Model.ConvertedToLicenseId. 
-                                Deleting this project will not affect the existing license record.
-                            </p>
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle"></i> Project Remarks</h6>
+                            <p class="mb-0">@Model.Remarks</p>
                         </div>
                     }
 
@@ -77,7 +83,7 @@
                     }
 
                     <!-- Notes that will be lost -->
-                    @if (!string.IsNullOrEmpty(Model.MarginNotes) || !string.IsNullOrEmpty(Model.Remarks))
+                    @if (!string.IsNullOrEmpty(Model.MarginNotes) || !string.IsNullOrEmpty(Model.CustomerNotes))
                     {
                         <div class="mb-3">
                             <h6>Notes that will be lost:</h6>
@@ -85,9 +91,9 @@
                             {
                                 <p class="mb-1"><strong>Margin Notes:</strong> @Model.MarginNotes</p>
                             }
-                            @if (!string.IsNullOrEmpty(Model.Remarks))
+                            @if (!string.IsNullOrEmpty(Model.CustomerNotes))
                             {
-                                <p class="mb-1"><strong>Remarks:</strong> @Model.Remarks</p>
+                                <p class="mb-1"><strong>Customer Notes:</strong> @Model.CustomerNotes</p>
                             }
                         </div>
                     }

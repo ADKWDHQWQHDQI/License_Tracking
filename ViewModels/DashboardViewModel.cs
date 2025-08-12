@@ -36,9 +36,6 @@ namespace License_Tracking.ViewModels
         // Pipeline Deals
         public List<Deal> PipelineDeals { get; set; } = new List<Deal>();
 
-        // BA Performance
-        public List<BATargetSummary> BAPerformance { get; set; } = new List<BATargetSummary>();
-
         // Upcoming Activities
         public List<Activity> UpcomingActivities { get; set; } = new List<Activity>();
 
@@ -53,16 +50,6 @@ namespace License_Tracking.ViewModels
         public int ActivePipelineProjects { get; set; }
         public decimal ProjectedPipelineRevenue { get; set; }
         public decimal ProjectedPipelineMargin { get; set; }
-    }
-
-    public class BATargetSummary
-    {
-        public string AssignedTo { get; set; } = string.Empty;
-        public decimal TargetValue { get; set; }
-        public decimal ActualValue { get; set; }
-        public decimal AchievementPercentage { get; set; }
-        public string TargetType { get; set; } = string.Empty;
-        public string TargetPeriod { get; set; } = string.Empty;
     }
 
     public class UserManagementViewModel

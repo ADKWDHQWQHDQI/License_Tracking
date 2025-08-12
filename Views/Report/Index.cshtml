@@ -75,6 +75,50 @@
         </div>
     </div>
 
+    <!-- Pipeline Analytics Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-project-diagram"></i> Current Projects Analytics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">Pipeline Margin</h6>
+                                <h4 class="text-success mb-0" id="pipelineMargin">Loading...</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">Pipeline Revenue</h6>
+                                <h4 class="text-primary mb-0" id="pipelineRevenue">Loading...</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">Weighted Revenue</h6>
+                                <h4 class="text-info mb-0" id="weightedRevenue">Loading...</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">Active Projects</h6>
+                                <h4 class="text-warning mb-0" id="activeProjects">Loading...</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <a asp-controller="ProjectPipeline" asp-action="PipelineAnalytics" class="btn btn-primary">
+                            <i class="fas fa-chart-area"></i> View Detailed Pipeline Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Access Reports -->
     <div class="row">
         <div class="col-md-6">
@@ -237,7 +281,49 @@
         $(document).ready(function () {
             // Initialize tooltips
             $('[data-toggle="tooltip"]').tooltip();
+
+            // Load pipeline analytics
+            loadPipelineAnalytics();
         });
+
+        async function loadPipelineAnalytics() {
+            try {
+                const response = await fetch('@Url.Action("GetPipelineAnalyticsSummary", "ProjectPipeline")');
+                if (!response.ok) throw new Error('Failed to load analytics');
+
+                const data = await response.json();
+                updatePipelineDisplay(data);
+            } catch (error) {
+                console.error('Error loading pipeline analytics:', error);
+                document.getElementById('pipelineMargin').textContent = 'Error loading';
+                document.getElementById('pipelineRevenue').textContent = 'Error loading';
+                document.getElementById('weightedRevenue').textContent = 'Error loading';
+                document.getElementById('activeProjects').textContent = 'Error loading';
+            }
+        }
+
+        function updatePipelineDisplay(data) {
+            if (data && typeof data.TotalEstimatedMargin !== 'undefined') {
+                document.getElementById('pipelineMargin').textContent = formatCurrency(data.TotalEstimatedMargin);
+                document.getElementById('pipelineRevenue').textContent = formatCurrency(data.TotalEstimatedRevenue);
+                document.getElementById('weightedRevenue').textContent = formatCurrency(data.TotalWeightedRevenue);
+                document.getElementById('activeProjects').textContent = data.ActiveProjectsCount;
+            } else {
+                document.getElementById('pipelineMargin').textContent = 'No data';
+                document.getElementById('pipelineRevenue').textContent = 'No data';
+                document.getElementById('weightedRevenue').textContent = 'No data';
+                document.getElementById('activeProjects').textContent = '0';
+            }
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount || 0);
+        }
 
         function openBulkVisualization() {
             // Open a comprehensive visualization

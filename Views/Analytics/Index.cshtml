@@ -1,0 +1,818 @@
+@model License_Tracking.ViewModels.AnalyticsDashboardViewModel
+@{
+    ViewData["Title"] = "Business Analytics Dashboard";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-chart-line text-primary"></i> Business Analytics Dashboard</h2>
+            <p class="text-muted mb-0">Comprehensive business intelligence and performance analytics -
+                @Model.CurrentPeriod</p>
+        </div>
+        <div>
+            <button class="btn btn-outline-secondary" onclick="refreshAnalytics()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn btn-success" onclick="exportAnalytics()">
+                <i class="fas fa-download"></i> Export Report
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs - Bigin.com Style -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <ul class="nav nav-pills nav-fill" id="analyticsTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="current-tab" data-bs-toggle="pill"
+                        data-bs-target="#current-analytics" type="button" role="tab">
+                        <i class="fas fa-chart-bar"></i> Current Analytics
+                        <small class="d-block">Actual Performance</small>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pipeline-tab" data-bs-toggle="pill"
+                        data-bs-target="#pipeline-analytics" type="button" role="tab">
+                        <i class="fas fa-chart-area"></i> Pipeline Analytics
+                        <small class="d-block">Future Projections</small>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="comparative-tab" data-bs-toggle="pill"
+                        data-bs-target="#comparative-analytics" type="button" role="tab">
+                        <i class="fas fa-balance-scale"></i> Comparative Analysis
+                        <small class="d-block">Current vs Pipeline</small>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="analyticsTabContent">
+
+        <!-- Current Analytics Tab -->
+        <div class="tab-pane fade show active" id="current-analytics" role="tabpanel">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4 class="text-success"><i class="fas fa-chart-bar"></i> Current Analytics - Actual Performance
+                    </h4>
+                    <p class="text-muted">Real-time data from completed and active deals for
+                        @Model.CurrentAnalytics.Period</p>
+                </div>
+            </div>
+
+            <!-- Current Analytics Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="card border-success border-start border-4 h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-success">Total Revenue</h6>
+                                    <h4 class="mb-1">@Model.CurrentAnalytics.Combined.TotalRevenue.ToString("C")</h4>
+                                    <small class="text-muted">@Model.CurrentAnalytics.Combined.TotalDeals deals</small>
+                                </div>
+                                <div class="ms-3">
+                                    <i class="fas fa-rupee-sign fa-2x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="card border-warning border-start border-4 h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-warning">Total Expenditure</h6>
+                                    <h4 class="mb-1">@Model.CurrentAnalytics.Combined.TotalExpenditure.ToString("C")
+                                    </h4>
+                                    <small class="text-muted">OEM payments</small>
+                                </div>
+                                <div class="ms-3">
+                                    <i class="fas fa-credit-card fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="card border-primary border-start border-4 h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-primary">Net Profit</h6>
+                                    <h4 class="mb-1">@Model.CurrentAnalytics.Combined.NetProfit.ToString("C")</h4>
+                                    <small
+                                        class="text-muted">@Model.CurrentAnalytics.Combined.ProfitMarginPercentage.ToString("F1")%
+                                        margin</small>
+                                </div>
+                                <div class="ms-3">
+                                    <i class="fas fa-chart-line fa-2x text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="card border-info border-start border-4 h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-info">Avg Margin %</h6>
+                                    <h4 class="mb-1">
+                                        @Model.CurrentAnalytics.Margin.AverageMarginPercentage.ToString("F1")%</h4>
+                                    <small
+                                        class="text-@Model.CurrentAnalytics.Margin.MarginStatusColor">@Model.CurrentAnalytics.Margin.MarginStatus</small>
+                                </div>
+                                <div class="ms-3">
+                                    <i class="fas fa-percentage fa-2x text-info"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Analytics Details -->
+            <div class="row">
+                <!-- Customer Revenue Analytics -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-users text-success"></i> Customer-Revenue Analytics</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Revenue</th>
+                                            <th>Deals</th>
+                                            <th>Growth</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var customer in Model.CurrentAnalytics.CustomerRevenue.Take(5))
+                                        {
+                                            <tr>
+                                                <td><strong>@customer.CustomerName</strong></td>
+                                                <td>@customer.TotalRevenue.ToString("C")</td>
+                                                <td><span class="badge bg-primary">@customer.TotalDeals</span></td>
+                                                <td>
+                                                    <i class="@customer.GrowthIcon"></i>
+                                                    @customer.RevenueGrowth.ToString("F1")%
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3">
+                                <canvas id="currentCustomerChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OEM Expenditure Analytics -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-building text-warning"></i> OEM-Expenditure Analytics</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>OEM</th>
+                                            <th>Expenditure</th>
+                                            <th>Deals</th>
+                                            <th>Growth</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var oem in Model.CurrentAnalytics.OemExpenditure.Take(5))
+                                        {
+                                            <tr>
+                                                <td><strong>@oem.OemName</strong></td>
+                                                <td>@oem.TotalExpenditure.ToString("C")</td>
+                                                <td><span class="badge bg-warning">@oem.TotalDeals</span></td>
+                                                <td>
+                                                    <i class="@oem.GrowthIcon"></i>
+                                                    @oem.ExpenditureGrowth.ToString("F1")%
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3">
+                                <canvas id="currentOemChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Combined Analytics -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-chart-pie text-primary"></i> Combined (OEM & Customer)
+                                Analytics</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <h6 class="text-muted">Top Customer</h6>
+                                    <p class="h6 text-success">@Model.CurrentAnalytics.Combined.TopPerformingCustomer
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="text-muted">Top OEM</h6>
+                                    <p class="h6 text-warning">@Model.CurrentAnalytics.Combined.TopSpendingOem</p>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <canvas id="currentCombinedChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Margin Analytics -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-percentage text-info"></i> Margin Analytics</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <h6 class="text-muted">Highest Margin Deal</h6>
+                                    <p class="small">@Model.CurrentAnalytics.Margin.HighestMarginDeal</p>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="text-muted">Lowest Margin Deal</h6>
+                                    <p class="small">@Model.CurrentAnalytics.Margin.LowestMarginDeal</p>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <canvas id="currentMarginChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pipeline Analytics Tab -->
+        <div class="tab-pane fade" id="pipeline-analytics" role="tabpanel">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4 class="text-primary"><i class="fas fa-chart-area"></i> Pipeline Analytics - Future Projections
+                    </h4>
+                    <p class="text-muted">Projected data from active pipeline deals for @Model.PipelineAnalytics.Period
+                    </p>
+                </div>
+            </div>
+
+            <!-- Pipeline Analytics Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="card border-success border-start border-4 h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-success">Projected Revenue</h6>
+                                    <h4 class="mb-1">@Model.PipelineAnalytics.Combined.TotalRevenue.ToString("C")</h4>
+                                    <small class="text-muted">@Model.PipelineAnalytics.Combined.TotalDeals deals</small>
+                                </div>
+                                <div class="ms-3">
+                                    <i class="fas fa-chart-area fa-2x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="card border-warning border-start border-4 h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-warning">Expected Expenditure</h6>
+                                    <h4 class="mb-1">@Model.PipelineAnalytics.Combined.TotalExpenditure.ToString("C")
+                                    </h4>
+                                    <small class="text-muted">OEM costs</small>
+                                </div>
+                                <div class="ms-3">
+                                    <i class="fas fa-shopping-cart fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="card border-primary border-start border-4 h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-primary">Weighted Revenue</h6>
+                                    <h4 class="mb-1">@Model.PipelineAnalytics.WeightedRevenue.ToString("C")</h4>
+                                    <small class="text-muted">Success probability adjusted</small>
+                                </div>
+                                <div class="ms-3">
+                                    <i class="fas fa-weight fa-2x text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="card border-info border-start border-4 h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-info">Weighted Margin</h6>
+                                    <h4 class="mb-1">@Model.PipelineAnalytics.WeightedMargin.ToString("C")</h4>
+                                    <small class="text-muted">Risk-adjusted margin</small>
+                                </div>
+                                <div class="ms-3">
+                                    <i class="fas fa-balance-scale fa-2x text-info"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pipeline Analytics Details (Similar structure to Current Analytics) -->
+            <div class="row">
+                <!-- Customer Revenue Analytics (Pipeline) -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-users text-success"></i> Pipeline Customer-Revenue
+                                Analytics</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Projected Revenue</th>
+                                            <th>Deals</th>
+                                            <th>Growth</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var customer in Model.PipelineAnalytics.CustomerRevenue.Take(5))
+                                        {
+                                            <tr>
+                                                <td><strong>@customer.CustomerName</strong></td>
+                                                <td>@customer.TotalRevenue.ToString("C")</td>
+                                                <td><span class="badge bg-success">@customer.TotalDeals</span></td>
+                                                <td>
+                                                    <i class="@customer.GrowthIcon"></i>
+                                                    @customer.RevenueGrowth.ToString("F1")%
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3">
+                                <canvas id="pipelineCustomerChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OEM Expenditure Analytics (Pipeline) -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-building text-warning"></i> Pipeline OEM-Expenditure
+                                Analytics</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>OEM</th>
+                                            <th>Expected Expenditure</th>
+                                            <th>Deals</th>
+                                            <th>Growth</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var oem in Model.PipelineAnalytics.OemExpenditure.Take(5))
+                                        {
+                                            <tr>
+                                                <td><strong>@oem.OemName</strong></td>
+                                                <td>@oem.TotalExpenditure.ToString("C")</td>
+                                                <td><span class="badge bg-warning">@oem.TotalDeals</span></td>
+                                                <td>
+                                                    <i class="@oem.GrowthIcon"></i>
+                                                    @oem.ExpenditureGrowth.ToString("F1")%
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3">
+                                <canvas id="pipelineOemChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Combined Pipeline Analytics -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-chart-pie text-primary"></i> Pipeline Combined Analytics
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <h6 class="text-muted">Top Prospect</h6>
+                                    <p class="h6 text-success">@Model.PipelineAnalytics.Combined.TopPerformingCustomer
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="text-muted">Primary OEM</h6>
+                                    <p class="h6 text-warning">@Model.PipelineAnalytics.Combined.TopSpendingOem</p>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <canvas id="pipelineCombinedChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pipeline Margin Analytics -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-percentage text-info"></i> Pipeline Margin Analytics</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <h6 class="text-muted">Highest Margin Deal</h6>
+                                    <p class="small">@Model.PipelineAnalytics.Margin.HighestMarginDeal</p>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="text-muted">Lowest Margin Deal</h6>
+                                    <p class="small">@Model.PipelineAnalytics.Margin.LowestMarginDeal</p>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <canvas id="pipelineMarginChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparative Analytics Tab -->
+        <div class="tab-pane fade" id="comparative-analytics" role="tabpanel">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4 class="text-dark"><i class="fas fa-balance-scale"></i> Comparative Analysis - Current vs
+                        Pipeline</h4>
+                    <p class="text-muted">Side-by-side comparison of actual performance vs future projections</p>
+                </div>
+            </div>
+
+            <!-- Comparative Summary -->
+            <div class="row mb-4">
+                <div class="col-lg-6">
+                    <div class="card border-success">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0"><i class="fas fa-chart-bar"></i> Current Performance</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <h6 class="text-muted">Revenue</h6>
+                                    <h5 class="text-success">@Model.CurrentAnalytics.Combined.TotalRevenue.ToString("C")
+                                    </h5>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="text-muted">Margin</h6>
+                                    <h5 class="text-success">@Model.CurrentAnalytics.Margin.TotalMargin.ToString("C")
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="fas fa-chart-area"></i> Pipeline Projections</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <h6 class="text-muted">Revenue</h6>
+                                    <h5 class="text-primary">
+                                        @Model.PipelineAnalytics.Combined.TotalRevenue.ToString("C")</h5>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="text-muted">Margin</h6>
+                                    <h5 class="text-primary">@Model.PipelineAnalytics.Margin.TotalMargin.ToString("C")
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparative Charts -->
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-chart-bar"></i> Revenue Comparison</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="comparativeRevenueChart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-chart-line"></i> Margin Comparison</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="comparativeMarginChart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let charts = {};
+
+        // Initialize analytics dashboard
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Current Analytics Charts
+            createCustomerChart('currentCustomerChart', @Html.Raw(Json.Serialize(Model.CurrentAnalytics.CustomerRevenue.Take(5))), 'Current');
+            createOemChart('currentOemChart', @Html.Raw(Json.Serialize(Model.CurrentAnalytics.OemExpenditure.Take(5))), 'Current');
+            createCombinedChart('currentCombinedChart', @Html.Raw(Json.Serialize(Model.CurrentAnalytics.Combined)), 'Current');
+            createMarginChart('currentMarginChart', @Html.Raw(Json.Serialize(Model.CurrentAnalytics.Margin.MarginTrend)), 'Current');
+
+            // Pipeline Analytics Charts
+            createCustomerChart('pipelineCustomerChart', @Html.Raw(Json.Serialize(Model.PipelineAnalytics.CustomerRevenue.Take(5))), 'Pipeline');
+            createOemChart('pipelineOemChart', @Html.Raw(Json.Serialize(Model.PipelineAnalytics.OemExpenditure.Take(5))), 'Pipeline');
+            createCombinedChart('pipelineCombinedChart', @Html.Raw(Json.Serialize(Model.PipelineAnalytics.Combined)), 'Pipeline');
+            createMarginChart('pipelineMarginChart', @Html.Raw(Json.Serialize(Model.PipelineAnalytics.Margin.MarginTrend)), 'Pipeline');
+
+            // Comparative Charts
+            createComparativeCharts();
+        }
+
+        function createCustomerChart(canvasId, data, type) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            charts[canvasId] = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(d => d.customerName),
+                    datasets: [{
+                        data: data.map(d => d.totalRevenue),
+                        backgroundColor: [
+                            '#198754', '#0d6efd', '#ffc107', '#dc3545', '#6f42c1'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function createOemChart(canvasId, data, type) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            charts[canvasId] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.oemName),
+                    datasets: [{
+                        label: type + ' Expenditure',
+                        data: data.map(d => d.totalExpenditure),
+                        backgroundColor: '#ffc107'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return new Intl.NumberFormat('en-IN', {
+                                        style: 'currency',
+                                        currency: 'INR'
+                                    }).format(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createCombinedChart(canvasId, data, type) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            charts[canvasId] = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Revenue', 'Expenditure', 'Net Profit'],
+                    datasets: [{
+                        data: [data.totalRevenue, data.totalExpenditure, data.netProfit],
+                        backgroundColor: ['#198754', '#ffc107', '#0d6efd']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function createMarginChart(canvasId, data, type) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            charts[canvasId] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: type + ' Margin Trend',
+                        data: data.slice(0, 6),
+                        borderColor: '#17a2b8',
+                        backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function createComparativeCharts() {
+            // Revenue Comparison
+            const revenueCtx = document.getElementById('comparativeRevenueChart').getContext('2d');
+            charts['comparativeRevenueChart'] = new Chart(revenueCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Current', 'Pipeline'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [@Model.CurrentAnalytics.Combined.TotalRevenue, @Model.PipelineAnalytics.Combined.TotalRevenue],
+                        backgroundColor: ['#198754', '#0d6efd']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return new Intl.NumberFormat('en-IN', {
+                                        style: 'currency',
+                                        currency: 'INR'
+                                    }).format(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Margin Comparison
+            const marginCtx = document.getElementById('comparativeMarginChart').getContext('2d');
+            charts['comparativeMarginChart'] = new Chart(marginCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Current', 'Pipeline'],
+                    datasets: [{
+                        label: 'Margin',
+                        data: [@Model.CurrentAnalytics.Margin.TotalMargin, @Model.PipelineAnalytics.Margin.TotalMargin],
+                        backgroundColor: ['#17a2b8', '#6f42c1']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return new Intl.NumberFormat('en-IN', {
+                                        style: 'currency',
+                                        currency: 'INR'
+                                    }).format(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function refreshAnalytics() {
+            location.reload();
+        }
+
+        function exportAnalytics() {
+            window.print();
+        }
+    </script>
+}
+
+<style>
+    .nav-pills .nav-link {
+        color: #6c757d;
+        border-radius: 10px;
+        margin: 0 5px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-pills .nav-link.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .nav-pills .nav-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .card {
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    /* Media query for print styles */
+    @@media print {
+
+        .btn,
+        .nav-pills {
+            display: none !important;
+        }
+    }
+</style>

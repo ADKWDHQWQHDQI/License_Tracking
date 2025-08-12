@@ -130,6 +130,34 @@ namespace License_Tracking.ViewModels
         [Range(0, 100, ErrorMessage = "Probability must be between 0 and 100")]
         public int SuccessProbability { get; set; } = 50;
 
+        // Week 10 Enhancement: Advanced Revenue and Margin Calculations
+        [Display(Name = "Estimated Revenue")]
+        [DataType(DataType.Currency)]
+        public decimal EstimatedRevenue { get; set; }
+
+        [Display(Name = "Estimated Cost")]
+        [DataType(DataType.Currency)]
+        public decimal EstimatedCost { get; set; }
+
+        [Display(Name = "Estimated Margin")]
+        [DataType(DataType.Currency)]
+        public decimal EstimatedMargin
+        {
+            get => EstimatedRevenue - EstimatedCost;
+            set => EstimatedCost = EstimatedRevenue - value;
+        }
+
+        [Display(Name = "Pipeline Stage")]
+        public string PipelineStage { get; set; } = "Lead";
+
+        [Display(Name = "Stage Confidence Level")]
+        [Range(1, 5, ErrorMessage = "Confidence level must be between 1 and 5")]
+        public int StageConfidenceLevel { get; set; } = 3;
+
+        [Display(Name = "Expected Close Date")]
+        [DataType(DataType.Date)]
+        public DateTime? ExpectedCloseDate { get; set; }
+
         [Display(Name = "Ship To Address")]
         public string? ShipToAddress { get; set; }
 
@@ -139,12 +167,17 @@ namespace License_Tracking.ViewModels
         [Display(Name = "Remarks")]
         public string? Remarks { get; set; }
 
-        // Read-only calculated properties
-        public decimal ProjectedMargin => ProjectedMarginInput ?? (ExpectedAmountToReceive - ExpectedAmountToPay);
+        // Week 10 Enhancement: Advanced calculated properties
+        public decimal WeightedRevenue => EstimatedRevenue * (SuccessProbability / 100.0m);
 
-        public decimal ProjectedProfitMargin => ExpectedAmountToReceive > 0 ? (ProjectedMargin / ExpectedAmountToReceive) * 100 : 0;
+        public decimal MarginPercentage => EstimatedRevenue > 0 ? (EstimatedMargin / EstimatedRevenue) * 100 : 0;
 
-        public decimal ProjectedRevenue => ExpectedAmountToReceive * (SuccessProbability / 100.0m);
+        // Legacy calculated properties (maintained for compatibility)
+        public decimal ProjectedMargin => ProjectedMarginInput ?? EstimatedMargin;
+
+        public decimal ProjectedProfitMargin => EstimatedRevenue > 0 ? (EstimatedMargin / EstimatedRevenue) * 100 : 0;
+
+        public decimal ProjectedRevenue => WeightedRevenue;
 
         public string CreatedBy { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }

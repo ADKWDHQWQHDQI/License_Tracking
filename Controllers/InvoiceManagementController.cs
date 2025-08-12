@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using License_Tracking.Data;
 using License_Tracking.Models;
+using License_Tracking.ViewModels;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -23,9 +24,11 @@ namespace License_Tracking.Controllers
         {
             var invoicesQuery = _context.Invoices
                 .Include(i => i.Deal)
-                .ThenInclude(d => d.Company)
+                .ThenInclude(d => d!.Company)
                 .Include(i => i.Deal)
-                .ThenInclude(d => d.Oem)
+                .ThenInclude(d => d!.Oem)
+                .Include(i => i.Deal)
+                .ThenInclude(d => d!.Product)
                 .AsQueryable();
 
             // Filter by phase
@@ -67,6 +70,7 @@ namespace License_Tracking.Controllers
             var deal = await _context.Deals
                 .Include(d => d.Company)
                 .Include(d => d.Product)
+                .Include(d => d.Oem)
                 .FirstOrDefaultAsync(d => d.DealId == dealId);
 
             if (deal == null)
@@ -74,10 +78,9 @@ namespace License_Tracking.Controllers
                 return NotFound();
             }
 
-            var invoice = new Invoice
+            var viewModel = new InvoiceGenerationViewModel
             {
                 DealId = dealId,
-                InvoiceNumber = "", // Will be set when form is submitted
                 InvoiceType = InvoiceType.Customer,
                 Amount = deal.CustomerInvoiceAmount ?? 0,
                 DueDate = DateTime.Now.AddDays(30),
@@ -85,21 +88,32 @@ namespace License_Tracking.Controllers
                 Deal = deal
             };
 
-            return View(invoice);
+            return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Finance")]
-        public async Task<IActionResult> GenerateCustomerInvoice(Invoice invoice)
+        public async Task<IActionResult> GenerateCustomerInvoice(InvoiceGenerationViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
                 // Generate invoice number
                 var invoiceCount = await _context.Invoices.CountAsync() + 1;
-                invoice.InvoiceNumber = $"CBMS-CUST-{DateTime.Now:yyyyMM}-{invoiceCount:D4}";
-                invoice.InvoiceType = InvoiceType.Customer;
-                invoice.PaymentStatus = "Pending";
+                var invoiceNumber = $"CBMS-CUST-{DateTime.Now:yyyyMM}-{invoiceCount:D4}";
+
+                var invoice = new Invoice
+                {
+                    DealId = viewModel.DealId,
+                    InvoiceNumber = invoiceNumber,
+                    InvoiceType = InvoiceType.Customer,
+                    Amount = viewModel.Amount,
+                    DueDate = viewModel.DueDate,
+                    InvoiceDate = viewModel.InvoiceDate ?? DateTime.Now,
+                    PaymentDate = viewModel.PaymentDate,
+                    PaymentStatus = viewModel.PaymentStatus,
+                    Notes = viewModel.Notes
+                };
 
                 _context.Add(invoice);
 
@@ -119,6 +133,16 @@ namespace License_Tracking.Controllers
                 };
                 _context.CbmsInvoices.Add(cbmsInvoice);
 
+                // Update deal status
+                var relatedDeal = await _context.Deals.FindAsync(invoice.DealId);
+                if (relatedDeal != null)
+                {
+                    relatedDeal.CustomerPaymentStatus = "Invoice Sent";
+                    relatedDeal.LastModifiedDate = DateTime.Now;
+                    relatedDeal.LastModifiedBy = User.Identity?.Name;
+                    _context.Update(relatedDeal);
+                }
+
                 // Update deal with invoice information
                 var deal = await _context.Deals.FindAsync(invoice.DealId);
                 if (deal != null)
@@ -136,7 +160,15 @@ namespace License_Tracking.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(invoice);
+            // If model is not valid, reload the deal data for the view
+            var dealData = await _context.Deals
+                .Include(d => d.Company)
+                .Include(d => d.Product)
+                .Include(d => d.Oem)
+                .FirstOrDefaultAsync(d => d.DealId == viewModel.DealId);
+
+            viewModel.Deal = dealData;
+            return View(viewModel);
         }
 
         // Generate OEM Invoice (Phase 4 - OEM Settlement)
@@ -147,6 +179,7 @@ namespace License_Tracking.Controllers
             var deal = await _context.Deals
                 .Include(d => d.Oem)
                 .Include(d => d.Product)
+                .Include(d => d.Company)
                 .FirstOrDefaultAsync(d => d.DealId == dealId);
 
             if (deal == null)
@@ -154,10 +187,9 @@ namespace License_Tracking.Controllers
                 return NotFound();
             }
 
-            var invoice = new Invoice
+            var viewModel = new InvoiceGenerationViewModel
             {
                 DealId = dealId,
-                InvoiceNumber = "", // Will be set when form is submitted
                 InvoiceType = InvoiceType.OEM,
                 Amount = deal.OemInvoiceAmount ?? 0,
                 DueDate = DateTime.Now.AddDays(30),
@@ -165,21 +197,32 @@ namespace License_Tracking.Controllers
                 Deal = deal
             };
 
-            return View(invoice);
+            return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Finance")]
-        public async Task<IActionResult> GenerateOemInvoice(Invoice invoice)
+        public async Task<IActionResult> GenerateOemInvoice(InvoiceGenerationViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
                 // Generate invoice number
                 var invoiceCount = await _context.Invoices.CountAsync() + 1;
-                invoice.InvoiceNumber = $"CBMS-OEM-{DateTime.Now:yyyyMM}-{invoiceCount:D4}";
-                invoice.InvoiceType = InvoiceType.OEM;
-                invoice.PaymentStatus = "Pending";
+                var invoiceNumber = $"CBMS-OEM-{DateTime.Now:yyyyMM}-{invoiceCount:D4}";
+
+                var invoice = new Invoice
+                {
+                    DealId = viewModel.DealId,
+                    InvoiceNumber = invoiceNumber,
+                    InvoiceType = InvoiceType.OEM,
+                    Amount = viewModel.Amount,
+                    DueDate = viewModel.DueDate,
+                    InvoiceDate = viewModel.InvoiceDate ?? DateTime.Now,
+                    PaymentDate = viewModel.PaymentDate,
+                    PaymentStatus = viewModel.PaymentStatus,
+                    Notes = viewModel.Notes
+                };
 
                 _context.Add(invoice);
 
@@ -216,7 +259,15 @@ namespace License_Tracking.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(invoice);
+            // If model is not valid, reload the deal data for the view
+            var dealData = await _context.Deals
+                .Include(d => d.Company)
+                .Include(d => d.Product)
+                .Include(d => d.Oem)
+                .FirstOrDefaultAsync(d => d.DealId == viewModel.DealId);
+
+            viewModel.Deal = dealData;
+            return View(viewModel);
         }
 
         // Generate Canarys to OEM Purchase Order Invoice (Phase 2 - OEM Procurement)
@@ -306,9 +357,11 @@ namespace License_Tracking.Controllers
         {
             var invoice = await _context.Invoices
                 .Include(i => i.Deal)
-                .ThenInclude(d => d.Company)
+                .ThenInclude(d => d!.Company)
                 .Include(i => i.Deal)
-                .ThenInclude(d => d.Oem)
+                .ThenInclude(d => d!.Oem)
+                .Include(i => i.Deal)
+                .ThenInclude(d => d!.Product)
                 .FirstOrDefaultAsync(m => m.InvoiceId == id);
 
             if (invoice == null)
@@ -446,6 +499,283 @@ namespace License_Tracking.Controllers
             {
                 return Json(new { success = false, message = ex.Message });
             }
+        }
+
+        // Invoice Aging Summary - Migrated from BillingController
+        [Authorize(Roles = "Admin,Finance")]
+        public async Task<IActionResult> AgingSummary(string invoiceType = "All")
+        {
+            var today = DateTime.Today;
+            var query = _context.Invoices
+                .Include(i => i.Deal)
+                .ThenInclude(d => d!.Company)
+                .Include(i => i.Deal)
+                .ThenInclude(d => d!.Product)
+                .AsQueryable();
+
+            if (invoiceType != "All")
+            {
+                if (Enum.TryParse<InvoiceType>(invoiceType, out var parsedType))
+                {
+                    query = query.Where(i => i.InvoiceType == parsedType);
+                }
+            }
+
+            var agingSummary = await query
+                .Where(i => i.PaymentStatus != "Completed")
+                .Select(i => new
+                {
+                    InvoiceId = i.InvoiceId,
+                    InvoiceNumber = i.InvoiceNumber,
+                    InvoiceType = i.InvoiceType.ToString(),
+                    ClientName = i.Deal != null && i.Deal.Company != null ? i.Deal.Company.CompanyName : "Unknown",
+                    ProductName = i.Deal != null && i.Deal.Product != null ? i.Deal.Product.ProductName : "Pipeline Project",
+                    Amount = i.Amount,
+                    AmountReceived = i.AmountReceived,
+                    OutstandingAmount = i.Amount - i.AmountReceived,
+                    DueDate = i.DueDate,
+                    DaysOverdue = (int)(today - i.DueDate).TotalDays,
+                    PaymentStatus = i.PaymentStatus,
+                    AgingCategory = (int)(today - i.DueDate).TotalDays <= 0 ? "Current" :
+                                   (int)(today - i.DueDate).TotalDays <= 30 ? "1-30 Days" :
+                                   (int)(today - i.DueDate).TotalDays <= 60 ? "31-60 Days" :
+                                   (int)(today - i.DueDate).TotalDays <= 90 ? "61-90 Days" : "90+ Days"
+                })
+                .OrderBy(i => i.DueDate)
+                .ToListAsync();
+
+            ViewBag.InvoiceTypeFilter = invoiceType;
+            ViewBag.InvoiceTypes = new SelectList(new[] { "All", "Customer", "OEM" }, invoiceType);
+
+            return View(agingSummary);
+        }
+
+        // Enhanced Payment Status Update - Migrated from BillingController
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Finance")]
+        public async Task<IActionResult> UpdatePaymentStatus(int invoiceId, string paymentStatus, decimal? amountReceived)
+        {
+            var invoice = await _context.Invoices
+                .Include(i => i.Deal)
+                .FirstOrDefaultAsync(i => i.InvoiceId == invoiceId);
+
+            if (invoice == null)
+            {
+                return NotFound();
+            }
+
+            invoice.PaymentStatus = paymentStatus;
+            if (amountReceived.HasValue)
+            {
+                invoice.AmountReceived = amountReceived.Value;
+
+                // If fully paid, mark as completed and set payment date
+                if (invoice.AmountReceived >= invoice.Amount)
+                {
+                    invoice.PaymentStatus = "Completed";
+                    invoice.PaymentDate = DateTime.Now;
+                }
+            }
+
+            // Update corresponding deal status
+            if (invoice.Deal != null)
+            {
+                if (invoice.InvoiceType == InvoiceType.Customer)
+                {
+                    invoice.Deal.CustomerPaymentStatus = invoice.PaymentStatus;
+                    // Note: AmountReceived is calculated, not directly assignable
+                }
+                else
+                {
+                    invoice.Deal.OemPaymentStatus = invoice.PaymentStatus;
+                }
+
+                invoice.Deal.LastModifiedDate = DateTime.Now;
+                invoice.Deal.LastModifiedBy = User.Identity?.Name;
+                _context.Update(invoice.Deal);
+            }
+
+            _context.Update(invoice);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Payment status updated successfully!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Auto-generate Customer Invoice from Deal - Enhanced from BillingController
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Finance")]
+        public async Task<IActionResult> AutoGenerateCustomerInvoice(int dealId)
+        {
+            var deal = await _context.Deals
+                .Include(d => d.Product)
+                .Include(d => d.Company)
+                .FirstOrDefaultAsync(d => d.DealId == dealId);
+
+            if (deal == null)
+            {
+                TempData["ErrorMessage"] = "Deal not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Check if Customer invoice already exists
+            var existingCustomerInvoice = await _context.Invoices
+                .FirstOrDefaultAsync(i => i.DealId == dealId && i.InvoiceType == InvoiceType.Customer);
+
+            if (existingCustomerInvoice != null)
+            {
+                TempData["ErrorMessage"] = "Customer invoice already exists for this deal.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Generate invoice number
+            var invoiceCount = await _context.Invoices.CountAsync() + 1;
+            var invoiceNumber = $"CBMS-CUST-{DateTime.Now:yyyyMM}-{invoiceCount:D4}";
+
+            var customerInvoice = new Invoice
+            {
+                DealId = dealId,
+                InvoiceNumber = invoiceNumber,
+                InvoiceType = InvoiceType.Customer,
+                Amount = deal.CustomerInvoiceAmount ?? 0,
+                PaymentStatus = (deal.AmountReceived ?? 0) >= (deal.CustomerInvoiceAmount ?? 0) ? "Completed" : "Pending",
+                DueDate = DateTime.Today.AddDays(30), // Default 30 days
+                InvoiceDate = DateTime.Now,
+                AmountReceived = deal.AmountReceived ?? 0
+            };
+
+            _context.Invoices.Add(customerInvoice);
+
+            // Generate corresponding CbmsInvoice with Phase 1 mapping
+            var cbmsInvoice = new CbmsInvoice
+            {
+                DealId = customerInvoice.DealId,
+                InvoiceType = "Customer_To_Canarys", // Phase 1 invoice type
+                InvoiceNumber = customerInvoice.InvoiceNumber,
+                InvoiceDate = customerInvoice.InvoiceDate ?? DateTime.Now,
+                DueDate = customerInvoice.DueDate,
+                Amount = customerInvoice.Amount,
+                PaymentStatus = customerInvoice.PaymentStatus,
+                BusinessPhase = 1, // Phase 1 - Customer Engagement
+                CreatedDate = DateTime.Now,
+                CreatedBy = User.Identity?.Name
+            };
+            _context.CbmsInvoices.Add(cbmsInvoice);
+
+            // Update deal with invoice information
+            deal.CustomerInvoiceNumber = customerInvoice.InvoiceNumber;
+            deal.CustomerInvoiceAmount = customerInvoice.Amount;
+            deal.CustomerPaymentStatus = "Invoice Sent";
+            deal.LastModifiedDate = DateTime.Now;
+            deal.LastModifiedBy = User.Identity?.Name;
+            _context.Update(deal);
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Customer invoice auto-generated successfully!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Auto-generate OEM Invoice from Deal - Enhanced from BillingController
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Finance")]
+        public async Task<IActionResult> AutoGenerateOemInvoice(int dealId)
+        {
+            var deal = await _context.Deals
+                .Include(d => d.Product)
+                .Include(d => d.Oem)
+                .FirstOrDefaultAsync(d => d.DealId == dealId);
+
+            if (deal == null)
+            {
+                TempData["ErrorMessage"] = "Deal not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Check if OEM invoice already exists
+            var existingOemInvoice = await _context.Invoices
+                .FirstOrDefaultAsync(i => i.DealId == dealId && i.InvoiceType == InvoiceType.OEM);
+
+            if (existingOemInvoice != null)
+            {
+                TempData["ErrorMessage"] = "OEM invoice already exists for this deal.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Generate invoice number
+            var invoiceCount = await _context.Invoices.CountAsync() + 1;
+            var invoiceNumber = $"CBMS-OEM-{DateTime.Now:yyyyMM}-{invoiceCount:D4}";
+
+            var oemInvoice = new Invoice
+            {
+                DealId = dealId,
+                InvoiceNumber = invoiceNumber,
+                InvoiceType = InvoiceType.OEM,
+                Amount = deal.OemQuoteAmount ?? 0,
+                PaymentStatus = deal.OemPaymentStatus == "Paid" ? "Completed" : "Pending",
+                DueDate = DateTime.Today.AddDays(30), // Default 30 days
+                InvoiceDate = DateTime.Now,
+                AmountReceived = deal.OemPaymentStatus == "Paid" ? deal.OemQuoteAmount ?? 0 : 0
+            };
+
+            _context.Invoices.Add(oemInvoice);
+
+            // Generate corresponding CbmsInvoice with Phase 4 mapping
+            var cbmsInvoice = new CbmsInvoice
+            {
+                DealId = oemInvoice.DealId,
+                InvoiceType = "OEM_To_Canarys", // Phase 4 invoice type
+                InvoiceNumber = oemInvoice.InvoiceNumber,
+                InvoiceDate = oemInvoice.InvoiceDate ?? DateTime.Now,
+                DueDate = oemInvoice.DueDate,
+                Amount = oemInvoice.Amount,
+                PaymentStatus = oemInvoice.PaymentStatus,
+                BusinessPhase = 4, // Phase 4 - OEM Settlement
+                CreatedDate = DateTime.Now,
+                CreatedBy = User.Identity?.Name
+            };
+            _context.CbmsInvoices.Add(cbmsInvoice);
+
+            // Update deal with OEM invoice information
+            deal.OemInvoiceNumber = oemInvoice.InvoiceNumber;
+            deal.OemInvoiceAmount = oemInvoice.Amount;
+            deal.OemPaymentStatus = "Invoice Received";
+            deal.LastModifiedDate = DateTime.Now;
+            deal.LastModifiedBy = User.Identity?.Name;
+            _context.Update(deal);
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "OEM invoice auto-generated successfully!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Billing Dashboard Summary - Migrated from BillingController
+        [Authorize(Roles = "Admin,Finance")]
+        public async Task<IActionResult> BillingDashboard()
+        {
+            var summary = new
+            {
+                TotalCustomerInvoices = await _context.Invoices.Where(i => i.InvoiceType == InvoiceType.Customer).CountAsync(),
+                TotalOemInvoices = await _context.Invoices.Where(i => i.InvoiceType == InvoiceType.OEM).CountAsync(),
+                PendingCustomerAmount = await _context.Invoices
+                    .Where(i => i.InvoiceType == InvoiceType.Customer && i.PaymentStatus != "Completed")
+                    .SumAsync(i => i.Amount - i.AmountReceived),
+                PendingOemAmount = await _context.Invoices
+                    .Where(i => i.InvoiceType == InvoiceType.OEM && i.PaymentStatus != "Completed")
+                    .SumAsync(i => i.Amount - i.AmountReceived),
+                OverdueCustomerInvoices = await _context.Invoices
+                    .Where(i => i.InvoiceType == InvoiceType.Customer && i.DueDate < DateTime.Today && i.PaymentStatus != "Completed")
+                    .CountAsync(),
+                OverdueOemInvoices = await _context.Invoices
+                    .Where(i => i.InvoiceType == InvoiceType.OEM && i.DueDate < DateTime.Today && i.PaymentStatus != "Completed")
+                    .CountAsync()
+            };
+
+            return View(summary);
         }
     }
 

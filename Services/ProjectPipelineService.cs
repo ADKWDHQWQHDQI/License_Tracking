@@ -9,6 +9,7 @@ namespace License_Tracking.Services
     {
         Task<List<ProjectPipelineViewModel>> GetAllProjectsAsync();
         Task<ProjectPipelineViewModel?> GetProjectByIdAsync(int id);
+        Task<ProjectPipeline?> GetByIdAsync(int id); // Week 10: Added for direct model access
         Task<ProjectPipelineViewModel> CreateProjectAsync(ProjectPipelineViewModel model, string userId);
         Task<ProjectPipelineViewModel> UpdateProjectAsync(ProjectPipelineViewModel model, string userId);
         Task<bool> DeleteProjectAsync(int id);
@@ -16,6 +17,12 @@ namespace License_Tracking.Services
         Task<ProjectPipelineListViewModel> GetFilteredProjectsAsync(string? statusFilter = null, string? oemFilter = null, string? customerFilter = null);
         Task<decimal> GetTotalProjectedRevenueAsync();
         Task<decimal> GetTotalProjectedMarginAsync();
+
+        // Week 10 Enhanced Analytics Methods
+        Task<decimal> GetTotalEstimatedRevenueAsync();
+        Task<decimal> GetTotalEstimatedMarginAsync();
+        Task<decimal> GetTotalWeightedRevenueAsync();
+        Task<object> GetPipelineAnalyticsSummaryAsync();
 
         // Week 9 Enhancements
         Task BulkUpdateStatusAsync(int[] projectIds, string newStatus);
@@ -45,6 +52,12 @@ namespace License_Tracking.Services
         {
             var project = await _context.ProjectPipelines.FindAsync(id);
             return project != null ? MapToViewModel(project) : null;
+        }
+
+        // Week 10: Direct model access for Delete view
+        public async Task<ProjectPipeline?> GetByIdAsync(int id)
+        {
+            return await _context.ProjectPipelines.FindAsync(id);
         }
 
         public async Task<ProjectPipelineViewModel> CreateProjectAsync(ProjectPipelineViewModel model, string userId)
@@ -80,7 +93,7 @@ namespace License_Tracking.Services
                 CreatedBy = userId,
                 CreatedDate = DateTime.Now,
 
-                // New Phase 4.7 fields
+                // Week 9 Enhancement fields
                 ExpectedInvoiceNumber = model.ExpectedInvoiceNumber,
                 PaymentStatus = model.PaymentStatus,
                 AmountReceived = model.AmountReceived,
@@ -92,7 +105,14 @@ namespace License_Tracking.Services
                 CustomerWebsite = model.CustomerWebsite,
                 OemRelationshipType = model.OemRelationshipType,
                 LastCustomerContact = model.LastCustomerContact,
-                CustomerNotes = model.CustomerNotes
+                CustomerNotes = model.CustomerNotes,
+
+                // Week 10 Enhancement: Advanced Revenue and Margin Calculations
+                EstimatedRevenue = model.EstimatedRevenue,
+                EstimatedCost = model.EstimatedRevenue - model.EstimatedMargin, // Calculate cost from revenue and margin
+                PipelineStage = model.PipelineStage,
+                StageConfidenceLevel = model.StageConfidenceLevel,
+                ExpectedCloseDate = model.ExpectedCloseDate
             };
 
             _context.ProjectPipelines.Add(project);
@@ -160,6 +180,13 @@ namespace License_Tracking.Services
             project.OemRelationshipType = model.OemRelationshipType;
             project.LastCustomerContact = model.LastCustomerContact;
             project.CustomerNotes = model.CustomerNotes;
+
+            // Week 10 Enhancement: Advanced Revenue and Margin Calculations
+            project.EstimatedRevenue = model.EstimatedRevenue;
+            project.EstimatedCost = model.EstimatedRevenue - model.EstimatedMargin; // Calculate cost from revenue and margin
+            project.PipelineStage = model.PipelineStage;
+            project.StageConfidenceLevel = model.StageConfidenceLevel;
+            project.ExpectedCloseDate = model.ExpectedCloseDate;
 
             project.LastUpdated = DateTime.Now;
 
@@ -323,6 +350,55 @@ namespace License_Tracking.Services
             return projects.Sum(p => p.ProjectedMargin);
         }
 
+        // Week 10 Enhanced Analytics Method Implementations
+        public async Task<decimal> GetTotalEstimatedRevenueAsync()
+        {
+            var projects = await _context.ProjectPipelines
+                .Where(pp => pp.ProjectStatus == "Pipeline" || pp.ProjectStatus == "In Progress")
+                .ToListAsync();
+
+            return projects.Sum(p => p.EstimatedRevenue);
+        }
+
+        public async Task<decimal> GetTotalEstimatedMarginAsync()
+        {
+            var projects = await _context.ProjectPipelines
+                .Where(pp => pp.ProjectStatus == "Pipeline" || pp.ProjectStatus == "In Progress")
+                .ToListAsync();
+
+            return projects.Sum(p => p.EstimatedMargin);
+        }
+
+        public async Task<decimal> GetTotalWeightedRevenueAsync()
+        {
+            var projects = await _context.ProjectPipelines
+                .Where(pp => pp.ProjectStatus == "Pipeline" || pp.ProjectStatus == "In Progress")
+                .ToListAsync();
+
+            return projects.Sum(p => p.WeightedRevenue);
+        }
+
+        public async Task<object> GetPipelineAnalyticsSummaryAsync()
+        {
+            var projects = await _context.ProjectPipelines
+                .Where(pp => pp.ProjectStatus == "Pipeline" || pp.ProjectStatus == "In Progress")
+                .ToListAsync();
+
+            return new
+            {
+                TotalEstimatedRevenue = projects.Sum(p => p.EstimatedRevenue),
+                TotalEstimatedMargin = projects.Sum(p => p.EstimatedMargin),
+                TotalWeightedRevenue = projects.Sum(p => p.WeightedRevenue),
+                AverageMarginPercentage = projects.Where(p => p.EstimatedRevenue > 0).Any() ?
+                    projects.Where(p => p.EstimatedRevenue > 0).Average(p => (p.EstimatedMargin / p.EstimatedRevenue) * 100) : 0,
+                AverageSuccessProbability = projects.Any() ? projects.Average(p => p.SuccessProbability) : 0,
+                AverageConfidenceLevel = projects.Any() ? projects.Average(p => p.StageConfidenceLevel) : 0,
+                ActiveProjectsCount = projects.Count,
+                HighValueProjects = projects.Count(p => p.EstimatedRevenue >= 50000),
+                HighProbabilityProjects = projects.Count(p => p.SuccessProbability >= 75)
+            };
+        }
+
         #region Private Helper Methods
 
         private static ProjectPipelineViewModel MapToViewModel(ProjectPipeline project)
@@ -359,7 +435,7 @@ namespace License_Tracking.Services
                 LastUpdated = project.LastUpdated,
                 ConvertedToLicenseId = project.ConvertedToLicenseId,
 
-                // New Phase 4.7 fields
+                // Week 9 Enhancement fields
                 ExpectedInvoiceNumber = project.ExpectedInvoiceNumber,
                 PaymentStatus = project.PaymentStatus,
                 AmountReceived = project.AmountReceived,
@@ -371,7 +447,14 @@ namespace License_Tracking.Services
                 CustomerWebsite = project.CustomerWebsite,
                 OemRelationshipType = project.OemRelationshipType,
                 LastCustomerContact = project.LastCustomerContact,
-                CustomerNotes = project.CustomerNotes
+                CustomerNotes = project.CustomerNotes,
+
+                // Week 10 Enhancement: Advanced Revenue and Margin Calculations
+                EstimatedRevenue = project.EstimatedRevenue,
+                EstimatedCost = project.EstimatedCost,
+                PipelineStage = project.PipelineStage,
+                StageConfidenceLevel = project.StageConfidenceLevel,
+                ExpectedCloseDate = project.ExpectedCloseDate
             };
         }
 
@@ -442,35 +525,108 @@ namespace License_Tracking.Services
             return package.GetAsByteArray();
         }
 
-        // Week 9 Enhancement: Pipeline Analytics
+        // Week 10 Enhancement: Enhanced Pipeline Analytics with Accurate Calculations
         public async Task<object> GetPipelineAnalyticsAsync()
         {
             var projects = await _context.ProjectPipelines.ToListAsync();
 
             var analytics = new
             {
+                // Basic Metrics
                 TotalProjects = projects.Count,
-                ProjectsByStatus = projects.GroupBy(p => p.ProjectStatus)
-                    .ToDictionary(g => g.Key, g => g.Count()),
-                ProjectsByOem = projects.GroupBy(p => p.OemName)
-                    .ToDictionary(g => g.Key, g => g.Count()),
-                TotalProjectedRevenue = projects.Sum(p => p.ExpectedAmountToReceive),
-                TotalProjectedCost = projects.Sum(p => p.ExpectedAmountToPay),
+                ActiveProjects = projects.Count(p => p.ProjectStatus == "Pipeline" || p.ProjectStatus == "Negotiation"),
+
+                // Week 10 Enhanced Revenue Calculations
+                TotalEstimatedRevenue = projects.Sum(p => p.EstimatedRevenue),
+                TotalEstimatedCost = projects.Sum(p => p.EstimatedCost),
+                TotalEstimatedMargin = projects.Sum(p => p.EstimatedMargin),
+                TotalWeightedRevenue = projects.Sum(p => p.WeightedRevenue),
+
+                // Legacy Calculations (for backward compatibility)
+                TotalProjectedRevenue = projects.Sum(p => p.ProjectedRevenue),
+                TotalProjectedMargin = projects.Sum(p => p.ProjectedMargin),
+
+                // Performance Metrics
                 AverageSuccessProbability = projects.Any() ? projects.Average(p => p.SuccessProbability) : 0,
+                AverageMarginPercentage = projects.Where(p => p.EstimatedRevenue > 0).Any() ?
+                    projects.Where(p => p.EstimatedRevenue > 0).Average(p => (p.EstimatedMargin / p.EstimatedRevenue) * 100) : 0,
+                AverageConfidenceLevel = projects.Any() ? projects.Average(p => p.StageConfidenceLevel) : 0,
+
+                // Groupings and Analysis
+                ProjectsByStatus = projects.GroupBy(p => p.ProjectStatus)
+                    .ToDictionary(g => g.Key, g => new
+                    {
+                        Count = g.Count(),
+                        EstimatedRevenue = g.Sum(p => p.EstimatedRevenue),
+                        WeightedRevenue = g.Sum(p => p.WeightedRevenue),
+                        EstimatedMargin = g.Sum(p => p.EstimatedMargin)
+                    }),
+
+                ProjectsByStage = projects.GroupBy(p => p.PipelineStage)
+                    .ToDictionary(g => g.Key, g => new
+                    {
+                        Count = g.Count(),
+                        EstimatedRevenue = g.Sum(p => p.EstimatedRevenue),
+                        WeightedRevenue = g.Sum(p => p.WeightedRevenue),
+                        AverageConfidence = g.Average(p => p.StageConfidenceLevel)
+                    }),
+
+                ProjectsByOem = projects.GroupBy(p => p.OemName)
+                    .ToDictionary(g => g.Key, g => new
+                    {
+                        Count = g.Count(),
+                        EstimatedRevenue = g.Sum(p => p.EstimatedRevenue),
+                        WeightedRevenue = g.Sum(p => p.WeightedRevenue),
+                        EstimatedMargin = g.Sum(p => p.EstimatedMargin)
+                    }),
+
+                // Time-based Analysis
                 ProjectsThisMonth = projects.Count(p => p.CreatedDate.Month == DateTime.Now.Month &&
                                                       p.CreatedDate.Year == DateTime.Now.Year),
+                UpcomingClosures = projects.Count(p => p.ExpectedCloseDate.HasValue &&
+                                                      p.ExpectedCloseDate <= DateTime.Now.AddDays(30) &&
+                                                      p.ExpectedCloseDate >= DateTime.Now),
                 UpcomingLicenses = projects.Count(p => p.ExpectedLicenseDate <= DateTime.Now.AddDays(30) &&
                                                       p.ExpectedLicenseDate >= DateTime.Now),
+
+                // Monthly Trend with Enhanced Metrics
                 MonthlyTrend = projects.GroupBy(p => new { p.CreatedDate.Year, p.CreatedDate.Month })
                     .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
                     .Select(g => new
                     {
                         Month = $"{g.Key.Year}-{g.Key.Month:D2}",
                         Count = g.Count(),
-                        Revenue = g.Sum(p => p.ExpectedAmountToReceive)
+                        EstimatedRevenue = g.Sum(p => p.EstimatedRevenue),
+                        WeightedRevenue = g.Sum(p => p.WeightedRevenue),
+                        EstimatedMargin = g.Sum(p => p.EstimatedMargin),
+                        AverageSuccessProbability = g.Average(p => p.SuccessProbability)
                     })
                     .TakeLast(12)
-                    .ToList()
+                    .ToList(),
+
+                // High-Value Pipeline Analysis
+                HighValueDeals = projects.Where(p => p.EstimatedRevenue >= 50000)
+                    .Select(p => new
+                    {
+                        p.ProjectPipelineId,
+                        p.ProductName,
+                        p.ClientName,
+                        p.EstimatedRevenue,
+                        p.WeightedRevenue,
+                        p.SuccessProbability,
+                        p.PipelineStage
+                    }).ToList(),
+
+                // Pipeline Health Indicators
+                PipelineHealth = new
+                {
+                    HighConfidenceDeals = projects.Count(p => p.StageConfidenceLevel >= 4),
+                    LowConfidenceDeals = projects.Count(p => p.StageConfidenceLevel <= 2),
+                    HighProbabilityDeals = projects.Count(p => p.SuccessProbability >= 75),
+                    AtRiskDeals = projects.Count(p => p.SuccessProbability <= 25),
+                    StaleDeals = projects.Count(p => p.LastActivityDate.HasValue &&
+                                               p.LastActivityDate < DateTime.Now.AddDays(-30))
+                }
             };
 
             return analytics;

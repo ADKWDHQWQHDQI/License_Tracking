@@ -193,7 +193,7 @@ namespace License_Tracking.Controllers
                 var licenses = await _context.Deals
                     .Include(l => l.Product)
                     .Include(l => l.Company)
-                    .Where(l => l.LicenseDeliveryStatus == "Active" && !l.IsProjectPipeline)
+                    .Where(l => l.LicenseDeliveryStatus == "Active" && l.IsProjectPipeline != true)
                     .Select(l => new
                     {
                         l.DealId,

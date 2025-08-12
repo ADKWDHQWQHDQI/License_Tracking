@@ -181,6 +181,29 @@ namespace License_Tracking.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin,Sales,Management")]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                var project = await _projectPipelineService.GetByIdAsync(id.Value);
+                if (project == null)
+                {
+                    return NotFound();
+                }
+                return View(project);
+            }
+            catch
+            {
+                return NotFound();
+            }
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [HttpPost]
@@ -356,7 +379,7 @@ namespace License_Tracking.Controllers
             }
         }
 
-        // Week 9 Enhancement: Pipeline Analytics API
+        // Week 10 Enhancement: Enhanced Pipeline Analytics API
         [HttpGet]
         [Authorize(Roles = "Admin,Sales,Management")]
         public async Task<IActionResult> GetPipelineAnalytics()
@@ -369,6 +392,37 @@ namespace License_Tracking.Controllers
             catch (Exception ex)
             {
                 return Json(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,Sales,Management")]
+        public async Task<IActionResult> GetPipelineAnalyticsSummary()
+        {
+            try
+            {
+                var summary = await _projectPipelineService.GetPipelineAnalyticsSummaryAsync();
+                return Json(summary);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,Sales,Management")]
+        public async Task<IActionResult> PipelineAnalytics()
+        {
+            try
+            {
+                var analytics = await _projectPipelineService.GetPipelineAnalyticsAsync();
+                return View(analytics);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Error loading analytics: {ex.Message}";
+                return View();
             }
         }
     }

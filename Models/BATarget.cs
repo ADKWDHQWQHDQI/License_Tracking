@@ -56,5 +56,12 @@ namespace License_Tracking.Models
 
         [StringLength(100)]
         public string? CreatedBy { get; set; }
+
+        public DateTime LastModifiedDate { get; set; } = DateTime.Now;
+
+        [StringLength(100)]
+        public string? LastModifiedBy { get; set; }
+
+        public bool IsActive { get; set; } = true;
     }
 }

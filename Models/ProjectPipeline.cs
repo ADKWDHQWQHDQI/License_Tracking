@@ -32,6 +32,55 @@ namespace License_Tracking.Models
         [Required]
         public DateTime ExpectedExpiryDate { get; set; }
 
+        // Pipeline Stage Management (Week 10 Enhancement)
+        [StringLength(50)]
+        public string PipelineStage { get; set; } = "Lead"; // Lead, Qualified, Proposal, Negotiation, Closing, Won, Lost
+
+        [Display(Name = "Stage Confidence Level")]
+        [Range(1, 5)]
+        public int StageConfidenceLevel { get; set; } = 3;
+
+        [Display(Name = "Expected Close Date")]
+        public DateTime? ExpectedCloseDate { get; set; }
+
+        [Display(Name = "Last Activity Date")]
+        public DateTime? LastActivityDate { get; set; }
+
+        [Display(Name = "Next Follow-up Date")]
+        public DateTime? NextFollowupDate { get; set; }
+
+        // Revenue and Margin Estimations (Week 10 Core Feature)
+        [Column(TypeName = "decimal(18,2)")]
+        [Display(Name = "Estimated Revenue (INR)")]
+        public decimal EstimatedRevenue { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        [Display(Name = "Estimated Cost (INR)")]
+        public decimal EstimatedCost { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        [Display(Name = "Estimated Margin (INR)")]
+        public decimal EstimatedMargin
+        {
+            get => EstimatedRevenue - EstimatedCost;
+        }
+
+        [Display(Name = "Estimated Margin (%)")]
+        public decimal EstimatedMarginPercentage
+        {
+            get => EstimatedRevenue > 0 ? (EstimatedMargin / EstimatedRevenue) * 100 : 0;
+        }
+
+        [Display(Name = "Success Probability (%)")]
+        [Range(0, 100)]
+        public int SuccessProbability { get; set; } = 50;
+
+        [Display(Name = "Weighted Revenue")]
+        public decimal WeightedRevenue
+        {
+            get => EstimatedRevenue * (SuccessProbability / 100.0m);
+        }
+
         // Customer PO Details
         [StringLength(50)]
         public string? CustomerPoNumber { get; set; }
@@ -113,9 +162,6 @@ namespace License_Tracking.Models
         [StringLength(50)]
         public string ProjectStatus { get; set; } = "Pipeline"; // Pipeline, In Progress, Converted, Cancelled
 
-        // Probability and confidence
-        public int SuccessProbability { get; set; } = 50; // Percentage
-
         [StringLength(200)]
         public string? ShipToAddress { get; set; }
 
@@ -136,22 +182,22 @@ namespace License_Tracking.Models
         public int? ConvertedToLicenseId { get; set; } // Reusing this field for deal ID
         public virtual Deal? ConvertedToDeal { get; set; }
 
-        // Calculated properties
+        // Legacy calculated properties (maintained for compatibility)
         [DataType(DataType.Currency)]
         public decimal ProjectedMargin
         {
-            get => ProjectedMarginInput ?? (ExpectedAmountToReceive - ExpectedAmountToPay);
+            get => ProjectedMarginInput ?? EstimatedMargin;
         }
 
         public decimal ProjectedProfitMargin
         {
-            get => ExpectedAmountToReceive > 0 ? (ProjectedMargin / ExpectedAmountToReceive) * 100 : 0;
+            get => EstimatedRevenue > 0 ? (EstimatedMargin / EstimatedRevenue) * 100 : 0;
         }
 
         // Revenue projection for analytics
         public decimal ProjectedRevenue
         {
-            get => ExpectedAmountToReceive * (SuccessProbability / 100.0m);
+            get => WeightedRevenue;
         }
     }
 }

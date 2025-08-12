@@ -14,11 +14,12 @@
                 <div class="card-body">
                     <form asp-action="Create" method="post">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-                        
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label asp-for="Subject" class="form-label">Subject *</label>
-                                <input asp-for="Subject" class="form-control" placeholder="Enter activity subject" required />
+                                <input asp-for="Subject" class="form-control" placeholder="Enter activity subject"
+                                    required />
                                 <span asp-validation-for="Subject" class="text-danger"></span>
                             </div>
                             <div class="col-md-6">
@@ -51,7 +52,8 @@
 
                         <div class="mb-3">
                             <label asp-for="Description" class="form-label">Description</label>
-                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Activity details..."></textarea>
+                            <textarea asp-for="Description" class="form-control" rows="3"
+                                placeholder="Activity details..."></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
 
@@ -113,5 +115,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
