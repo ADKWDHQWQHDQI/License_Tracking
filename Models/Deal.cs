@@ -223,6 +223,9 @@ namespace License_Tracking.Models
 
         public virtual ICollection<CbmsInvoice> Invoices { get; set; } = new List<CbmsInvoice>();
 
+        // Week 8 Enhancement: Deal Activities for Collaboration
+        public virtual ICollection<DealCollaborationActivity> Activities { get; set; } = new List<DealCollaborationActivity>();
+
         // Business Logic Methods for Phase Management
         [NotMapped]
         public bool CanProgressToPhase2 =>

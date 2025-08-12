@@ -129,9 +129,14 @@
                                             <i class="fas fa-chart-area"></i> Week 10 Enhanced Pipeline Analytics
                                         </h6>
                                         <div>
-                                            <a asp-action="PipelineAnalytics" class="btn btn-sm btn-primary">
-                                                <i class="fas fa-chart-area"></i> Detailed Analytics Dashboard
-                                            </a>
+                                            <div class="btn-group">
+                                                <a asp-action="PipelineAnalytics" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-chart-area"></i> Analytics Dashboard
+                                                </a>
+                                                <a asp-action="DesktopReports" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-desktop"></i> Desktop Reports
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -205,37 +210,143 @@
                         </div>
                     </div>
 
-                    <!-- Filters -->
+                    <!-- Week 10 Enhanced: Advanced Desktop-First Bigin.com Style Filters -->
                     <form method="get" class="mb-4">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label class="form-label">Status Filter</label>
-                                <select name="statusFilter" class="form-select" onchange="this.form.submit()">
-                                    <option value="">All Statuses</option>
-                                    <option value="Pipeline" selected="@(Model.StatusFilter == "Pipeline")">Pipeline
-                                    </option>
-                                    <option value="Negotiation" selected="@(Model.StatusFilter == "Negotiation")">
-                                        Negotiation</option>
-                                    <option value="Pending" selected="@(Model.StatusFilter == "Pending")">Pending
-                                    </option>
-                                    <option value="Confirmed" selected="@(Model.StatusFilter == "Confirmed")">Confirmed
-                                    </option>
-                                    <option value="Lost" selected="@(Model.StatusFilter == "Lost")">Lost</option>
-                                </select>
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-light border-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-filter text-primary"></i> Advanced Pipeline Filters
+                                    </h6>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleAdvancedFilters()">
+                                        <i class="fas fa-cog"></i> More Filters
+                                    </button>
+                                </div>
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label">OEM Filter</label>
-                                <input name="oemFilter" value="@Model.OemFilter" class="form-control"
-                                    placeholder="Filter by OEM..." />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Customer Filter</label>
-                                <input name="customerFilter" value="@Model.CustomerFilter" class="form-control"
-                                    placeholder="Filter by Customer..." />
-                            </div>
-                            <div class="col-md-3 d-flex align-items-end">
-                                <button type="submit" class="btn btn-outline-primary me-2">Filter</button>
-                                <a href="@Url.Action("Index")" class="btn btn-outline-secondary">Clear</a>
+                            <div class="card-body">
+                                <!-- Primary Filters Row -->
+                                <div class="row g-3 mb-3">
+                                    <div class="col-lg-2 col-md-3">
+                                        <label class="form-label text-muted fw-semibold">Status</label>
+                                        <select name="statusFilter" class="form-select form-select-sm" onchange="this.form.submit()">
+                                            <option value="">All Statuses</option>
+                                            <option value="Pipeline" selected="@(Model.StatusFilter == "Pipeline")">Pipeline</option>
+                                            <option value="Lead" selected="@(Model.StatusFilter == "Lead")">Lead</option>
+                                            <option value="Qualified" selected="@(Model.StatusFilter == "Qualified")">Qualified</option>
+                                            <option value="Proposal" selected="@(Model.StatusFilter == "Proposal")">Proposal</option>
+                                            <option value="Negotiation" selected="@(Model.StatusFilter == "Negotiation")">Negotiation</option>
+                                            <option value="Won" selected="@(Model.StatusFilter == "Won")">Won</option>
+                                            <option value="Lost" selected="@(Model.StatusFilter == "Lost")">Lost</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2 col-md-3">
+                                        <label class="form-label text-muted fw-semibold">OEM Partner</label>
+                                        <input name="oemFilter" value="@Model.OemFilter" class="form-control form-control-sm"
+                                            placeholder="Search OEMs..." autocomplete="off" />
+                                    </div>
+                                    <div class="col-lg-2 col-md-3">
+                                        <label class="form-label text-muted fw-semibold">Customer</label>
+                                        <input name="customerFilter" value="@Model.CustomerFilter" class="form-control form-control-sm"
+                                            placeholder="Search customers..." autocomplete="off" />
+                                    </div>
+                                    <div class="col-lg-2 col-md-3">
+                                        <label class="form-label text-muted fw-semibold">Success Rate</label>
+                                        <select name="successFilter" class="form-select form-select-sm">
+                                            <option value="">All Rates</option>
+                                            <option value="high">High (75%+)</option>
+                                            <option value="medium">Medium (25-74%)</option>
+                                            <option value="low">Low (0-24%)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2 col-md-6">
+                                        <label class="form-label text-muted fw-semibold">Quick Actions</label>
+                                        <div class="btn-group w-100">
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-search"></i> Apply
+                                            </button>
+                                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-sm">
+                                                <i class="fas fa-times"></i> Clear
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-6">
+                                        <label class="form-label text-muted fw-semibold">Export</label>
+                                        <div class="btn-group w-100">
+                                            <a asp-action="ExportToExcel" class="btn btn-success btn-sm w-100">
+                                                <i class="fas fa-file-excel"></i> Excel
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Advanced Filters Row (Collapsible) -->
+                                <div id="advancedFilters" class="collapse">
+                                    <hr class="my-3">
+                                    <h6 class="text-muted fw-semibold mb-3">
+                                        <i class="fas fa-sliders-h"></i> Advanced Filters
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-lg-2 col-md-3">
+                                            <label class="form-label text-muted fw-semibold">Pipeline Stage</label>
+                                            <select name="stageFilter" class="form-select form-select-sm">
+                                                <option value="">All Stages</option>
+                                                <option value="Lead">Lead</option>
+                                                <option value="Qualified">Qualified</option>
+                                                <option value="Proposal">Proposal</option>
+                                                <option value="Negotiation">Negotiation</option>
+                                                <option value="Closing">Closing</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2 col-md-3">
+                                            <label class="form-label text-muted fw-semibold">Revenue Range</label>
+                                            <select name="revenueFilter" class="form-select form-select-sm">
+                                                <option value="">All Amounts</option>
+                                                <option value="small">< ₹50k</option>
+                                                <option value="medium">₹50k - ₹5L</option>
+                                                <option value="large">₹5L - ₹50L</option>
+                                                <option value="enterprise">> ₹50L</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2 col-md-3">
+                                            <label class="form-label text-muted fw-semibold">Expected Close</label>
+                                            <select name="closeDateFilter" class="form-select form-select-sm">
+                                                <option value="">All Dates</option>
+                                                <option value="overdue">Overdue</option>
+                                                <option value="thisweek">This Week</option>
+                                                <option value="thismonth">This Month</option>
+                                                <option value="nextmonth">Next Month</option>
+                                                <option value="thisquarter">This Quarter</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2 col-md-3">
+                                            <label class="form-label text-muted fw-semibold">Confidence Level</label>
+                                            <select name="confidenceFilter" class="form-select form-select-sm">
+                                                <option value="">All Levels</option>
+                                                <option value="5">Very High (5)</option>
+                                                <option value="4">High (4)</option>
+                                                <option value="3">Medium (3)</option>
+                                                <option value="2">Low (2)</option>
+                                                <option value="1">Very Low (1)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2 col-md-3">
+                                            <label class="form-label text-muted fw-semibold">Last Activity</label>
+                                            <select name="activityFilter" class="form-select form-select-sm">
+                                                <option value="">All Times</option>
+                                                <option value="today">Today</option>
+                                                <option value="week">This Week</option>
+                                                <option value="month">This Month</option>
+                                                <option value="stale">Stale (30+ days)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2 col-md-3">
+                                            <label class="form-label text-muted fw-semibold">Save View</label>
+                                            <button type="button" class="btn btn-outline-info btn-sm w-100" onclick="saveCurrentView()">
+                                                <i class="fas fa-bookmark"></i> Save Filter
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -394,16 +505,211 @@
     </div>
 </div>
 
+<!-- Week 10 Enhancement: Autocomplete Datalists for Desktop Experience -->
+<datalist id="oemSuggestions">
+    <!-- Populated via JavaScript -->
+</datalist>
+
+<datalist id="customerSuggestions">
+    <!-- Populated via JavaScript -->
+</datalist>
+
 @section Scripts {
     <script>
-        // Auto-submit filters after a delay
+        // Week 10 Enhanced: Desktop-First Advanced Filtering with Bigin.com UX
+        
+        // Auto-submit filters after a delay (enhanced for desktop workflow)
         let filterTimeout;
         document.querySelectorAll('input[name="oemFilter"], input[name="customerFilter"]').forEach(input => {
             input.addEventListener('input', function () {
                 clearTimeout(filterTimeout);
                 filterTimeout = setTimeout(() => {
                     this.form.submit();
-                }, 500);
+                }, 750); // Slightly increased delay for better desktop UX
+            });
+        });
+
+        // Week 10 Enhancement: Toggle Advanced Filters
+        function toggleAdvancedFilters() {
+            const advancedFilters = document.getElementById('advancedFilters');
+            const button = event.target.closest('button');
+            
+            if (advancedFilters.classList.contains('show')) {
+                advancedFilters.classList.remove('show');
+                button.innerHTML = '<i class="fas fa-cog"></i> More Filters';
+                button.classList.remove('btn-secondary');
+                button.classList.add('btn-outline-secondary');
+            } else {
+                advancedFilters.classList.add('show');
+                button.innerHTML = '<i class="fas fa-minus"></i> Less Filters';
+                button.classList.remove('btn-outline-secondary');
+                button.classList.add('btn-secondary');
+            }
+        }
+
+        // Week 10 Enhancement: Save Current Filter View (Bigin.com style feature)
+        function saveCurrentView() {
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+            const filters = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (value) filters[key] = value;
+            }
+            
+            // Save to localStorage for quick access (desktop workflow optimization)
+            const savedViews = JSON.parse(localStorage.getItem('pipelineViews') || '[]');
+            const viewName = prompt('Enter a name for this filter view:');
+            
+            if (viewName) {
+                const newView = {
+                    name: viewName,
+                    filters: filters,
+                    timestamp: new Date().toISOString()
+                };
+                
+                savedViews.push(newView);
+                localStorage.setItem('pipelineViews', JSON.stringify(savedViews));
+                
+                showToast('Filter view saved successfully!', 'success');
+                updateSavedViewsDropdown();
+            }
+        }
+
+        // Week 10 Enhancement: Quick Filter Shortcuts (Desktop UX)
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + F to focus on customer search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                document.querySelector('input[name="customerFilter"]').focus();
+            }
+            
+            // Ctrl/Cmd + Shift + F to focus on OEM search
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'F') {
+                e.preventDefault();
+                document.querySelector('input[name="oemFilter"]').focus();
+            }
+            
+            // Escape to clear all filters
+            if (e.key === 'Escape') {
+                window.location.href = '@Url.Action("Index")';
+            }
+        });
+
+        // Week 10 Enhancement: Advanced Search Suggestions (Desktop UX)
+        function setupAdvancedSearchSuggestions() {
+            const oemInput = document.querySelector('input[name="oemFilter"]');
+            const customerInput = document.querySelector('input[name="customerFilter"]');
+            
+            // Add autocomplete functionality for better desktop experience
+            if (oemInput) {
+                oemInput.setAttribute('list', 'oemSuggestions');
+                // Load OEM suggestions
+                fetch('/ProjectPipeline/GetOemSuggestions')
+                    .then(response => response.json())
+                    .then(data => {
+                        const datalist = document.getElementById('oemSuggestions');
+                        data.forEach(oem => {
+                            const option = document.createElement('option');
+                            option.value = oem;
+                            datalist.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.log('Error loading OEM suggestions:', error));
+            }
+            
+            if (customerInput) {
+                customerInput.setAttribute('list', 'customerSuggestions');
+                // Load customer suggestions
+                fetch('/ProjectPipeline/GetCustomerSuggestions')
+                    .then(response => response.json())
+                    .then(data => {
+                        const datalist = document.getElementById('customerSuggestions');
+                        data.forEach(customer => {
+                            const option = document.createElement('option');
+                            option.value = customer;
+                            datalist.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.log('Error loading customer suggestions:', error));
+            }
+        }
+
+        // Week 10 Enhancement: Real-time Filter Count Display
+        function updateFilterCount() {
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+            let activeFilters = 0;
+            
+            for (let [key, value] of formData.entries()) {
+                if (value && key !== 'view') activeFilters++;
+            }
+            
+            const filterButton = document.querySelector('button[type="submit"]');
+            if (activeFilters > 0) {
+                filterButton.innerHTML = `<i class="fas fa-search"></i> Apply (${activeFilters})`;
+                filterButton.classList.add('btn-primary');
+                filterButton.classList.remove('btn-outline-primary');
+            } else {
+                filterButton.innerHTML = '<i class="fas fa-search"></i> Apply';
+                filterButton.classList.remove('btn-primary');
+                filterButton.classList.add('btn-outline-primary');
+            }
+        }
+
+        // Week 10 Enhancement: Smart Filter Persistence
+        function initializeSmartFilters() {
+            // Restore last used filters for better desktop workflow
+            const lastFilters = JSON.parse(sessionStorage.getItem('lastPipelineFilters') || '{}');
+            
+            Object.keys(lastFilters).forEach(key => {
+                const element = document.querySelector(`[name="${key}"]`);
+                if (element && !element.value) {
+                    element.value = lastFilters[key];
+                }
+            });
+            
+            // Save current filters
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function() {
+                const formData = new FormData(form);
+                const filters = {};
+                for (let [key, value] of formData.entries()) {
+                    if (value) filters[key] = value;
+                }
+                sessionStorage.setItem('lastPipelineFilters', JSON.stringify(filters));
+            });
+        }
+
+        // Week 10 Enhancement: Toast Notification System
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 4000);
+        }
+
+        // Initialize enhanced desktop features on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setupAdvancedSearchSuggestions();
+            updateFilterCount();
+            initializeSmartFilters();
+            
+            // Add real-time filter count updates
+            document.querySelectorAll('select, input').forEach(element => {
+                element.addEventListener('change', updateFilterCount);
+                element.addEventListener('input', updateFilterCount);
             });
         });
     </script>

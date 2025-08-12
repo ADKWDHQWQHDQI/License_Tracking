@@ -48,6 +48,10 @@ namespace License_Tracking.Models
         [Display(Name = "Payment Date")]
         public DateTime? PaymentDate { get; set; }
 
+        [Column(TypeName = "decimal(18,2)")]
+        [Display(Name = "Payment Received")]
+        public decimal? PaymentReceived { get; set; } = 0;
+
         [StringLength(50)]
         [Display(Name = "Payment Method")]
         public string? PaymentMethod { get; set; }
@@ -55,6 +59,10 @@ namespace License_Tracking.Models
         [StringLength(100)]
         [Display(Name = "Payment Reference")]
         public string? PaymentReference { get; set; }
+
+        [StringLength(500)]
+        [Display(Name = "Reference")]
+        public string? Reference { get; set; }
 
         [Required]
         [Display(Name = "Business Phase")]

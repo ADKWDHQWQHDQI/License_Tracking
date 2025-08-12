@@ -18,6 +18,16 @@
                     <p class="mb-0 opacity-75">4-Phase B2B2B Workflow - Deal Details & Progress</p>
                 </div>
                 <div class="col-md-4 text-end">
+                    <div class="btn-group me-2">
+                        <a asp-controller="DealCollaboration" asp-action="Index" asp-route-dealId="@Model.DealId"
+                            class="btn btn-light">
+                            <i class="fas fa-users"></i> Collaborate
+                        </a>
+                        <a asp-controller="DealInvoice" asp-action="Index" asp-route-dealId="@Model.DealId"
+                            class="btn btn-light">
+                            <i class="fas fa-file-invoice"></i> Invoices
+                        </a>
+                    </div>
                     @if (User.IsInRole("Admin") || User.IsInRole("Sales"))
                     {
                         <a asp-action="Edit" asp-route-id="@Model.DealId" class="btn btn-light btn-lg me-2">

@@ -1,0 +1,682 @@
+@model IEnumerable<License_Tracking.Models.CbmsInvoice>
+@{
+    ViewData["Title"] = "Multi-Invoice Dashboard";
+    var metrics = ViewBag.Metrics as License_Tracking.Controllers.InvoiceDashboardMetrics;
+}
+
+<!-- Bigin.com-inspired Multi-Invoice Dashboard -->
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="bigin-page-header mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="bigin-page-title">
+                            <i class="fas fa-file-invoice-dollar text-primary"></i>
+                            Multi-Invoice Dashboard
+                        </h1>
+                        <p class="text-muted mb-0">Comprehensive invoice management across all deal phases</p>
+                    </div>
+                    <div class="bigin-action-buttons">
+                        <a asp-action="PhaseSummaryReport" class="btn bigin-btn-outline-info">
+                            <i class="fas fa-chart-bar"></i> Phase Summary
+                        </a>
+                        <a asp-controller="Deals" asp-action="Index" class="btn bigin-btn-outline-primary">
+                            <i class="fas fa-handshake"></i> Back to Deals
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="bigin-card bigin-metric-card bg-gradient-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bigin-metric-icon bg-white bg-opacity-20">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-0">@metrics!.TotalInvoices</h3>
+                            <small class="text-white-50">Total Invoices</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="bigin-card bigin-metric-card bg-gradient-success text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bigin-metric-icon bg-white bg-opacity-20">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-0">@metrics.TotalAmount.ToString("C0")</h3>
+                            <small class="text-white-50">Total Value</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="bigin-card bigin-metric-card bg-gradient-info text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bigin-metric-icon bg-white bg-opacity-20">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-0">@metrics.PaidAmount.ToString("C0")</h3>
+                            <small class="text-white-50">Collected</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="bigin-card bigin-metric-card bg-gradient-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bigin-metric-icon bg-white bg-opacity-20">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-0">@metrics.PendingAmount.ToString("C0")</h3>
+                            <small class="text-white-50">Outstanding</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collection Rate and Phase Breakdown -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="bigin-card">
+                <div class="card-header bigin-card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie text-primary"></i> Collection Performance
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="text-center mb-4">
+                                <div class="bigin-progress-circle" data-percentage="@((int)metrics.CollectionRate)">
+                                    <div class="progress-circle-value">@metrics.CollectionRate.ToString("F1")%</div>
+                                </div>
+                                <h6 class="mt-3 text-success">Collection Rate</h6>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bigin-metric-bars">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small>Paid Invoices</small>
+                                        <small>@metrics.CollectionRate.ToString("F1")%</small>
+                                    </div>
+                                    <div class="progress bigin-progress">
+                                        <div class="progress-bar bg-success" style="width: @metrics.CollectionRate%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small>Outstanding</small>
+                                        <small>@metrics.OutstandingPercentage.ToString("F1")%</small>
+                                    </div>
+                                    <div class="progress bigin-progress">
+                                        <div class="progress-bar bg-warning" style="width: @metrics.OutstandingPercentage%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small>Overdue Count</small>
+                                        <small>@metrics.OverdueCount invoices</small>
+                                    </div>
+                                    <div class="progress bigin-progress">
+                                        <div class="progress-bar bg-danger" style="width: @(metrics.TotalInvoices > 0 ? (metrics.OverdueCount * 100.0 / metrics.TotalInvoices) : 0)%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bigin-card">
+                <div class="card-header bigin-card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-layer-group text-info"></i> Phase Breakdown
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="phase-stats">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="phase-icon bg-primary">
+                                    <i class="fas fa-handshake"></i>
+                                </div>
+                                <span class="ms-2">Phase 1</span>
+                            </div>
+                            <span class="badge bg-primary fs-6">@metrics.Phase1Count</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="phase-icon bg-info">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <span class="ms-2">Phase 2</span>
+                            </div>
+                            <span class="badge bg-info fs-6">@metrics.Phase2Count</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="phase-icon bg-warning">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <span class="ms-2">Phase 4</span>
+                            </div>
+                            <span class="badge bg-warning fs-6">@metrics.Phase4Count</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bigin-card">
+                <div class="card-body">
+                    <form method="get" class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Filter by Phase</label>
+                            <select name="phase" class="form-select bigin-select">
+                                <option value="all" selected="@(ViewBag.CurrentPhase == "all")">All Phases</option>
+                                <option value="phase1" selected="@(ViewBag.CurrentPhase == "phase1")">Phase 1 - Customer Billing</option>
+                                <option value="phase2" selected="@(ViewBag.CurrentPhase == "phase2")">Phase 2 - OEM Procurement</option>
+                                <option value="phase4" selected="@(ViewBag.CurrentPhase == "phase4")">Phase 4 - OEM Settlement</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Filter by Status</label>
+                            <select name="status" class="form-select bigin-select">
+                                <option value="all" selected="@(ViewBag.CurrentStatus == "all")">All Status</option>
+                                <option value="Unpaid" selected="@(ViewBag.CurrentStatus == "Unpaid")">Unpaid</option>
+                                <option value="Partial" selected="@(ViewBag.CurrentStatus == "Partial")">Partial</option>
+                                <option value="Paid" selected="@(ViewBag.CurrentStatus == "Paid")">Paid</option>
+                                <option value="Overdue" selected="@(ViewBag.CurrentStatus == "Overdue")">Overdue</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn bigin-btn-primary">
+                                <i class="fas fa-filter"></i> Apply Filters
+                            </button>
+                            <a asp-action="MultiInvoiceDashboard" class="btn bigin-btn-outline-secondary ms-2">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <div class="btn-group">
+                                <button type="button" class="btn bigin-btn-outline-success dropdown-toggle" data-bs-toggle="dropdown">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="exportData('excel')">
+                                        <i class="fas fa-file-excel"></i> Excel
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportData('csv')">
+                                        <i class="fas fa-file-csv"></i> CSV
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportData('pdf')">
+                                        <i class="fas fa-file-pdf"></i> PDF
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="bigin-card">
+                <div class="card-header bigin-card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list text-primary"></i> Invoice List
+                        </h5>
+                        <div class="bigin-view-toggles">
+                            <span class="text-muted me-2">View:</span>
+                            <button type="button" class="btn btn-sm bigin-btn-toggle active" onclick="switchView('table')">
+                                <i class="fas fa-table"></i> Table
+                            </button>
+                            <button type="button" class="btn btn-sm bigin-btn-toggle" onclick="switchView('cards')">
+                                <i class="fas fa-th-large"></i> Cards
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <!-- Table View -->
+                        <div id="tableView" class="table-responsive">
+                            <table class="table table-hover bigin-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="selectAll">
+                                            </div>
+                                        </th>
+                                        <th>Invoice #</th>
+                                        <th>Deal</th>
+                                        <th>Phase</th>
+                                        <th>Customer/OEM</th>
+                                        <th>Amount</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var invoice in Model)
+                                    {
+                                        <tr class="@(invoice.DueDate < DateTime.Now && invoice.PaymentStatus != "Paid" ? "table-warning" : "")">
+                                            <td>
+                                                <div class="form-check">
+                                                    <input class="form-check-input invoice-checkbox" type="checkbox" value="@invoice.InvoiceId">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold">@invoice.InvoiceNumber</div>
+                                                <small class="text-muted">@invoice.InvoiceDate.ToString("MMM dd, yyyy")</small>
+                                            </td>
+                                            <td>
+                                                <a asp-controller="Deals" asp-action="Details" asp-route-id="@invoice.Deal?.DealId" class="text-decoration-none">
+                                                    @invoice.Deal?.DealName
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@GetInvoiceTypeColor(invoice.InvoiceType) bigin-badge">
+                                                    @GetPhaseDisplay(invoice.InvoiceType)
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if (invoice.InvoiceType == "Customer_To_Canarys")
+                                                {
+                                                    <span>@invoice.Deal?.Company?.CompanyName</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@invoice.Deal?.Oem?.OemName</span>
+                                                }
+                                            </td>
+                                            <td class="fw-bold text-success">@invoice.TotalAmount.ToString("C")</td>
+                                            <td>
+                                                @if (invoice.DueDate.HasValue)
+                                                {
+                                                    <span class="@(invoice.DueDate < DateTime.Now && invoice.PaymentStatus != "Paid" ? "text-danger" : "")">
+                                                        @invoice.DueDate.Value.ToString("MMM dd, yyyy")
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">No due date</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@GetPaymentStatusColor(invoice.PaymentStatus) bigin-badge">
+                                                    @invoice.PaymentStatus
+                                                </span>
+                                                @if (invoice.DueDate < DateTime.Now && invoice.PaymentStatus != "Paid")
+                                                {
+                                                    <br><small class="text-danger"><i class="fas fa-exclamation-triangle"></i> Overdue</small>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a asp-action="InvoiceDetails" asp-route-invoiceId="@invoice.InvoiceId" 
+                                                       class="btn bigin-btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    @if (invoice.PaymentStatus != "Paid")
+                                                    {
+                                                        <button type="button" class="btn bigin-btn-outline-success btn-sm" 
+                                                                onclick="recordPayment(@invoice.InvoiceId, '@invoice.InvoiceNumber', @invoice.TotalAmount)">
+                                                            <i class="fas fa-money-check-alt"></i>
+                                                        </button>
+                                                    }
+                                                    <button type="button" class="btn bigin-btn-outline-secondary btn-sm" 
+                                                            onclick="downloadInvoice(@invoice.InvoiceId)">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Cards View (Hidden by default) -->
+                        <div id="cardsView" class="row d-none">
+                            @foreach (var invoice in Model)
+                            {
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="bigin-card bigin-invoice-card h-100">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-@GetInvoiceTypeColor(invoice.InvoiceType)">
+                                                @GetPhaseDisplay(invoice.InvoiceType)
+                                            </span>
+                                            <span class="badge bg-@GetPaymentStatusColor(invoice.PaymentStatus)">
+                                                @invoice.PaymentStatus
+                                            </span>
+                                        </div>
+                                        <div class="card-body">
+                                            <h6 class="card-title">@invoice.InvoiceNumber</h6>
+                                            <p class="card-text text-muted mb-2">@invoice.Deal?.DealName</p>
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="fw-bold text-success fs-5">@invoice.TotalAmount.ToString("C")</span>
+                                                @if (invoice.DueDate < DateTime.Now && invoice.PaymentStatus != "Paid")
+                                                {
+                                                    <span class="badge bg-danger">Overdue</span>
+                                                }
+                                            </div>
+                                            <small class="text-muted">
+                                                Due: @(invoice.DueDate?.ToString("MMM dd, yyyy") ?? "No due date")
+                                            </small>
+                                        </div>
+                                        <div class="card-footer">
+                                            <div class="btn-group w-100">
+                                                <a asp-action="InvoiceDetails" asp-route-invoiceId="@invoice.InvoiceId" 
+                                                   class="btn bigin-btn-outline-primary btn-sm">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                                @if (invoice.PaymentStatus != "Paid")
+                                                {
+                                                    <button type="button" class="btn bigin-btn-outline-success btn-sm" 
+                                                            onclick="recordPayment(@invoice.InvoiceId, '@invoice.InvoiceNumber', @invoice.TotalAmount)">
+                                                        <i class="fas fa-money-check-alt"></i> Pay
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Bulk Actions Bar -->
+                        <div id="bulkActionsBar" class="bigin-bulk-actions d-none">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span id="selectedCount">0 invoices selected</span>
+                                <div>
+                                    <button type="button" class="btn bigin-btn-outline-primary btn-sm" onclick="bulkExport()">
+                                        <i class="fas fa-download"></i> Bulk Export
+                                    </button>
+                                    <button type="button" class="btn bigin-btn-outline-warning btn-sm" onclick="bulkMarkOverdue()">
+                                        <i class="fas fa-exclamation-triangle"></i> Mark Overdue
+                                    </button>
+                                    <button type="button" class="btn bigin-btn-outline-danger btn-sm" onclick="bulkSendReminder()">
+                                        <i class="fas fa-envelope"></i> Send Reminder
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No invoices found</h5>
+                            <p class="text-muted">No invoices match your current filter criteria</p>
+                            <a asp-action="MultiInvoiceDashboard" class="btn bigin-btn-primary">
+                                <i class="fas fa-refresh"></i> Reset Filters
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetPaymentStatusColor(string status)
+    {
+        return status switch
+        {
+            "Paid" => "success",
+            "Partial" => "warning",
+            "Unpaid" => "secondary",
+            "Overdue" => "danger",
+            _ => "secondary"
+        };
+    }
+
+    string GetInvoiceTypeColor(string type)
+    {
+        return type switch
+        {
+            "Customer_To_Canarys" => "primary",
+            "Canarys_To_OEM" => "info",
+            "OEM_To_Canarys" => "warning",
+            _ => "secondary"
+        };
+    }
+
+    string GetPhaseDisplay(string type)
+    {
+        return type switch
+        {
+            "Customer_To_Canarys" => "Phase 1",
+            "Canarys_To_OEM" => "Phase 2",
+            "OEM_To_Canarys" => "Phase 4",
+            _ => "Unknown"
+        };
+    }
+}
+
+<script>
+// View switching
+function switchView(viewType) {
+    if (viewType === 'table') {
+        $('#tableView').removeClass('d-none');
+        $('#cardsView').addClass('d-none');
+        $('.bigin-btn-toggle').removeClass('active');
+        $('button[onclick="switchView(\'table\')"]').addClass('active');
+    } else {
+        $('#tableView').addClass('d-none');
+        $('#cardsView').removeClass('d-none');
+        $('.bigin-btn-toggle').removeClass('active');
+        $('button[onclick="switchView(\'cards\')"]').addClass('active');
+    }
+}
+
+// Bulk selection
+$(document).ready(function() {
+    $('#selectAll').change(function() {
+        $('.invoice-checkbox').prop('checked', this.checked);
+        updateBulkActions();
+    });
+
+    $('.invoice-checkbox').change(function() {
+        updateBulkActions();
+    });
+});
+
+function updateBulkActions() {
+    var selectedCount = $('.invoice-checkbox:checked').length;
+    $('#selectedCount').text(selectedCount + ' invoices selected');
+    
+    if (selectedCount > 0) {
+        $('#bulkActionsBar').removeClass('d-none');
+    } else {
+        $('#bulkActionsBar').addClass('d-none');
+    }
+}
+
+// Record payment function
+function recordPayment(invoiceId, invoiceNumber, amount) {
+    // This would open a modal or redirect to payment page
+    if (confirm(`Record payment for invoice ${invoiceNumber} (Amount: $${amount})?`)) {
+        // Implementation would go here
+        alert('Payment recording functionality will be implemented');
+    }
+}
+
+// Export functions
+function exportData(format) {
+    var params = new URLSearchParams(window.location.search);
+    params.set('format', format);
+    window.open('/DealInvoice/Export?' + params.toString(), '_blank');
+}
+
+function bulkExport() {
+    var selected = $('.invoice-checkbox:checked').map(function() {
+        return this.value;
+    }).get();
+    
+    if (selected.length === 0) {
+        alert('Please select invoices to export');
+        return;
+    }
+    
+    // Implementation for bulk export
+    console.log('Bulk export for invoices:', selected);
+}
+
+function downloadInvoice(invoiceId) {
+    window.open(`/DealInvoice/DownloadInvoice/${invoiceId}`, '_blank');
+}
+
+function bulkMarkOverdue() {
+    var selected = $('.invoice-checkbox:checked').map(function() {
+        return this.value;
+    }).get();
+    
+    if (selected.length === 0) {
+        alert('Please select invoices to mark as overdue');
+        return;
+    }
+    
+    if (confirm(`Mark ${selected.length} invoices as overdue?`)) {
+        // Implementation for bulk overdue marking
+        console.log('Mark overdue for invoices:', selected);
+    }
+}
+
+function bulkSendReminder() {
+    var selected = $('.invoice-checkbox:checked').map(function() {
+        return this.value;
+    }).get();
+    
+    if (selected.length === 0) {
+        alert('Please select invoices to send reminders for');
+        return;
+    }
+    
+    if (confirm(`Send payment reminders for ${selected.length} invoices?`)) {
+        // Implementation for bulk reminder sending
+        console.log('Send reminders for invoices:', selected);
+    }
+}
+</script>
+
+<style>
+.bigin-progress-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: conic-gradient(#28a745 calc(var(--percentage) * 1%), #e9ecef 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.progress-circle-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.phase-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+
+.bigin-invoice-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid #6c5ce7;
+}
+
+.bigin-invoice-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.bigin-bulk-actions {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.bigin-btn-toggle {
+    border: 1px solid #dee2e6;
+    background: white;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.bigin-btn-toggle.active {
+    background: #6c5ce7;
+    color: white;
+    border-color: #6c5ce7;
+}
+
+.bigin-metric-card {
+    transition: all 0.3s ease;
+}
+
+.bigin-metric-card:hover {
+    transform: translateY(-2px);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #6c5ce7 0%, #5a67d8 100%);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+</style>

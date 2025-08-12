@@ -22,17 +22,49 @@ namespace License_Tracking.Controllers
         }
 
         [Authorize(Roles = "Admin,Sales,Management")]
-        public async Task<IActionResult> Index(string? statusFilter = null, string? oemFilter = null, string? customerFilter = null, string view = "list")
+        public async Task<IActionResult> Index(
+            string? statusFilter = null,
+            string? oemFilter = null,
+            string? customerFilter = null,
+            string? stageFilter = null,
+            string? revenueFilter = null,
+            string? closeDateFilter = null,
+            string? confidenceFilter = null,
+            string? activityFilter = null,
+            string? successFilter = null,
+            string view = "list")
         {
             try
             {
-                var projects = await _projectPipelineService.GetFilteredProjectsAsync(statusFilter, oemFilter, customerFilter);
+                // Week 10 Enhancement: Use advanced filtering if any advanced filters are provided
+                var hasAdvancedFilters = !string.IsNullOrEmpty(stageFilter) || !string.IsNullOrEmpty(revenueFilter) ||
+                                         !string.IsNullOrEmpty(closeDateFilter) || !string.IsNullOrEmpty(confidenceFilter) ||
+                                         !string.IsNullOrEmpty(activityFilter) || !string.IsNullOrEmpty(successFilter);
 
-                // Store view type for the template
+                ProjectPipelineListViewModel projects;
+
+                if (hasAdvancedFilters)
+                {
+                    projects = await _projectPipelineService.GetAdvancedFilteredProjectsAsync(
+                        statusFilter, oemFilter, customerFilter, stageFilter, revenueFilter,
+                        closeDateFilter, confidenceFilter, activityFilter, successFilter);
+                }
+                else
+                {
+                    projects = await _projectPipelineService.GetFilteredProjectsAsync(statusFilter, oemFilter, customerFilter);
+                }
+
+                // Store view type and filters for the template
                 ViewBag.CurrentView = view.ToLower();
                 ViewBag.StatusFilter = statusFilter;
                 ViewBag.OemFilter = oemFilter;
                 ViewBag.CustomerFilter = customerFilter;
+                ViewBag.StageFilter = stageFilter;
+                ViewBag.RevenueFilter = revenueFilter;
+                ViewBag.CloseDateFilter = closeDateFilter;
+                ViewBag.ConfidenceFilter = confidenceFilter;
+                ViewBag.ActivityFilter = activityFilter;
+                ViewBag.SuccessFilter = successFilter;
 
                 // Return appropriate view based on requested view type
                 switch (view.ToLower())
@@ -423,6 +455,60 @@ namespace License_Tracking.Controllers
             {
                 ViewBag.ErrorMessage = $"Error loading analytics: {ex.Message}";
                 return View();
+            }
+        }
+
+        // Week 10 Enhancement: Comprehensive Desktop Reports View
+        [Authorize(Roles = "Admin,Sales,Management")]
+        public IActionResult DesktopReports()
+        {
+            return View();
+        }
+
+        // Week 10 Enhancement: Desktop Reporting API
+        [HttpGet]
+        [Authorize(Roles = "Admin,Sales,Management")]
+        public async Task<IActionResult> GetDesktopReportingData()
+        {
+            try
+            {
+                var reportData = await _projectPipelineService.GetDesktopReportingDataAsync();
+                return Json(reportData);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
+
+        // Week 10 Enhancement: Autocomplete APIs for Enhanced Filtering
+        [HttpGet]
+        [Authorize(Roles = "Admin,Sales,Management")]
+        public async Task<IActionResult> GetOemSuggestions()
+        {
+            try
+            {
+                var oems = await _projectPipelineService.GetUniqueOemNamesAsync();
+                return Json(oems);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,Sales,Management")]
+        public async Task<IActionResult> GetCustomerSuggestions()
+        {
+            try
+            {
+                var customers = await _projectPipelineService.GetUniqueCustomerNamesAsync();
+                return Json(customers);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
             }
         }
     }

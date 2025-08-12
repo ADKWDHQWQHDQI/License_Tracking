@@ -58,30 +58,46 @@ namespace License_Tracking.Controllers
         [HttpGet]
         public async Task<IActionResult> GetRecentAlerts(int take = 5)
         {
-            var alerts = await _context.Alerts
-                .Include(a => a.Deal)
-                .Include(a => a.ProjectPipeline)
-                .Where(a => a.Status == "Pending" || a.Status == "Sent")
-                .OrderByDescending(a => a.Priority)
-                .ThenByDescending(a => a.CreatedDate)
-                .Take(take)
-                .Select(a => new
-                {
-                    a.AlertId,
-                    a.Title,
-                    a.AlertMessage,
-                    a.Priority,
-                    a.AlertType,
-                    a.CreatedDate,
-                    a.IsOverdue,
-                    LicenseName = a.License != null ? a.License.ProductName : null,
-                    ProjectName = a.ProjectPipeline != null ? a.ProjectPipeline.ProductName : null,
-                    ClientName = a.License != null ? a.License.ClientName :
-                                a.ProjectPipeline != null ? a.ProjectPipeline.ClientName : null
-                })
-                .ToListAsync();
+            try
+            {
+                var alerts = await _context.Alerts
+                    .Include(a => a.Deal)
+                        .ThenInclude(d => d != null ? d.Product : null)
+                    .Include(a => a.Deal)
+                        .ThenInclude(d => d != null ? d.Company : null)
+                    .Include(a => a.ProjectPipeline)
+                    .Where(a => a.Status == "Pending" || a.Status == "Sent")
+                    .OrderByDescending(a => a.Priority)
+                    .ThenByDescending(a => a.CreatedDate)
+                    .Take(take)
+                    .Select(a => new
+                    {
+                        a.AlertId,
+                        a.Title,
+                        a.AlertMessage,
+                        a.Priority,
+                        a.AlertType,
+                        a.CreatedDate,
+                        a.IsOverdue,
+                        a.Status,
+                        a.AlertDate,
+                        // Safe navigation for Deal-related properties
+                        LicenseName = a.Deal != null && a.Deal.Product != null ? a.Deal.Product.ProductName : null,
+                        ProjectName = a.ProjectPipeline != null ? a.ProjectPipeline.ProductName : null,
+                        ClientName = a.Deal != null && a.Deal.Company != null ? a.Deal.Company.CompanyName :
+                                    a.ProjectPipeline != null ? a.ProjectPipeline.ClientName : null,
+                        DealId = a.Deal != null ? a.Deal.DealId : (int?)null,
+                        ProjectPipelineId = a.ProjectPipeline != null ? a.ProjectPipeline.ProjectPipelineId : (int?)null
+                    })
+                    .ToListAsync();
 
-            return Json(alerts);
+                return Json(alerts);
+            }
+            catch (Exception ex)
+            {
+                // Log the error and return an empty result
+                return Json(new { error = ex.Message, alerts = new object[0] });
+            }
         }
 
         [HttpPost]
@@ -115,28 +131,36 @@ namespace License_Tracking.Controllers
         [HttpGet]
         public async Task<IActionResult> Dashboard()
         {
-            var pendingAlerts = await _context.Alerts
-                .Include(a => a.License)
-                .Include(a => a.ProjectPipeline)
-                .Where(a => a.Status == "Pending")
-                .OrderByDescending(a => a.Priority)
-                .ThenBy(a => a.AlertDate)
-                .ToListAsync();
-
-            var alertStats = new
+            try
             {
-                TotalPending = pendingAlerts.Count,
-                Critical = pendingAlerts.Count(a => a.Priority == AlertPriority.Critical),
-                High = pendingAlerts.Count(a => a.Priority == AlertPriority.High),
-                Medium = pendingAlerts.Count(a => a.Priority == AlertPriority.Medium),
-                Low = pendingAlerts.Count(a => a.Priority == AlertPriority.Low),
-                Overdue = pendingAlerts.Count(a => a.IsOverdue),
-                RenewalAlerts = pendingAlerts.Count(a => a.AlertType == AlertType.Renewal),
-                PipelineAlerts = pendingAlerts.Count(a => a.AlertType == AlertType.PipelineReminder)
-            };
+                var pendingAlerts = await _context.Alerts
+                    .Include(a => a.Deal)
+                    .Include(a => a.ProjectPipeline)
+                    .Where(a => a.Status == "Pending")
+                    .OrderByDescending(a => a.Priority)
+                    .ThenBy(a => a.AlertDate)
+                    .ToListAsync();
 
-            ViewBag.AlertStats = alertStats;
-            return View(pendingAlerts);
+                var alertStats = new
+                {
+                    TotalPending = pendingAlerts.Count,
+                    Critical = pendingAlerts.Count(a => a.Priority == AlertPriority.Critical),
+                    High = pendingAlerts.Count(a => a.Priority == AlertPriority.High),
+                    Medium = pendingAlerts.Count(a => a.Priority == AlertPriority.Medium),
+                    Low = pendingAlerts.Count(a => a.Priority == AlertPriority.Low),
+                    Overdue = pendingAlerts.Count(a => a.IsOverdue),
+                    RenewalAlerts = pendingAlerts.Count(a => a.AlertType == AlertType.Renewal),
+                    PipelineAlerts = pendingAlerts.Count(a => a.AlertType == AlertType.PipelineReminder)
+                };
+
+                ViewBag.AlertStats = alertStats;
+                return View(pendingAlerts);
+            }
+            catch (Exception)
+            {
+                // Log error and return empty view
+                return View(new List<Alert>());
+            }
         }
 
         [HttpPost]

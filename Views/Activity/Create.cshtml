@@ -4,113 +4,252 @@
     ViewData["Title"] = "Create Activity";
 }
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="fas fa-plus"></i> Create New Activity</h4>
+<!-- Week 11: Bigin.com-Style Activity Creation Interface -->
+<div class="bigin-container desktop-optimized">
+    <div class="bigin-header-section">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="bigin-page-title">
+                    <div class="title-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="title-content">
+                        <h1 class="bigin-h1">Create Activity</h1>
+                        <p class="bigin-subtitle">Add new CRM activity for enhanced tracking and follow-up</p>
+                        <div class="bigin-breadcrumb">
+                            <a href="@Url.Action("Index", "Home")">Dashboard</a>
+                            <i class="fas fa-chevron-right"></i>
+                            <a href="@Url.Action("Index", "Activity")">Activities</a>
+                            <i class="fas fa-chevron-right"></i>
+                            <span>Create</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form asp-action="Create" method="post">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            </div>
+            <div class="col-lg-4">
+                <div class="bigin-action-toolbar desktop-actions">
+                    <a href="@Url.Action("Index", "Activity")" class="btn bigin-btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Back to List</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label asp-for="Subject" class="form-label">Subject *</label>
-                                <input asp-for="Subject" class="form-control" placeholder="Enter activity subject"
-                                    required />
-                                <span asp-validation-for="Subject" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="ActivityType" class="form-label">Activity Type *</label>
-                                <select asp-for="ActivityType" class="form-select" required>
-                                    <option value="">Select Type</option>
+    <div class="bigin-form-panel">
+        <form asp-action="Create" method="post" class="bigin-form-enhanced" id="activityForm">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Basic Information
+                    </h3>
+                    <p class="section-description">Essential activity details and type classification</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="bigin-form-group">
+                            <label asp-for="Subject" class="bigin-label required">Activity Subject</label>
+                            <input asp-for="Subject" class="bigin-input" 
+                                   placeholder="Enter a clear, descriptive subject for this activity"
+                                   maxlength="200" required />
+                            <span asp-validation-for="Subject" class="field-validation-error"></span>
+                            <div class="field-help">A clear subject helps with activity tracking and reporting</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="bigin-form-group">
+                            <label asp-for="Type" class="bigin-label required">Activity Type</label>
+                            <select asp-for="Type" class="bigin-select" required id="activityTypeSelect">
+                                <option value="">Choose activity type</option>
+                                @if (ViewBag.ActivityTypes != null)
+                                {
                                     @foreach (var type in ViewBag.ActivityTypes)
                                     {
                                         <option value="@type">@type</option>
                                     }
-                                </select>
-                                <span asp-validation-for="ActivityType" class="text-danger"></span>
-                            </div>
+                                }
+                            </select>
+                            <span asp-validation-for="Type" class="field-validation-error"></span>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label asp-for="RelatedEntityType" class="form-label">Related To</label>
-                                <select asp-for="RelatedEntityType" class="form-select">
-                                    <option value="Deal">Deal</option>
-                                    <option value="Company">Company</option>
-                                    <option value="Contact">Contact</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="RelatedEntityId" class="form-label">Entity ID</label>
-                                <input asp-for="RelatedEntityId" class="form-control" type="number" />
-                            </div>
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="bigin-form-group">
+                            <label asp-for="Description" class="bigin-label">Description</label>
+                            <textarea asp-for="Description" class="bigin-textarea" rows="4"
+                                      placeholder="Provide detailed description of the activity, its purpose, and expected outcomes"
+                                      maxlength="1000"></textarea>
+                            <span asp-validation-for="Description" class="field-validation-error"></span>
+                            <div class="field-help">Detailed descriptions improve activity tracking and team coordination</div>
                         </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Description" class="form-label">Description</label>
-                            <textarea asp-for="Description" class="form-control" rows="3"
-                                placeholder="Activity details..."></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label asp-for="ActivityDate" class="form-label">Activity Date *</label>
-                                <input asp-for="ActivityDate" class="form-control" type="datetime-local" required />
-                                <span asp-validation-for="ActivityDate" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4">
-                                <label asp-for="DueDate" class="form-label">Due Date</label>
-                                <input asp-for="DueDate" class="form-control" type="datetime-local" />
-                                <span asp-validation-for="DueDate" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-4">
-                                <label asp-for="Priority" class="form-label">Priority</label>
-                                <select asp-for="Priority" class="form-select">
-                                    @foreach (var priority in ViewBag.Priorities)
-                                    {
-                                        <option value="@priority" selected="@(priority == "Medium")">@priority</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label asp-for="AssignedTo" class="form-label">Assigned To</label>
-                                <select asp-for="AssignedTo" class="form-select">
-                                    @foreach (var user in ViewBag.Users)
-                                    {
-                                        <option value="@user">@user</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="Status" class="form-label">Status</label>
-                                <select asp-for="Status" class="form-select">
-                                    <option value="Pending">Pending</option>
-                                    <option value="Completed">Completed</option>
-                                    <option value="Cancelled">Cancelled</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="text-end">
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Cancel
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Create Activity
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <!-- Scheduling & Priority Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Scheduling & Priority
+                    </h3>
+                    <p class="section-description">Set timing, deadlines, and importance level</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-lg-3">
+                        <div class="bigin-form-group">
+                            <label asp-for="ScheduledDate" class="bigin-label required">Scheduled Date</label>
+                            <input asp-for="ScheduledDate" type="datetime-local" class="bigin-input" required />
+                            <span asp-validation-for="ScheduledDate" class="field-validation-error"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3">
+                        <div class="bigin-form-group">
+                            <label asp-for="DueDate" class="bigin-label">Due Date</label>
+                            <input asp-for="DueDate" type="datetime-local" class="bigin-input" />
+                            <span asp-validation-for="DueDate" class="field-validation-error"></span>
+                            <div class="field-help">Optional deadline for completion</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3">
+                        <div class="bigin-form-group">
+                            <label asp-for="Priority" class="bigin-label">Priority Level</label>
+                            <select asp-for="Priority" class="bigin-select" id="prioritySelect">
+                                @if (ViewBag.Priorities != null)
+                                {
+                                    @foreach (var priority in ViewBag.Priorities)
+                                    {
+                                        <option value="@priority" class="priority-@priority.ToLower()">@priority</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="Priority" class="field-validation-error"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3">
+                        <div class="bigin-form-group">
+                            <label asp-for="Status" class="bigin-label">Initial Status</label>
+                            <select asp-for="Status" class="bigin-select">
+                                <option value="Pending" selected>Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                            <span asp-validation-for="Status" class="field-validation-error"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignment & Relationship Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-users"></i>
+                        Assignment & Relationships
+                    </h3>
+                    <p class="section-description">Define ownership and related business entities</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="bigin-form-group">
+                            <label asp-for="AssignedTo" class="bigin-label">Assigned To</label>
+                            <input asp-for="AssignedTo" class="bigin-input" 
+                                   placeholder="Enter assignee name or email"
+                                   list="assigneeDatalist" />
+                            <datalist id="assigneeDatalist">
+                                <!-- Will be populated via JavaScript -->
+                            </datalist>
+                            <span asp-validation-for="AssignedTo" class="field-validation-error"></span>
+                            <div class="field-help">Person responsible for completing this activity</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3">
+                        <div class="bigin-form-group">
+                            <label asp-for="EntityType" class="bigin-label">Related Entity Type</label>
+                            <select asp-for="EntityType" class="bigin-select" id="entityTypeSelect" onchange="loadEntityOptions()">
+                                <option value="">No relation</option>
+                                <option value="Deal">Deal</option>
+                                <option value="Company">Company</option>
+                                <option value="Contact">Contact</option>
+                            </select>
+                            <span asp-validation-for="EntityType" class="field-validation-error"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3">
+                        <div class="bigin-form-group">
+                            <label asp-for="EntityId" class="bigin-label">Related Entity</label>
+                            <select asp-for="EntityId" class="bigin-select" id="entityIdSelect" disabled>
+                                <option value="">Select entity first</option>
+                            </select>
+                            <span asp-validation-for="EntityId" class="field-validation-error"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Notes Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-sticky-note"></i>
+                        Additional Notes
+                    </h3>
+                    <p class="section-description">Extra information and context</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="bigin-form-group">
+                            <label asp-for="Notes" class="bigin-label">Notes</label>
+                            <textarea asp-for="Notes" class="bigin-textarea" rows="3"
+                                      placeholder="Any additional notes, context, or follow-up actions"
+                                      maxlength="2000"></textarea>
+                            <span asp-validation-for="Notes" class="field-validation-error"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="form-help">
+                        <i class="fas fa-info-circle"></i>
+                        Fields marked with <span class="required-indicator">*</span> are required
+                    </div>
+                    <div class="action-buttons">
+                        <a href="@Url.Action("Index", "Activity")" class="btn bigin-btn-secondary">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </a>
+                        <button type="button" class="btn bigin-btn-outline" onclick="saveDraft()">
+                            <i class="fas fa-save"></i>
+                            Save Draft
+                        </button>
+                        <button type="submit" class="btn bigin-btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Create Activity
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -118,4 +257,263 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    
+    <script>
+        // Week 11: Enhanced Activity Creation with Desktop UX
+        $(document).ready(function() {
+            initializeActivityForm();
+            setupFormValidation();
+            populateAssigneeOptions();
+            setDefaultValues();
+        });
+
+        function initializeActivityForm() {
+            // Auto-set scheduled date to current time + 1 hour
+            var now = new Date();
+            now.setHours(now.getHours() + 1);
+            var dateTimeStr = now.toISOString().slice(0, 16);
+            $('#ScheduledDate').val(dateTimeStr);
+
+            // Auto-set due date to scheduled date + 24 hours
+            $('#ScheduledDate').on('change', function() {
+                var scheduledDate = new Date($(this).val());
+                if (scheduledDate) {
+                    scheduledDate.setHours(scheduledDate.getHours() + 24);
+                    var dueDateStr = scheduledDate.toISOString().slice(0, 16);
+                    $('#DueDate').val(dueDateStr);
+                }
+            });
+
+            // Priority color coding
+            $('#prioritySelect').on('change', function() {
+                updatePriorityDisplay();
+            });
+
+            // Character counters for text fields
+            setupCharacterCounters();
+        }
+
+        function setupFormValidation() {
+            $('#activityForm').on('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    showNotification('Please fix validation errors before submitting', 'error');
+                }
+            });
+
+            // Real-time validation
+            $('.bigin-input, .bigin-select, .bigin-textarea').on('blur', function() {
+                validateField($(this));
+            });
+        }
+
+        function populateAssigneeOptions() {
+            $.ajax({
+                url: '@Url.Action("GetAssigneeOptions", "Activity")',
+                method: 'GET',
+                success: function(data) {
+                    var datalist = $('#assigneeDatalist');
+                    datalist.empty();
+                    
+                    data.forEach(function(assignee) {
+                        datalist.append(`<option value="${assignee}">`);
+                    });
+                },
+                error: function() {
+                    console.log('Could not load assignee options');
+                }
+            });
+        }
+
+        function loadEntityOptions() {
+            var entityType = $('#entityTypeSelect').val();
+            var entitySelect = $('#entityIdSelect');
+            
+            if (!entityType) {
+                entitySelect.prop('disabled', true).html('<option value="">Select entity type first</option>');
+                return;
+            }
+
+            entitySelect.prop('disabled', false).html('<option value="">Loading...</option>');
+
+            $.ajax({
+                url: '@Url.Action("GetEntitiesByType", "Activity")',
+                method: 'GET',
+                data: { entityType: entityType },
+                success: function(data) {
+                    entitySelect.html('<option value="">Select ' + entityType.toLowerCase() + '</option>');
+                    
+                    data.forEach(function(entity) {
+                        entitySelect.append(`<option value="${entity.id}">${entity.name}</option>`);
+                    });
+                },
+                error: function() {
+                    entitySelect.html('<option value="">Error loading options</option>');
+                }
+            });
+        }
+
+        function setDefaultValues() {
+            // Set default assignee to current user if available
+            var currentUser = '@User.Identity.Name';
+            if (currentUser) {
+                $('#AssignedTo').val(currentUser);
+            }
+
+            // Set default priority
+            $('#Priority').val('Medium');
+            updatePriorityDisplay();
+        }
+
+        function updatePriorityDisplay() {
+            var priority = $('#prioritySelect').val();
+            var select = $('#prioritySelect');
+            
+            // Remove existing priority classes
+            select.removeClass('priority-low priority-medium priority-high priority-urgent');
+            
+            // Add appropriate class
+            if (priority) {
+                select.addClass('priority-' + priority.toLowerCase());
+            }
+        }
+
+        function setupCharacterCounters() {
+            $('.bigin-input[maxlength], .bigin-textarea[maxlength]').each(function() {
+                var field = $(this);
+                var maxLength = parseInt(field.attr('maxlength'));
+                var counter = $('<div class="character-counter"></div>');
+                
+                field.after(counter);
+                
+                function updateCounter() {
+                    var currentLength = field.val().length;
+                    var remaining = maxLength - currentLength;
+                    counter.text(`${currentLength}/${maxLength} characters`);
+                    
+                    if (remaining < 20) {
+                        counter.addClass('warning');
+                    } else {
+                        counter.removeClass('warning');
+                    }
+                }
+                
+                field.on('input', updateCounter);
+                updateCounter();
+            });
+        }
+
+        function validateForm() {
+            var isValid = true;
+            
+            // Required field validation
+            $('.bigin-input[required], .bigin-select[required]').each(function() {
+                if (!$(this).val()) {
+                    isValid = false;
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // Date validation
+            var scheduledDate = new Date($('#ScheduledDate').val());
+            var dueDate = $('#DueDate').val() ? new Date($('#DueDate').val()) : null;
+            
+            if (dueDate && dueDate < scheduledDate) {
+                isValid = false;
+                $('#DueDate').addClass('is-invalid');
+                showNotification('Due date cannot be before scheduled date', 'error');
+            }
+
+            return isValid;
+        }
+
+        function validateField(field) {
+            if (field.prop('required') && !field.val()) {
+                field.addClass('is-invalid');
+                return false;
+            } else {
+                field.removeClass('is-invalid');
+                return true;
+            }
+        }
+
+        function saveDraft() {
+            var formData = new FormData($('#activityForm')[0]);
+            formData.append('isDraft', 'true');
+            
+            $.ajax({
+                url: '@Url.Action("SaveDraft", "Activity")',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        showNotification('Draft saved successfully', 'success');
+                    } else {
+                        showNotification('Error saving draft: ' + response.message, 'error');
+                    }
+                },
+                error: function() {
+                    showNotification('Error saving draft', 'error');
+                }
+            });
+        }
+
+        function showNotification(message, type) {
+            // Create toast notification
+            var toast = $(`
+                <div class="toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `);
+            
+            var toastContainer = $('.toast-container');
+            if (!toastContainer.length) {
+                toastContainer = $('<div class="toast-container position-fixed top-0 end-0 p-3"></div>');
+                $('body').append(toastContainer);
+            }
+            
+            toastContainer.append(toast);
+            var toastBootstrap = new bootstrap.Toast(toast[0]);
+            toastBootstrap.show();
+        }
+
+        // Auto-save functionality
+        setInterval(function() {
+            if (formHasChanges()) {
+                saveDraft();
+            }
+        }, 300000); // Auto-save every 5 minutes
+
+        function formHasChanges() {
+            // Check if form has been modified
+            return $('#activityForm').find('input, select, textarea').filter(function() {
+                return $(this).val() !== $(this).prop('defaultValue');
+            }).length > 0;
+        }
+
+        // Keyboard shortcuts
+        $(document).on('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.which) {
+                    case 83: // Ctrl+S - Save Draft
+                        e.preventDefault();
+                        saveDraft();
+                        break;
+                    case 13: // Ctrl+Enter - Submit Form
+                        e.preventDefault();
+                        $('#activityForm').submit();
+                        break;
+                }
+            }
+        });
+    </script>
 }

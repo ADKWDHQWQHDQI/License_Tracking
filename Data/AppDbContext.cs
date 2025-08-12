@@ -32,6 +32,9 @@ namespace License_Tracking.Data
         public DbSet<CbmsInvoice> CbmsInvoices { get; set; }
         public DbSet<Activity> Activities { get; set; }
 
+        // Week 8 Enhancements: Advanced Deal Features & Multi-Invoice System
+        public DbSet<DealCollaborationActivity> DealActivities { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -361,6 +364,21 @@ namespace License_Tracking.Data
             builder.Entity<Activity>()
                 .HasIndex(a => a.DueDate)
                 .HasDatabaseName("IX_Activity_DueDate");
+
+            // Week 8 Enhancement: Configure DealCollaborationActivity
+            builder.Entity<DealCollaborationActivity>()
+                .HasOne<Deal>()
+                .WithMany(d => d.Activities)
+                .HasForeignKey(dca => dca.DealId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<DealCollaborationActivity>()
+                .HasIndex(dca => dca.DealId)
+                .HasDatabaseName("IX_DealCollaborationActivity_DealId");
+
+            builder.Entity<DealCollaborationActivity>()
+                .HasIndex(dca => dca.CreatedDate)
+                .HasDatabaseName("IX_DealCollaborationActivity_CreatedDate");
         }
     }
 }

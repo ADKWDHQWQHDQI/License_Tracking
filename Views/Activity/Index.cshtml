@@ -4,80 +4,473 @@
     ViewData["Title"] = "Activity Management";
 }
 
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1><i class="fas fa-calendar-alt"></i> Activity Management</h1>
-                    <p class="text-muted">CRM-style follow-ups and interaction tracking</p>
+<!-- Week 11: Bigin.com-inspired Desktop Activity Management Interface -->
+<div class="bigin-container desktop-optimized">
+    <!-- Desktop Header Section with Enhanced CRM Actions -->
+    <div class="bigin-header-section">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="bigin-page-title">
+                    <div class="title-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="title-content">
+                        <h1 class="bigin-h1">Activity Management</h1>
+                        <p class="bigin-subtitle">CRM-style follow-ups and interaction tracking with desktop workflow optimization</p>
+                        <div class="bigin-breadcrumb">
+                            <a href="@Url.Action("Index", "Home")">Dashboard</a>
+                            <i class="fas fa-chevron-right"></i>
+                            <span>Activities</span>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <a asp-action="Create" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> New Activity
+            </div>
+            <div class="col-lg-4">
+                <div class="bigin-action-toolbar desktop-actions">
+                    <button class="btn bigin-btn-secondary" onclick="refreshActivityView()" title="Refresh">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="btn bigin-btn-secondary" onclick="toggleActivityViewMode()" title="Toggle View">
+                        <i class="fas fa-th-list"></i>
+                    </button>
+                    <a asp-action="WeeklyReport" class="btn bigin-btn-outline">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Reports</span>
                     </a>
-                    <a asp-action="WeeklyReport" class="btn btn-info">
-                        <i class="fas fa-chart-bar"></i> Weekly Report
+                    <a asp-action="Create" class="btn bigin-btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>New Activity</span>
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Filter Section -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label">Activity Type</label>
-                    <select name="type" class="form-select">
-                        <option value="all">All Types</option>
-                        <option value="Call">Call</option>
-                        <option value="Email">Email</option>
-                        <option value="Meeting">Meeting</option>
-                        <option value="Follow-up">Follow-up</option>
-                        <option value="Demo">Demo</option>
-                        <option value="Proposal">Proposal</option>
-                        <option value="Contract">Contract</option>
-                    </select>
+    <!-- Desktop-Optimized Advanced Filter Section with Bigin.com Style -->
+    <div class="bigin-filter-panel desktop-filter-enhanced">
+        <div class="filter-panel-header" onclick="toggleFilterCollapse()">
+            <h3 class="filter-title">
+                <i class="fas fa-filter"></i>
+                Advanced Filters
+            </h3>
+            <div class="filter-actions">
+                <button type="button" class="btn bigin-btn-ghost btn-sm" onclick="clearAllFilters()">
+                    <i class="fas fa-times"></i> Clear All
+                </button>
+                <button type="button" class="btn bigin-btn-ghost btn-sm" onclick="saveCurrentFilter()">
+                    <i class="fas fa-save"></i> Save Filter
+                </button>
+                <i class="fas fa-chevron-down filter-collapse-icon"></i>
+            </div>
+        </div>
+        
+        <div class="filter-content" id="activityFilterContent">
+            <form method="get" id="activityFilterForm" class="desktop-filter-form">
+                <div class="row g-4">
+                    <!-- Primary Filters Row -->
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="bigin-form-group">
+                            <label class="bigin-label">Activity Type</label>
+                            <select name="type" class="bigin-select" id="activityTypeFilter">
+                                <option value="all">All Types</option>
+                                <option value="Call" selected="@(ViewBag.CurrentType == "Call")">Call</option>
+                                <option value="Email" selected="@(ViewBag.CurrentType == "Email")">Email</option>
+                                <option value="Meeting" selected="@(ViewBag.CurrentType == "Meeting")">Meeting</option>
+                                <option value="Follow-up" selected="@(ViewBag.CurrentType == "Follow-up")">Follow-up</option>
+                                <option value="Demo" selected="@(ViewBag.CurrentType == "Demo")">Demo</option>
+                                <option value="Proposal" selected="@(ViewBag.CurrentType == "Proposal")">Proposal</option>
+                                <option value="Contract" selected="@(ViewBag.CurrentType == "Contract")">Contract</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="bigin-form-group">
+                            <label class="bigin-label">Status</label>
+                            <select name="status" class="bigin-select" id="activityStatusFilter">
+                                <option value="all">All Statuses</option>
+                                <option value="Pending" selected="@(ViewBag.CurrentStatus == "Pending")">Pending</option>
+                                <option value="In Progress" selected="@(ViewBag.CurrentStatus == "In Progress")">In Progress</option>
+                                <option value="Completed" selected="@(ViewBag.CurrentStatus == "Completed")">Completed</option>
+                                <option value="Cancelled" selected="@(ViewBag.CurrentStatus == "Cancelled")">Cancelled</option>
+                                <option value="Deferred" selected="@(ViewBag.CurrentStatus == "Deferred")">Deferred</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="bigin-form-group">
+                            <label class="bigin-label">Priority</label>
+                            <select name="priority" class="bigin-select" id="activityPriorityFilter">
+                                <option value="all">All Priorities</option>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                                <option value="Urgent">Urgent</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="bigin-form-group">
+                            <label class="bigin-label">Assigned To</label>
+                            <input type="text" name="assignedTo" class="bigin-input" placeholder="Search by assignee..." 
+                                   id="assignedToFilter" autocomplete="off">
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Filters Row -->
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="bigin-form-group">
+                            <label class="bigin-label">Date Range</label>
+                            <select name="dateRange" class="bigin-select" id="dateRangeFilter" onchange="toggleCustomDateRange()">
+                                <option value="all">All Dates</option>
+                                <option value="today">Today</option>
+                                <option value="thisWeek">This Week</option>
+                                <option value="thisMonth">This Month</option>
+                                <option value="overdue">Overdue</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-lg-4 col-md-6" id="customDateRange" style="display: none;">
+                        <div class="bigin-form-group">
+                            <label class="bigin-label">From - To</label>
+                            <div class="d-flex gap-2">
+                                <input type="date" name="dateFrom" class="bigin-input" style="flex: 1;">
+                                <input type="date" name="dateTo" class="bigin-input" style="flex: 1;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="bigin-form-group">
+                            <label class="bigin-label">Entity Type</label>
+                            <select name="entityType" class="bigin-select" id="entityTypeFilter">
+                                <option value="all">All Entities</option>
+                                <option value="Deal">Deal</option>
+                                <option value="Company">Company</option>
+                                <option value="Contact">Contact</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="bigin-form-group">
+                            <label class="bigin-label">Search</label>
+                            <div class="search-input-wrapper">
+                                <input type="text" name="search" class="bigin-input bigin-search" 
+                                       placeholder="Search activities, subjects, notes..." id="globalSearchFilter">
+                                <i class="fas fa-search search-icon"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Status</label>
-                    <select name="status" class="form-select">
-                        <option value="all">All Statuses</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">&nbsp;</label>
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-filter"></i> Filter
-                    </button>
+                
+                <!-- Filter Action Buttons -->
+                <div class="filter-actions-row">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="filter-quick-actions">
+                            <button type="button" class="btn bigin-btn-ghost btn-sm" onclick="applyQuickFilter('myActivities')">
+                                <i class="fas fa-user"></i> My Activities
+                            </button>
+                            <button type="button" class="btn bigin-btn-ghost btn-sm" onclick="applyQuickFilter('dueToday')">
+                                <i class="fas fa-calendar-day"></i> Due Today
+                            </button>
+                            <button type="button" class="btn bigin-btn-ghost btn-sm" onclick="applyQuickFilter('overdue')">
+                                <i class="fas fa-exclamation-triangle"></i> Overdue
+                            </button>
+                        </div>
+                        <div class="filter-submit-actions">
+                            <button type="button" class="btn bigin-btn-secondary" onclick="resetFilters()">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>
+                            <button type="submit" class="btn bigin-btn-primary">
+                                <i class="fas fa-search"></i> Apply Filters
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Activities Table -->
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-dark">
+    <!-- Desktop-Optimized Activity Table with CRM Enhancement -->
+    <div class="bigin-data-panel">
+        <div class="panel-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="panel-info">
+                    <h3 class="panel-title">
+                        <i class="fas fa-list"></i>
+                        Activities List
+                    </h3>
+                    <span class="panel-count">@Model.Count() activities</span>
+                </div>
+                <div class="panel-controls">
+                    <div class="view-controls">
+                        <button class="btn bigin-btn-ghost btn-sm" onclick="selectAllActivities()" title="Select All">
+                            <i class="fas fa-check-square"></i>
+                        </button>
+                        <button class="btn bigin-btn-ghost btn-sm" onclick="bulkActionModal()" title="Bulk Actions">
+                            <i class="fas fa-tasks"></i>
+                        </button>
+                        <button class="btn bigin-btn-ghost btn-sm" onclick="exportActivities()" title="Export">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                    <div class="pagination-summary">
+                        <span class="text-muted">Page @ViewBag.CurrentPage</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bigin-table-container desktop-table-enhanced">
+            <table class="bigin-table activity-table" id="activitiesTable">
+                <thead class="bigin-table-header">
+                    <tr>
+                        <th class="select-column">
+                            <input type="checkbox" class="bigin-checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                        </th>
+                        <th class="sortable" data-sort="subject">
+                            <div class="header-content">
+                                <span>Subject</span>
+                                <i class="fas fa-sort sort-icon"></i>
+                            </div>
+                        </th>
+                        <th class="sortable" data-sort="type">
+                            <div class="header-content">
+                                <span>Type</span>
+                                <i class="fas fa-sort sort-icon"></i>
+                            </div>
+                        </th>
+                        <th class="sortable" data-sort="entity">
+                            <span>Related To</span>
+                            <i class="fas fa-sort sort-icon"></i>
+                        </th>
+                        <th class="sortable" data-sort="dueDate">
+                            <span>Due Date</span>
+                            <i class="fas fa-sort sort-icon"></i>
+                        </th>
+                        <th class="sortable" data-sort="status">
+                            <span>Status</span>
+                            <i class="fas fa-sort sort-icon"></i>
+                        </th>
+                        <th class="sortable" data-sort="priority">
+                            <span>Priority</span>
+                            <i class="fas fa-sort sort-icon"></i>
+                        </th>
+                        <th class="sortable" data-sort="assignedTo">
+                            <span>Assigned To</span>
+                            <i class="fas fa-sort sort-icon"></i>
+                        </th>
+                        <th class="actions-column">
+                            <span>Actions</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bigin-table-body">
+                    @if (Model.Any())
+                    {
+                        @foreach (var activity in Model)
+                        {
+                            <tr class="activity-row" data-activity-id="@activity.ActivityId" data-priority="@activity.Priority.ToLower()">
+                                <td class="select-cell">
+                                    <input type="checkbox" class="bigin-checkbox activity-checkbox" value="@activity.ActivityId">
+                                </td>
+                                <td class="subject-cell">
+                                    <div class="activity-subject">
+                                        <div class="subject-main">
+                                            <a href="@Url.Action("Details", new { id = activity.ActivityId })" class="activity-title">
+                                                @activity.Subject
+                                            </a>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(activity.Description))
+                                        {
+                                            <div class="subject-description">
+                                                @(activity.Description.Length > 100 ? activity.Description.Substring(0, 100) + "..." : activity.Description)
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                                <td class="type-cell">
+                                    <span class="activity-type-badge type-@activity.Type.ToLower().Replace(" ", "-")">
+                                        @activity.Type
+                                    </span>
+                                </td>
+                                <td class="entity-cell">
+                                    @if (!string.IsNullOrEmpty(activity.RelatedEntityType) && activity.RelatedEntityId > 0)
+                                    {
+                                        <div class="entity-link">
+                                            @if (activity.RelatedEntityType == "Deal")
+                                            {
+                                                <a href="@Url.Action("Details", "Deals", new { id = activity.RelatedEntityId })" class="entity-ref">
+                                                    <i class="fas fa-handshake"></i>
+                                                    Deal #@activity.RelatedEntityId
+                                                </a>
+                                            }
+                                            else if (activity.RelatedEntityType == "Company")
+                                            {
+                                                <a href="@Url.Action("Details", "Companies", new { id = activity.RelatedEntityId })" class="entity-ref">
+                                                    <i class="fas fa-building"></i>
+                                                    Company #@activity.RelatedEntityId
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="entity-ref">
+                                                    <i class="fas fa-link"></i>
+                                                    @activity.RelatedEntityType #@activity.RelatedEntityId
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No relation</span>
+                                    }
+                                </td>
+                                <td class="date-cell">
+                                    <div class="due-date-info">
+                                        @if (activity.DueDate.HasValue)
+                                        {
+                                            var isOverdue = activity.DueDate < DateTime.Now && activity.Status != "Completed";
+                                            var isToday = activity.DueDate.Value.Date == DateTime.Today;
+                                            
+                                            <div class="date-display @(isOverdue ? "overdue" : isToday ? "due-today" : "")">
+                                                <span class="date-text">@activity.DueDate.Value.ToString("MMM dd, yyyy")</span>
+                                                @if (isOverdue)
+                                                {
+                                                    <i class="fas fa-exclamation-triangle text-danger" title="Overdue"></i>
+                                                }
+                                                else if (isToday)
+                                                {
+                                                    <i class="fas fa-clock text-warning" title="Due Today"></i>
+                                                }
+                                            </div>
+                                            <small class="time-text">@activity.DueDate.Value.ToString("HH:mm")</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No due date</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td class="status-cell">
+                                    <span class="status-badge status-@activity.Status.ToLower().Replace(" ", "-")">
+                                        @activity.Status
+                                    </span>
+                                </td>
+                                <td class="priority-cell">
+                                    <span class="priority-badge priority-@activity.Priority.ToLower()">
+                                        @activity.Priority
+                                    </span>
+                                </td>
+                                <td class="assignee-cell">
+                                    <div class="assignee-info">
+                                        @if (!string.IsNullOrEmpty(activity.AssignedTo))
+                                        {
+                                            <div class="assignee-avatar">
+                                                <i class="fas fa-user-circle"></i>
+                                            </div>
+                                            <span class="assignee-name">@activity.AssignedTo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Unassigned</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td class="actions-cell">
+                                    <div class="action-buttons">
+                                        <a href="@Url.Action("Details", new { id = activity.ActivityId })" 
+                                           class="btn bigin-btn-ghost btn-sm" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="@Url.Action("Edit", new { id = activity.ActivityId })" 
+                                           class="btn bigin-btn-ghost btn-sm" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        @if (activity.Status != "Completed")
+                                        {
+                                            <button type="button" class="btn bigin-btn-ghost btn-sm" 
+                                                    onclick="markAsCompleted(@activity.ActivityId)" title="Mark Complete">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn bigin-btn-ghost btn-sm" 
+                                                onclick="followUpActivity(@activity.ActivityId)" title="Create Follow-up">
+                                            <i class="fas fa-reply"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
                         <tr>
-                            <th>Subject</th>
-                            <th>Type</th>
-                            <th>Related To</th>
-                            <th>Due Date</th>
-                            <th>Status</th>
-                            <th>Assigned To</th>
-                            <th>Actions</th>
+                            <td colspan="9" class="text-center py-5">
+                                <div class="empty-state">
+                                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                    <h4 class="text-muted">No Activities Found</h4>
+                                    <p class="text-muted">No activities match your current filters.</p>
+                                    <a asp-action="Create" class="btn bigin-btn-primary">
+                                        <i class="fas fa-plus"></i> Create First Activity
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.Any())
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Desktop Pagination Enhanced -->
+        @if (Model.Any())
+        {
+            <div class="bigin-pagination-wrapper">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="pagination-info">
+                        <span class="text-muted">
+                            Showing @((ViewBag.CurrentPage - 1) * 20 + 1) to @(Math.Min(ViewBag.CurrentPage * 20, Model.Count())) 
+                            of @Model.Count() activities
+                        </span>
+                    </div>
+                    <nav aria-label="Activity pagination">
+                        <ul class="pagination bigin-pagination">
+                            @if (ViewBag.CurrentPage > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=@(ViewBag.CurrentPage - 1)&type=@ViewBag.CurrentType&status=@ViewBag.CurrentStatus">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                            }
+                            
+                            @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.CurrentPage + 2, 10); i++)
+                            {
+                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                    <a class="page-link" href="?page=@i&type=@ViewBag.CurrentType&status=@ViewBag.CurrentStatus">@i</a>
+                                </li>
+                            }
+                            
+                            @if (ViewBag.CurrentPage < 10)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=@(ViewBag.CurrentPage + 1)&type=@ViewBag.CurrentType&status=@ViewBag.CurrentStatus">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        }
+    </div>
+</div>
                         {
                             @foreach (var activity in Model)
                             {
@@ -184,5 +577,265 @@
                 }
             });
         }
+    }
+
+    // Week 11: Enhanced Desktop Activity Management Functions
+    $(document).ready(function() {
+        initializeActivityManagement();
+        setupKeyboardShortcuts();
+        initializeTooltips();
+        loadSavedFilterState();
+    });
+
+    // Initialize Activity Management Features
+    function initializeActivityManagement() {
+        // Auto-refresh activities every 5 minutes
+        setInterval(function() {
+            if (!document.hidden) {
+                refreshActivityView(true);
+            }
+        }, 300000);
+
+        // Setup real-time filter updates
+        $('.bigin-select, .bigin-input').on('change keyup', debounce(function() {
+            if ($(this).attr('id') === 'globalSearchFilter') {
+                performLiveSearch();
+            }
+        }, 500));
+
+        // Initialize sortable table headers
+        $('.sortable').on('click', function() {
+            var sortField = $(this).data('sort');
+            var currentSort = localStorage.getItem('activitySort') || 'dueDate-asc';
+            var newSort = sortField + '-' + (currentSort.includes(sortField + '-asc') ? 'desc' : 'asc');
+            
+            localStorage.setItem('activitySort', newSort);
+            sortActivitiesTable(sortField, newSort.includes('desc'));
+        });
+
+        // Enhanced row interactions
+        $('.activity-row').on('click', function(e) {
+            if (!$(e.target).closest('.actions-cell, .select-cell').length) {
+                var activityId = $(this).data('activity-id');
+                window.location.href = '@Url.Action("Details", "Activity")/' + activityId;
+            }
+        });
+    }
+
+    // Desktop Keyboard Shortcuts
+    function setupKeyboardShortcuts() {
+        $(document).on('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.which) {
+                    case 78: // Ctrl+N - New Activity
+                        e.preventDefault();
+                        window.location.href = '@Url.Action("Create", "Activity")';
+                        break;
+                    case 70: // Ctrl+F - Focus Search
+                        e.preventDefault();
+                        $('#globalSearchFilter').focus().select();
+                        break;
+                    case 82: // Ctrl+R - Refresh
+                        e.preventDefault();
+                        refreshActivityView();
+                        break;
+                }
+            }
+        });
+    }
+
+    // Enhanced Filter Management
+    function toggleFilterCollapse() {
+        var content = $('#activityFilterContent');
+        var icon = $('.filter-collapse-icon');
+        
+        content.slideToggle(300);
+        icon.toggleClass('fa-chevron-down fa-chevron-up');
+        
+        localStorage.setItem('activityFiltersExpanded', content.is(':visible'));
+    }
+
+    function clearAllFilters() {
+        $('#activityFilterForm')[0].reset();
+        $('#customDateRange').hide();
+        performLiveSearch();
+        showNotification('All filters cleared', 'info');
+    }
+
+    function saveCurrentFilter() {
+        var filterData = $('#activityFilterForm').serialize();
+        var filterName = prompt('Enter a name for this filter:');
+        
+        if (filterName) {
+            var savedFilters = JSON.parse(localStorage.getItem('savedActivityFilters') || '{}');
+            savedFilters[filterName] = filterData;
+            localStorage.setItem('savedActivityFilters', JSON.stringify(savedFilters));
+            showNotification('Filter saved successfully', 'success');
+        }
+    }
+
+    function applyQuickFilter(filterType) {
+        clearAllFilters();
+        
+        switch(filterType) {
+            case 'myActivities':
+                $('#assignedToFilter').val('@User.Identity.Name');
+                break;
+            case 'dueToday':
+                $('#dateRangeFilter').val('today');
+                break;
+            case 'overdue':
+                $('#dateRangeFilter').val('overdue');
+                break;
+        }
+        
+        $('#activityFilterForm').submit();
+    }
+
+    function resetFilters() {
+        clearAllFilters();
+        window.location.href = '@Url.Action("Index", "Activity")';
+    }
+
+    function performLiveSearch() {
+        var searchTerm = $('#globalSearchFilter').val().toLowerCase();
+        
+        $('.activity-row').each(function() {
+            var rowText = $(this).text().toLowerCase();
+            var matches = searchTerm === '' || rowText.includes(searchTerm);
+            $(this).toggle(matches);
+        });
+    }
+
+    function selectAllActivities() {
+        var allChecked = $('#selectAllCheckbox').prop('checked');
+        $('.activity-checkbox').prop('checked', !allChecked);
+        $('#selectAllCheckbox').prop('checked', !allChecked);
+    }
+
+    function toggleSelectAll() {
+        var isChecked = $('#selectAllCheckbox').prop('checked');
+        $('.activity-checkbox').prop('checked', isChecked);
+    }
+
+    function markAsCompleted(activityId) {
+        if (confirm('Mark this activity as completed?')) {
+            $.ajax({
+                url: '@Url.Action("MarkCompleted", "Activity")',
+                type: 'POST',
+                data: { id: activityId },
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    showNotification('Activity marked as completed', 'success');
+                    refreshActivityView();
+                },
+                error: function() {
+                    showNotification('Error updating activity', 'error');
+                }
+            });
+        }
+    }
+
+    function followUpActivity(activityId) {
+        window.location.href = '@Url.Action("Create", "Activity")?followUpTo=' + activityId;
+    }
+
+    function bulkActionModal() {
+        var selectedIds = $('.activity-checkbox:checked').map(function() {
+            return $(this).val();
+        }).get();
+        
+        if (selectedIds.length === 0) {
+            showNotification('Please select activities first', 'warning');
+            return;
+        }
+        
+        showNotification(`${selectedIds.length} activities selected for bulk action`, 'info');
+    }
+
+    function exportActivities() {
+        var filterData = $('#activityFilterForm').serialize();
+        window.open('@Url.Action("Export", "Activity")?' + filterData, '_blank');
+    }
+
+    function refreshActivityView(silent = false) {
+        if (!silent) {
+            showNotification('Refreshing activities...', 'info');
+        }
+        window.location.reload();
+    }
+
+    function toggleActivityViewMode() {
+        var currentView = localStorage.getItem('activityViewMode') || 'list';
+        var newView = currentView === 'list' ? 'card' : 'list';
+        localStorage.setItem('activityViewMode', newView);
+        showNotification(`Switched to ${newView} view`, 'info');
+    }
+
+    function toggleCustomDateRange() {
+        var dateRange = $('#dateRangeFilter').val();
+        $('#customDateRange').toggle(dateRange === 'custom');
+    }
+
+    function sortActivitiesTable(field, descending) {
+        var rows = $('#activitiesTable tbody tr').get();
+        
+        rows.sort(function(a, b) {
+            var aVal = $(a).find(`[data-sort="${field}"]`).text().trim();
+            var bVal = $(b).find(`[data-sort="${field}"]`).text().trim();
+            
+            if (field === 'dueDate') {
+                aVal = new Date(aVal);
+                bVal = new Date(bVal);
+            }
+            
+            if (descending) {
+                return aVal < bVal ? 1 : -1;
+            } else {
+                return aVal > bVal ? 1 : -1;
+            }
+        });
+        
+        $.each(rows, function(index, row) {
+            $('#activitiesTable tbody').append(row);
+        });
+        
+        $('.sort-icon').removeClass('fa-sort-up fa-sort-down').addClass('fa-sort');
+        $(`.sortable[data-sort="${field}"] .sort-icon`)
+            .removeClass('fa-sort')
+            .addClass(descending ? 'fa-sort-down' : 'fa-sort-up');
+    }
+
+    function loadSavedFilterState() {
+        var filtersExpanded = localStorage.getItem('activityFiltersExpanded') !== 'false';
+        if (!filtersExpanded) {
+            $('#activityFilterContent').hide();
+            $('.filter-collapse-icon').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        }
+    }
+
+    function showNotification(message, type) {
+        console.log(`${type.toUpperCase()}: ${message}`);
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    function initializeTooltips() {
+        $('[title]').tooltip({
+            placement: 'top',
+            trigger: 'hover'
+        });
     }
 </script>

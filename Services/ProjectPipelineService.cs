@@ -15,6 +15,19 @@ namespace License_Tracking.Services
         Task<bool> DeleteProjectAsync(int id);
         Task<Deal> ConvertToDealAsync(int projectId, string userId);
         Task<ProjectPipelineListViewModel> GetFilteredProjectsAsync(string? statusFilter = null, string? oemFilter = null, string? customerFilter = null);
+
+        // Week 10 Enhanced: Advanced Filtering with Desktop-First Experience
+        Task<ProjectPipelineListViewModel> GetAdvancedFilteredProjectsAsync(
+            string? statusFilter = null,
+            string? oemFilter = null,
+            string? customerFilter = null,
+            string? stageFilter = null,
+            string? revenueFilter = null,
+            string? closeDateFilter = null,
+            string? confidenceFilter = null,
+            string? activityFilter = null,
+            string? successFilter = null);
+
         Task<decimal> GetTotalProjectedRevenueAsync();
         Task<decimal> GetTotalProjectedMarginAsync();
 
@@ -28,6 +41,11 @@ namespace License_Tracking.Services
         Task BulkUpdateStatusAsync(int[] projectIds, string newStatus);
         Task<byte[]> ExportToExcelAsync(string? statusFilter = null, string? oemFilter = null, string? customerFilter = null);
         Task<object> GetPipelineAnalyticsAsync();
+
+        // Week 10 Enhanced: Desktop Reporting Tools
+        Task<object> GetDesktopReportingDataAsync();
+        Task<List<string>> GetUniqueOemNamesAsync();
+        Task<List<string>> GetUniqueCustomerNamesAsync();
     }
 
     public class ProjectPipelineService : IProjectPipelineService
@@ -630,6 +648,167 @@ namespace License_Tracking.Services
             };
 
             return analytics;
+        }
+
+        // Week 10 Enhanced: Advanced Filtering with Desktop-First Experience
+        public async Task<ProjectPipelineListViewModel> GetAdvancedFilteredProjectsAsync(
+            string? statusFilter = null,
+            string? oemFilter = null,
+            string? customerFilter = null,
+            string? stageFilter = null,
+            string? revenueFilter = null,
+            string? closeDateFilter = null,
+            string? confidenceFilter = null,
+            string? activityFilter = null,
+            string? successFilter = null)
+        {
+            var query = _context.ProjectPipelines.AsQueryable();
+
+            // Apply basic filters
+            if (!string.IsNullOrEmpty(statusFilter))
+                query = query.Where(p => p.ProjectStatus == statusFilter);
+
+            if (!string.IsNullOrEmpty(oemFilter))
+                query = query.Where(p => p.OemName.Contains(oemFilter));
+
+            if (!string.IsNullOrEmpty(customerFilter))
+                query = query.Where(p => p.ClientName.Contains(customerFilter));
+
+            // Apply advanced filters
+            if (!string.IsNullOrEmpty(stageFilter))
+                query = query.Where(p => p.PipelineStage == stageFilter);
+
+            if (!string.IsNullOrEmpty(revenueFilter))
+            {
+                query = revenueFilter switch
+                {
+                    "small" => query.Where(p => p.EstimatedRevenue < 50000),
+                    "medium" => query.Where(p => p.EstimatedRevenue >= 50000 && p.EstimatedRevenue < 500000),
+                    "large" => query.Where(p => p.EstimatedRevenue >= 500000 && p.EstimatedRevenue < 5000000),
+                    "enterprise" => query.Where(p => p.EstimatedRevenue >= 5000000),
+                    _ => query
+                };
+            }
+
+            if (!string.IsNullOrEmpty(closeDateFilter))
+            {
+                var now = DateTime.Now;
+                query = closeDateFilter switch
+                {
+                    "overdue" => query.Where(p => p.ExpectedCloseDate.HasValue && p.ExpectedCloseDate < now),
+                    "thisweek" => query.Where(p => p.ExpectedCloseDate.HasValue && p.ExpectedCloseDate >= now && p.ExpectedCloseDate <= now.AddDays(7)),
+                    "thismonth" => query.Where(p => p.ExpectedCloseDate.HasValue && p.ExpectedCloseDate >= now && p.ExpectedCloseDate <= now.AddMonths(1)),
+                    "nextmonth" => query.Where(p => p.ExpectedCloseDate.HasValue && p.ExpectedCloseDate >= now.AddMonths(1) && p.ExpectedCloseDate <= now.AddMonths(2)),
+                    "thisquarter" => query.Where(p => p.ExpectedCloseDate.HasValue && p.ExpectedCloseDate >= now && p.ExpectedCloseDate <= now.AddMonths(3)),
+                    _ => query
+                };
+            }
+
+            if (!string.IsNullOrEmpty(confidenceFilter) && int.TryParse(confidenceFilter, out int confidence))
+                query = query.Where(p => p.StageConfidenceLevel == confidence);
+
+            if (!string.IsNullOrEmpty(activityFilter))
+            {
+                var now = DateTime.Now;
+                query = activityFilter switch
+                {
+                    "today" => query.Where(p => p.LastActivityDate.HasValue && p.LastActivityDate.Value.Date == now.Date),
+                    "week" => query.Where(p => p.LastActivityDate.HasValue && p.LastActivityDate >= now.AddDays(-7)),
+                    "month" => query.Where(p => p.LastActivityDate.HasValue && p.LastActivityDate >= now.AddMonths(-1)),
+                    "stale" => query.Where(p => !p.LastActivityDate.HasValue || p.LastActivityDate < now.AddDays(-30)),
+                    _ => query
+                };
+            }
+
+            if (!string.IsNullOrEmpty(successFilter))
+            {
+                query = successFilter switch
+                {
+                    "high" => query.Where(p => p.SuccessProbability >= 75),
+                    "medium" => query.Where(p => p.SuccessProbability >= 25 && p.SuccessProbability < 75),
+                    "low" => query.Where(p => p.SuccessProbability < 25),
+                    _ => query
+                };
+            }
+
+            var projects = await query.OrderByDescending(p => p.CreatedDate).ToListAsync();
+            var projectViewModels = projects.Select(MapToViewModel).ToList();
+
+            return new ProjectPipelineListViewModel
+            {
+                Projects = projectViewModels,
+                TotalCount = projectViewModels.Count,
+                TotalProjectedRevenue = projectViewModels.Sum(p => p.ProjectedRevenue),
+                TotalProjectedMargin = projectViewModels.Sum(p => p.ProjectedMargin),
+                StatusFilter = statusFilter ?? "",
+                OemFilter = oemFilter ?? "",
+                CustomerFilter = customerFilter ?? ""
+            };
+        }
+
+        // Week 10 Enhanced: Desktop Reporting Tools
+        public async Task<object> GetDesktopReportingDataAsync()
+        {
+            var projects = await _context.ProjectPipelines.ToListAsync();
+
+            return new
+            {
+                TotalProjects = projects.Count,
+                ProjectsByMonth = projects.GroupBy(p => new { p.CreatedDate.Year, p.CreatedDate.Month })
+                    .Select(g => new
+                    {
+                        Period = $"{g.Key.Year}-{g.Key.Month:D2}",
+                        Count = g.Count(),
+                        Revenue = g.Sum(p => p.EstimatedRevenue),
+                        Margin = g.Sum(p => p.EstimatedMargin)
+                    }).ToList(),
+                ProjectsByOem = projects.GroupBy(p => p.OemName)
+                    .Select(g => new
+                    {
+                        OemName = g.Key,
+                        Count = g.Count(),
+                        Revenue = g.Sum(p => p.EstimatedRevenue),
+                        AverageSuccessRate = g.Average(p => p.SuccessProbability)
+                    }).ToList(),
+                ProjectsByStage = projects.GroupBy(p => p.PipelineStage)
+                    .Select(g => new
+                    {
+                        Stage = g.Key,
+                        Count = g.Count(),
+                        Revenue = g.Sum(p => p.EstimatedRevenue),
+                        WeightedRevenue = g.Sum(p => p.WeightedRevenue)
+                    }).ToList(),
+                PerformanceMetrics = new
+                {
+                    AverageSuccessRate = projects.Any() ? projects.Average(p => p.SuccessProbability) : 0,
+                    AverageMarginPercentage = projects.Where(p => p.EstimatedRevenue > 0).Any() ?
+                        projects.Where(p => p.EstimatedRevenue > 0).Average(p => (p.EstimatedMargin / p.EstimatedRevenue) * 100) : 0,
+                    ConversionRate = projects.Count(p => p.ProjectStatus == "Won") / (double)Math.Max(projects.Count, 1) * 100,
+                    PipelineVelocity = projects.Where(p => p.LastActivityDate.HasValue)
+                        .Select(p => (DateTime.Now - p.LastActivityDate!.Value).TotalDays)
+                        .DefaultIfEmpty(0)
+                        .Average()
+                }
+            };
+        }
+
+        // Week 10 Enhanced: Autocomplete Support
+        public async Task<List<string>> GetUniqueOemNamesAsync()
+        {
+            return await _context.ProjectPipelines
+                .Select(p => p.OemName)
+                .Distinct()
+                .OrderBy(name => name)
+                .ToListAsync();
+        }
+
+        public async Task<List<string>> GetUniqueCustomerNamesAsync()
+        {
+            return await _context.ProjectPipelines
+                .Select(p => p.ClientName)
+                .Distinct()
+                .OrderBy(name => name)
+                .ToListAsync();
         }
 
         #endregion

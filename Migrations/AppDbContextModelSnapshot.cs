@@ -42,18 +42,12 @@ namespace License_Tracking.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("int");
-
                     b.Property<string>("CompletedBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("CompletedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("ContactPersonContactId")
-                        .HasColumnType("int");
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(100)
@@ -62,15 +56,23 @@ namespace License_Tracking.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DealId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("EntityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EntityType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Priority")
                         .IsRequired()
@@ -85,6 +87,9 @@ namespace License_Tracking.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<DateTime>("ScheduledDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -95,16 +100,24 @@ namespace License_Tracking.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("ActivityId");
-
-                    b.HasIndex("CompanyId");
-
-                    b.HasIndex("ContactPersonContactId");
-
-                    b.HasIndex("DealId");
 
                     b.HasIndex("DueDate")
                         .HasDatabaseName("IX_Activity_DueDate");
+
+                    b.HasIndex("EntityId");
 
                     b.HasIndex("RelatedEntityId");
 
@@ -244,66 +257,6 @@ namespace License_Tracking.Migrations
                     b.ToTable("AlertConfigurations");
                 });
 
-            modelBuilder.Entity("License_Tracking.Models.BATarget", b =>
-                {
-                    b.Property<int>("TargetId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TargetId"));
-
-                    b.Property<decimal>("ActualValue")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("AssignedTo")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PeriodType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("TargetPeriod")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("TargetType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("TargetValue")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("TargetId");
-
-                    b.HasIndex("AssignedTo", "TargetPeriod")
-                        .HasDatabaseName("IX_BATarget_AssignedTo_Period");
-
-                    b.ToTable("BATargets");
-                });
-
             modelBuilder.Entity("License_Tracking.Models.CbmsInvoice", b =>
                 {
                     b.Property<int>("InvoiceId")
@@ -356,6 +309,9 @@ namespace License_Tracking.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<decimal?>("PaymentReceived")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("PaymentReference")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -364,6 +320,10 @@ namespace License_Tracking.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Reference")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<decimal>("TaxAmount")
                         .HasColumnType("decimal(18,2)");
@@ -637,7 +597,7 @@ namespace License_Tracking.Migrations
                     b.Property<int?>("AlertConfigurationId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("AlertsEnabled")
+                    b.Property<bool?>("AlertsEnabled")
                         .HasColumnType("bit");
 
                     b.Property<string>("AssignedTo")
@@ -719,7 +679,7 @@ namespace License_Tracking.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsProjectPipeline")
+                    b.Property<bool?>("IsProjectPipeline")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
@@ -798,6 +758,95 @@ namespace License_Tracking.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("Deals");
+                });
+
+            modelBuilder.Entity("License_Tracking.Models.DealCollaborationActivity", b =>
+                {
+                    b.Property<int>("ActivityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityId"));
+
+                    b.Property<DateTime>("ActivityDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ActivityDescription")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("ActivityTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ActivityType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("AssignedTo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DealId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DealId1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DealId2")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsInternal")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("PerformedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("ActivityId");
+
+                    b.HasIndex("CreatedDate")
+                        .HasDatabaseName("IX_DealCollaborationActivity_CreatedDate");
+
+                    b.HasIndex("DealId")
+                        .HasDatabaseName("IX_DealCollaborationActivity_DealId");
+
+                    b.HasIndex("DealId1");
+
+                    b.ToTable("DealActivities");
                 });
 
             modelBuilder.Entity("License_Tracking.Models.Invoice", b =>
@@ -1124,6 +1173,12 @@ namespace License_Tracking.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<decimal>("EstimatedCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("EstimatedRevenue")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("ExpectedAmountToPay")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -1131,6 +1186,9 @@ namespace License_Tracking.Migrations
                     b.Property<decimal>("ExpectedAmountToReceive")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ExpectedCloseDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("ExpectedCustomerPoAmount")
                         .HasPrecision(18, 2)
@@ -1150,6 +1208,9 @@ namespace License_Tracking.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime?>("LastActivityDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("LastCustomerContact")
                         .HasColumnType("datetime2");
 
@@ -1166,6 +1227,9 @@ namespace License_Tracking.Migrations
                     b.Property<string>("MarginNotes")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("NextFollowupDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("OemName")
                         .IsRequired()
@@ -1194,6 +1258,11 @@ namespace License_Tracking.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("PipelineStage")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("ProductName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1215,6 +1284,9 @@ namespace License_Tracking.Migrations
                     b.Property<string>("ShipToAddress")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("StageConfidenceLevel")
+                        .HasColumnType("int");
 
                     b.Property<int>("SuccessProbability")
                         .HasColumnType("int");
@@ -1563,15 +1635,15 @@ namespace License_Tracking.Migrations
                 {
                     b.HasOne("License_Tracking.Models.Company", "Company")
                         .WithMany()
-                        .HasForeignKey("CompanyId");
+                        .HasForeignKey("EntityId");
 
                     b.HasOne("License_Tracking.Models.ContactPerson", "ContactPerson")
                         .WithMany()
-                        .HasForeignKey("ContactPersonContactId");
+                        .HasForeignKey("EntityId");
 
                     b.HasOne("License_Tracking.Models.Deal", "Deal")
                         .WithMany()
-                        .HasForeignKey("DealId");
+                        .HasForeignKey("EntityId");
 
                     b.HasOne("License_Tracking.Models.Company", null)
                         .WithMany()
@@ -1713,6 +1785,23 @@ namespace License_Tracking.Migrations
                     b.Navigation("Oem");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("License_Tracking.Models.DealCollaborationActivity", b =>
+                {
+                    b.HasOne("License_Tracking.Models.Deal", null)
+                        .WithMany("Activities")
+                        .HasForeignKey("DealId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("License_Tracking.Models.Deal", "Deal")
+                        .WithMany()
+                        .HasForeignKey("DealId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Deal");
                 });
 
             modelBuilder.Entity("License_Tracking.Models.Invoice", b =>
@@ -1863,6 +1952,8 @@ namespace License_Tracking.Migrations
 
             modelBuilder.Entity("License_Tracking.Models.Deal", b =>
                 {
+                    b.Navigation("Activities");
+
                     b.Navigation("Invoices");
                 });
 
