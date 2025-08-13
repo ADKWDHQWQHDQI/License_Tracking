@@ -34,14 +34,4 @@ namespace License_Tracking.ViewModels
         public List<Activity> RecentActivities { get; set; } = new List<Activity>();
         public List<Activity> UpcomingActivities { get; set; } = new List<Activity>();
     }
-
-    public class PaymentRecordViewModel
-    {
-        public int InvoiceId { get; set; }
-        public decimal AmountPaid { get; set; }
-        public DateTime PaymentDate { get; set; }
-        public string PaymentMethod { get; set; } = string.Empty;
-        public string PaymentReference { get; set; } = string.Empty;
-        public string Notes { get; set; } = string.Empty;
-    }
 }

@@ -42,6 +42,9 @@ namespace License_Tracking.Controllers
                 .Take(20)
                 .ToListAsync();
 
+            // Manually load related entities for display
+            await LoadRelatedEntitiesAsync(activities);
+
             ViewBag.ActivityTypes = new[]
             {
                 "Call", "Email", "Meeting", "Follow-up", "Demo", "Proposal", "Contract"
@@ -113,6 +116,29 @@ namespace License_Tracking.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Activity activity)
         {
+            // Validate RelatedEntityId exists in the correct table
+            if (activity.RelatedEntityId > 0 && !string.IsNullOrEmpty(activity.RelatedEntityType))
+            {
+                bool entityExists = false;
+                switch (activity.RelatedEntityType.ToLower())
+                {
+                    case "deal":
+                        entityExists = await _context.Deals.AnyAsync(d => d.DealId == activity.RelatedEntityId);
+                        break;
+                    case "company":
+                        entityExists = await _context.Companies.AnyAsync(c => c.CompanyId == activity.RelatedEntityId);
+                        break;
+                    case "contact":
+                        entityExists = await _context.ContactPersons.AnyAsync(cp => cp.ContactId == activity.RelatedEntityId);
+                        break;
+                }
+
+                if (!entityExists)
+                {
+                    ModelState.AddModelError("RelatedEntityId", $"The specified {activity.RelatedEntityType} does not exist.");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 activity.CreatedDate = DateTime.Now;
@@ -717,6 +743,35 @@ namespace License_Tracking.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // Helper method to load related entities for activities
+        private async Task LoadRelatedEntitiesAsync(IEnumerable<Activity> activities)
+        {
+            foreach (var activity in activities)
+            {
+                if (!string.IsNullOrEmpty(activity.RelatedEntityType) && activity.RelatedEntityId > 0)
+                {
+                    switch (activity.RelatedEntityType.ToLower())
+                    {
+                        case "deal":
+                            activity.Deal = await _context.Deals
+                                .Include(d => d.Company)
+                                .Include(d => d.Product)
+                                .FirstOrDefaultAsync(d => d.DealId == activity.RelatedEntityId);
+                            break;
+                        case "company":
+                            activity.Company = await _context.Companies
+                                .FirstOrDefaultAsync(c => c.CompanyId == activity.RelatedEntityId);
+                            break;
+                        case "contact":
+                            activity.ContactPerson = await _context.ContactPersons
+                                .Include(cp => cp.Company)
+                                .FirstOrDefaultAsync(cp => cp.ContactId == activity.RelatedEntityId);
+                            break;
+                    }
+                }
             }
         }
     }

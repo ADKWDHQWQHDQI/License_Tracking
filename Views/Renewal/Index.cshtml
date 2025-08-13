@@ -13,8 +13,8 @@
             </a>
             @if (User.IsInRole("Admin") || User.IsInRole("Finance"))
             {
-                <a asp-controller="Billing" asp-action="PaymentStatus" class="btn btn-outline-info">
-                    <i class="fas fa-money-bill-wave"></i> View Billing
+                <a asp-controller="InvoiceManagement" asp-action="Index" class="btn btn-outline-info">
+                    <i class="fas fa-money-bill-wave"></i> Invoice Management
                 </a>
             }
         </div>

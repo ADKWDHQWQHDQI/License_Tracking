@@ -1,0 +1,180 @@
+@model License_Tracking.ViewModels.InvoiceGenerationViewModel
+
+@{
+    ViewData["Title"] = "Create OEM Invoice (Phase 4)";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a asp-action="Index">Invoice Management</a></li>
+                    <li class="breadcrumb-item active">Create OEM Invoice</li>
+                </ol>
+            </nav>
+            <h3 class="mb-0">Create OEM Invoice (Phase 4)</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="fas fa-file-invoice"></i> Invoice Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateOemInvoice" method="post">
+                        <input type="hidden" asp-for="DealId" />
+                        <input type="hidden" asp-for="BusinessPhase" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="InvoiceNumber" class="form-label fw-semibold">Invoice Number</label>
+                                    <input asp-for="InvoiceNumber" class="form-control" readonly />
+                                    <span asp-validation-for="InvoiceNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="InvoiceDate" class="form-label fw-semibold">Invoice Date</label>
+                                    <input asp-for="InvoiceDate" type="date" class="form-control" />
+                                    <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="DueDate" class="form-label fw-semibold">Due Date</label>
+                                    <input asp-for="DueDate" type="date" class="form-control" />
+                                    <span asp-validation-for="DueDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="TotalAmount" class="form-label fw-semibold">Total Amount</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input asp-for="TotalAmount" type="number" step="0.01" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="TotalAmount" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-semibold">Description (Optional)</label>
+                            <textarea asp-for="Description" class="form-control" rows="3"
+                                placeholder="Enter invoice description or additional notes"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Create Invoice
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Deal Information -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="fas fa-handshake"></i> Deal Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Deal Name</label>
+                        <div class="fw-semibold">@Model.Deal.DealName</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Customer</label>
+                        <div>@Model.Deal.Company.CompanyName</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Product</label>
+                        <div>@Model.Deal.Product.ProductName</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">OEM</label>
+                        <div class="fw-semibold text-warning">@Model.Deal.Oem.OemName</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Deal Amount</label>
+                        <div class="fw-semibold">@(Model.Deal.OemInvoiceAmount?.ToString("C") ?? "N/A")</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase Information -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="fas fa-info-circle"></i> Phase 4 Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Invoice Type:</strong> OEM Invoice</p>
+                    <p class="mb-2"><strong>From:</strong> OEM (@Model.Deal.Oem.OemName)</p>
+                    <p class="mb-2"><strong>To:</strong> Canarys</p>
+                    <p class="mb-0 text-muted small">
+                        This invoice will be received from the OEM for the product/service provided.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Phase 1 Reference -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="fas fa-link"></i> Related Phase 1 Invoice
+                    </h6>
+                </div>
+                <div class="card-body">
+                    @{
+                        var phase1Invoice = ViewBag.Phase1Invoice as License_Tracking.Models.CbmsInvoice;
+                    }
+                    @if (phase1Invoice != null)
+                    {
+                        <p class="mb-2">
+                            <strong>Customer Invoice:</strong>
+                            <a asp-action="Details" asp-route-id="@phase1Invoice.InvoiceId" class="text-decoration-none">
+                                @phase1Invoice.InvoiceNumber
+                            </a>
+                        </p>
+                        <p class="mb-2"><strong>Amount:</strong> @phase1Invoice.TotalAmount.ToString("C")</p>
+                        <p class="mb-0"><strong>Status:</strong>
+                            <span class="badge bg-@(phase1Invoice.PaymentStatus == "Paid" ? "success" : "secondary")">
+                                @phase1Invoice.PaymentStatus
+                            </span>
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No Phase 1 customer invoice found for this deal.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

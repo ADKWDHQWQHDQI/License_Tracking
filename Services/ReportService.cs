@@ -216,12 +216,17 @@ namespace License_Tracking.Services
 
         public async Task<Report> GenerateFinancialSummaryReport(DateTime? startDate, DateTime? endDate, string period = "Monthly")
         {
-            var query = _context.Invoices.AsQueryable();
+            var query = _context.CbmsInvoices.AsQueryable();
             if (startDate.HasValue) query = query.Where(i => i.DueDate >= startDate.Value);
             if (endDate.HasValue) query = query.Where(i => i.DueDate <= endDate.Value);
 
             var summary = await query
-                .GroupBy(i => new { Year = i.DueDate.Year, Period = period == "Monthly" ? i.DueDate.Month : (period == "Quarterly" ? (i.DueDate.Month - 1) / 3 + 1 : 1) })
+                .Where(i => i.DueDate.HasValue) // Filter out null dates
+                .GroupBy(i => new
+                {
+                    Year = i.DueDate!.Value.Year,
+                    Period = period == "Monthly" ? i.DueDate!.Value.Month : (period == "Quarterly" ? (i.DueDate!.Value.Month - 1) / 3 + 1 : 1)
+                })
                 .Select(g => new
                 {
                     Period = $"{g.Key.Year}-{(period == "Monthly" ? g.Key.Period.ToString("00") : period == "Quarterly" ? $"Q{g.Key.Period}" : "Year")}",

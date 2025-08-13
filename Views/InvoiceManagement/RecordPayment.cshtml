@@ -1,0 +1,206 @@
+@model License_Tracking.ViewModels.PaymentRecordViewModel
+
+@{
+    ViewData["Title"] = $"Record Payment - {Model.Invoice.InvoiceNumber}";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a asp-action="Index">Invoice Management</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Details"
+                            asp-route-id="@Model.Invoice.InvoiceId">@Model.Invoice.InvoiceNumber</a></li>
+                    <li class="breadcrumb-item active">Record Payment</li>
+                </ol>
+            </nav>
+            <h3 class="mb-0">Record Payment</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="fas fa-money-bill"></i> Payment Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="RecordPayment" method="post">
+                        <input type="hidden" asp-for="InvoiceId" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="PaymentAmount" class="form-label fw-semibold">Payment Amount</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input asp-for="PaymentAmount" type="number" step="0.01" class="form-control"
+                                            max="@Model.OutstandingAmount" />
+                                    </div>
+                                    <div class="form-text">Maximum: @Model.OutstandingAmount.ToString("C")</div>
+                                    <span asp-validation-for="PaymentAmount" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="PaymentDate" class="form-label fw-semibold">Payment Date</label>
+                                    <input asp-for="PaymentDate" type="date" class="form-control" />
+                                    <span asp-validation-for="PaymentDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="PaymentMethod" class="form-label fw-semibold">Payment Method</label>
+                                    <select asp-for="PaymentMethod" class="form-select">
+                                        <option value="">Select payment method</option>
+                                        <option value="Bank Transfer">Bank Transfer</option>
+                                        <option value="Check">Check</option>
+                                        <option value="Credit Card">Credit Card</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Wire Transfer">Wire Transfer</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ReferenceNumber" class="form-label fw-semibold">Reference Number
+                                        (Optional)</label>
+                                    <input asp-for="ReferenceNumber" class="form-control"
+                                        placeholder="Transaction ID, Check number, etc." />
+                                    <span asp-validation-for="ReferenceNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label fw-semibold">Notes (Optional)</label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"
+                                placeholder="Any additional notes about this payment"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Record Payment
+                            </button>
+                            <a asp-action="Details" asp-route-id="@Model.InvoiceId" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Invoice Summary -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="fas fa-file-invoice"></i> Invoice Summary
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Invoice Number</label>
+                        <div class="fw-semibold">@Model.Invoice.InvoiceNumber</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Deal</label>
+                        <div class="fw-semibold">@Model.Invoice.Deal?.DealName</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Business Phase</label>
+                        <div>
+                            @if (Model.Invoice.BusinessPhase == 1)
+                            {
+                                <span class="badge bg-primary">Phase 1 - Customer</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Phase 4 - OEM</span>
+                            }
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Total Invoice Amount</label>
+                        <div class="fw-bold fs-5">@Model.Invoice.TotalAmount.ToString("C")</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Previously Paid</label>
+                        <div class="fw-semibold text-success">@((Model.Invoice.PaymentReceived ?? 0).ToString("C"))
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Outstanding Amount</label>
+                        <div class="fw-bold text-warning fs-5">@Model.OutstandingAmount.ToString("C")</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Progress -->
+            @if ((Model.Invoice.PaymentReceived ?? 0) > 0)
+            {
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h6 class="mb-0 fw-semibold">
+                            <i class="fas fa-chart-pie"></i> Current Payment Progress
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        @{
+                            var currentPercentage = Math.Round(((Model.Invoice.PaymentReceived ?? 0) /
+                            Model.Invoice.TotalAmount) * 100, 1);
+                        }
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Current Progress</span>
+                                <span class="fw-semibold">@currentPercentage%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: @currentPercentage%"
+                                    aria-valuenow="@currentPercentage" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Auto-calculate full payment
+        document.addEventListener('DOMContentLoaded', function () {
+            const paymentInput = document.querySelector('#PaymentAmount');
+            const outstandingAmount = @Model.OutstandingAmount;
+
+            // Set default to outstanding amount
+            paymentInput.value = outstandingAmount.toFixed(2);
+
+            // Validate payment amount doesn't exceed outstanding
+            paymentInput.addEventListener('input', function () {
+                const value = parseFloat(this.value);
+                if (value > outstandingAmount) {
+                    this.value = outstandingAmount.toFixed(2);
+                }
+            });
+        });
+    </script>
+}

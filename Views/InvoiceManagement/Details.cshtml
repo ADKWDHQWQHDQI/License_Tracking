@@ -1,0 +1,221 @@
+@model License_Tracking.Models.CbmsInvoice
+
+@{
+    ViewData["Title"] = $"Invoice {Model.InvoiceNumber}";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-2">
+                            <li class="breadcrumb-item"><a asp-action="Index">Invoice Management</a></li>
+                            <li class="breadcrumb-item active">@Model.InvoiceNumber</li>
+                        </ol>
+                    </nav>
+                    <h3 class="mb-0">Invoice Details</h3>
+                </div>
+                <div>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                    @if (Model.PaymentStatus != "Paid")
+                    {
+                        <a asp-action="RecordPayment" asp-route-id="@Model.InvoiceId" class="btn btn-success">
+                            <i class="fas fa-money-bill"></i> Record Payment
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Information -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="fas fa-file-invoice"></i> Invoice Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Invoice Number</label>
+                                <div class="fw-semibold">@Model.InvoiceNumber</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Business Phase</label>
+                                <div>
+                                    @if (Model.BusinessPhase == 1)
+                                    {
+                                        <span class="badge bg-primary">Phase 1 - Customer Invoice</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">Phase 4 - OEM Invoice</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Invoice Date</label>
+                                <div class="fw-semibold">@Model.InvoiceDate.ToString("MMMM dd, yyyy")</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Due Date</label>
+                                <div class="fw-semibold">
+                                    @Model.DueDate?.ToString("MMMM dd, yyyy")
+                                    @if (Model.DueDate < DateTime.Today && Model.PaymentStatus != "Paid")
+                                    {
+                                        <span class="text-danger ms-2">
+                                            <i class="fas fa-exclamation-triangle"></i> Overdue
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Total Amount</label>
+                                <div class="fw-bold fs-5 text-primary">@Model.TotalAmount.ToString("C")</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Payment Status</label>
+                                <div>
+                                    @switch (Model.PaymentStatus)
+                                    {
+                                        case "Paid":
+                                            <span class="badge bg-success fs-6">Paid</span>
+                                            break;
+                                        case "Partial":
+                                            <span class="badge bg-info fs-6">Partial Payment</span>
+                                            break;
+                                        case "Overdue":
+                                            <span class="badge bg-danger fs-6">Overdue</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary fs-6">@Model.PaymentStatus</span>
+                                            break;
+                                    }
+                                </div>
+                            </div>
+                            @if ((Model.PaymentReceived ?? 0) > 0)
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Amount Received</label>
+                                    <div class="fw-semibold text-success">@((Model.PaymentReceived ?? 0).ToString("C"))</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Outstanding Balance</label>
+                                    <div class="fw-semibold text-warning">@((Model.TotalAmount - (Model.PaymentReceived ?? 0)).ToString("C"))</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <hr>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Notes</label>
+                            <div class="text-muted">@Model.Notes</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Deal Information -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="fas fa-handshake"></i> Related Deal
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Deal Name</label>
+                        <div class="fw-semibold">
+                            <a asp-controller="Deals" asp-action="Details" asp-route-id="@Model.Deal?.DealId" class="text-decoration-none">
+                                @(Model.Deal?.DealName ?? "N/A")
+                            </a>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Product</label>
+                        <div>@(Model.Deal?.Product?.ProductName ?? "N/A")</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">
+                            @if (Model.BusinessPhase == 1)
+                            {
+                                <text>Customer</text>
+                            }
+                            else
+                            {
+                                <text>OEM</text>
+                            }
+                        </label>
+                        <div>
+                            @if (Model.BusinessPhase == 1)
+                            {
+                                @(Model.Deal?.Company?.CompanyName ?? "N/A")
+                            }
+                            else
+                            {
+                                @(Model.Deal?.Oem?.OemName ?? "N/A")
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Progress -->
+            @if ((Model.PaymentReceived ?? 0) > 0)
+            {
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h6 class="mb-0 fw-semibold">
+                            <i class="fas fa-chart-pie"></i> Payment Progress
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        @{
+                            var paymentPercentage = Math.Round(((Model.PaymentReceived ?? 0) / Model.TotalAmount) * 100, 1);
+                        }
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Payment Progress</span>
+                                <span class="fw-semibold">@paymentPercentage%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: @paymentPercentage%" 
+                                     aria-valuenow="@paymentPercentage" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="text-success fw-semibold">@((Model.PaymentReceived ?? 0).ToString("C"))</div>
+                                <div class="text-muted small">Received</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-warning fw-semibold">@((Model.TotalAmount - (Model.PaymentReceived ?? 0)).ToString("C"))</div>
+                                <div class="text-muted small">Outstanding</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

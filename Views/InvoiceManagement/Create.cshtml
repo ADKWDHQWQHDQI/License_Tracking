@@ -1,0 +1,240 @@
+@model License_Tracking.ViewModels.InvoiceGenerationViewModel
+
+@{
+    ViewData["Title"] = $"Create {Model.InvoiceType?.Replace("_", " ")} Invoice";
+    var isCustomerInvoice = Model.InvoiceType == "Customer_To_Canarys";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="text-primary">
+                        <i class="fas fa-plus"></i> @ViewData["Title"]
+                    </h2>
+                    <p class="text-muted mb-0">
+                        @if (isCustomerInvoice)
+                        {
+                            <span>Create invoice to send to customer for payment</span>
+                        }
+                        else
+                        {
+                            <span>Record invoice received from OEM for settlement</span>
+                        }
+                    </p>
+                </div>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Invoices
+                </a>
+            </div>
+
+            @if (ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert alert-danger">
+                    <asp-validation-summary />
+                </div>
+            }
+
+            <!-- Main Form -->
+            <form asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <input asp-for="DealId" type="hidden" />
+                <input asp-for="InvoiceType" type="hidden" />
+                <input asp-for="BusinessPhase" type="hidden" />
+
+                <div class="row">
+                    <!-- Left Column - Form Fields -->
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-file-invoice-dollar"></i> Invoice Details
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Invoice Number -->
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="InvoiceNumber" class="form-label fw-bold">
+                                            Invoice Number <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="InvoiceNumber" class="form-control" readonly style="background-color: #f8f9fa;" />
+                                        <span asp-validation-for="InvoiceNumber" class="text-danger"></span>
+                                    </div>
+
+                                    <!-- Invoice Type Display -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Invoice Type</label>
+                                        <input value="@Model.InvoiceType?.Replace("_", " ")" class="form-control" readonly style="background-color: #f8f9fa;" />
+                                    </div>
+
+                                    <!-- Invoice Date -->
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="InvoiceDate" class="form-label fw-bold">
+                                            Invoice Date <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="InvoiceDate" type="date" class="form-control" required />
+                                        <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+                                    </div>
+
+                                    <!-- Due Date -->
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="DueDate" class="form-label fw-bold">
+                                            Due Date <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="DueDate" type="date" class="form-control" required />
+                                        <span asp-validation-for="DueDate" class="text-danger"></span>
+                                    </div>
+
+                                    <!-- Total Amount -->
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="TotalAmount" class="form-label fw-bold">
+                                            Total Amount <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">₹</span>
+                                            <input asp-for="TotalAmount" type="number" step="0.01" class="form-control" required />
+                                        </div>
+                                        <span asp-validation-for="TotalAmount" class="text-danger"></span>
+                                    </div>
+
+                                    <!-- Attachment -->
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="AttachmentFile" class="form-label fw-bold">
+                                            @(isCustomerInvoice ? "Invoice Document" : "OEM Invoice Document")
+                                        </label>
+                                        <input asp-for="AttachmentFile" type="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png" />
+                                        <div class="form-text">
+                                            Supported formats: PDF, DOC, DOCX, JPG, PNG (Max 5MB)
+                                        </div>
+                                    </div>
+
+                                    <!-- Description -->
+                                    <div class="col-12 mb-3">
+                                        <label asp-for="Description" class="form-label fw-bold">Description</label>
+                                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter invoice description or notes..."></textarea>
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Deal Summary -->
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-handshake"></i> Deal Information
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                @if (Model.Deal != null)
+                                {
+                                    <div class="mb-3">
+                                        <strong>Deal Name:</strong><br />
+                                        <span class="text-primary">@Model.DealName</span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <strong>Customer:</strong><br />
+                                        <span>@Model.CustomerName</span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <strong>OEM Partner:</strong><br />
+                                        <span>@Model.OemName</span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <strong>Product:</strong><br />
+                                        <span>@Model.ProductName</span>
+                                    </div>
+
+                                    @if (isCustomerInvoice)
+                                    {
+                                        <div class="mb-3">
+                                            <strong>Deal Amount:</strong><br />
+                                            <span class="text-success">₹@(Model.Deal.CustomerInvoiceAmount?.ToString("N2") ?? "0.00")</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="mb-3">
+                                            <strong>OEM Amount:</strong><br />
+                                            <span class="text-info">₹@(Model.Deal.OemInvoiceAmount?.ToString("N2") ?? Model.Deal.OemQuoteAmount?.ToString("N2") ?? "0.00")</span>
+                                        </div>
+                                    }
+
+                                    <div class="mb-3">
+                                        <strong>Current Phase:</strong><br />
+                                        <span class="badge bg-info">@Model.Deal.CurrentPhase</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="card shadow-sm mt-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-lightning-bolt"></i> Quick Actions
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save"></i> Create Invoice
+                                    </button>
+                                    <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-calculate due date when invoice date changes
+        document.getElementById('InvoiceDate').addEventListener('change', function() {
+            const invoiceDate = new Date(this.value);
+            const dueDate = new Date(invoiceDate);
+            dueDate.setDate(dueDate.getDate() + 30); // Add 30 days
+            
+            document.getElementById('DueDate').value = dueDate.toISOString().split('T')[0];
+        });
+
+        // Form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+
+        // File size validation
+        document.getElementById('AttachmentFile').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file && file.size > 5 * 1024 * 1024) { // 5MB
+                alert('File size must be less than 5MB');
+                this.value = '';
+            }
+        });
+    </script>
+}

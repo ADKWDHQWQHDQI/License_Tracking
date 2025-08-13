@@ -11,7 +11,7 @@ namespace License_Tracking.Data
         // Existing DbSets (Legacy - being phased out)
         public DbSet<CustomerPo> CustomerPOs { get; set; }
         public DbSet<OemPo> OemPOs { get; set; }
-        public DbSet<Invoice> Invoices { get; set; }
+        // Invoice DbSet removed - using CbmsInvoices instead
         public DbSet<Alert> Alerts { get; set; }
         public DbSet<AlertConfiguration> AlertConfigurations { get; set; }
         public DbSet<Renewal> Renewals { get; set; }
@@ -48,14 +48,13 @@ namespace License_Tracking.Data
                 .Property(op => op.PoAmount)
                 .HasPrecision(18, 2);
 
-            // Configure decimal precision for Invoice
-            builder.Entity<Invoice>()
+            // Configure decimal precision for CbmsInvoice (Invoice model removed - consolidated)
+            builder.Entity<CbmsInvoice>()
                 .Property(i => i.Amount)
                 .HasPrecision(18, 2);
 
-            builder.Entity<Invoice>()
-                .Property(i => i.AmountReceived)
-                .HasPrecision(18, 2);
+            // Note: AmountReceived field doesn't exist in CbmsInvoice model
+            // Payment tracking is handled through separate Payment entities
 
             builder.Entity<Payment>()
                 .Property(p => p.Amount)
@@ -124,7 +123,8 @@ namespace License_Tracking.Data
                 .HasForeignKey(op => op.DealId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<Invoice>()
+            // CbmsInvoice relationship configuration (Invoice model removed - consolidated)
+            builder.Entity<CbmsInvoice>()
                 .HasOne(i => i.Deal)
                 .WithMany()
                 .HasForeignKey(i => i.DealId)
@@ -137,7 +137,7 @@ namespace License_Tracking.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Payment>()
-                .HasOne(p => p.Invoice)
+                .HasOne(p => p.CbmsInvoice)
                 .WithMany()
                 .HasForeignKey(p => p.InvoiceId)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -191,14 +191,14 @@ namespace License_Tracking.Data
                 .HasIndex(a => a.Status)
                 .HasDatabaseName("IX_Alert_Status");
 
-
-            builder.Entity<Invoice>()
+            // CbmsInvoice indexes (Invoice model removed - consolidated)
+            builder.Entity<CbmsInvoice>()
                 .HasIndex(i => i.InvoiceType)
-                .HasDatabaseName("IX_Invoice_InvoiceType");
+                .HasDatabaseName("IX_CbmsInvoice_InvoiceType");
 
-            builder.Entity<Invoice>()
+            builder.Entity<CbmsInvoice>()
                 .HasIndex(i => i.PaymentStatus)
-                .HasDatabaseName("IX_Invoice_PaymentStatus");
+                .HasDatabaseName("IX_CbmsInvoice_PaymentStatus");
 
             // CBMS (B2B2B CRM) Model Configurations
 
@@ -335,28 +335,9 @@ namespace License_Tracking.Data
                 .HasIndex(c => c.Email)
                 .HasDatabaseName("IX_ContactPerson_Email");
 
-            // Configure Activity relationships to prevent cascade cycles
-            builder.Entity<Activity>()
-                .HasOne<Deal>()
-                .WithMany()
-                .HasForeignKey(a => a.RelatedEntityId)
-                .HasPrincipalKey(d => d.DealId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            builder.Entity<Activity>()
-                .HasOne<Company>()
-                .WithMany()
-                .HasForeignKey(a => a.RelatedEntityId)
-                .HasPrincipalKey(c => c.CompanyId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            builder.Entity<Activity>()
-                .HasOne<ContactPerson>()
-                .WithMany()
-                .HasForeignKey(a => a.RelatedEntityId)
-                .HasPrincipalKey(cp => cp.ContactId)
-                .OnDelete(DeleteBehavior.NoAction);
-
+            // Configure Activity indexes (removed problematic FK constraints)
+            // Note: Activities use polymorphic relationships via RelatedEntityType + RelatedEntityId
+            // No explicit foreign keys are configured to avoid conflicts
             builder.Entity<Activity>()
                 .HasIndex(a => new { a.RelatedEntityType, a.RelatedEntityId })
                 .HasDatabaseName("IX_Activity_RelatedEntity");

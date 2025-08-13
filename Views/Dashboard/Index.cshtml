@@ -86,10 +86,10 @@
                         @if (User.IsInRole("Admin") || User.IsInRole("Finance"))
                         {
                             <div class="col-lg-2 col-md-3 col-sm-6">
-                                <a asp-controller="Billing" asp-action="GenerateInvoice"
+                                <a asp-controller="InvoiceManagement" asp-action="Index"
                                     class="btn btn-success w-100 d-flex flex-column align-items-center py-2">
                                     <i class="fas fa-file-invoice-dollar fa-lg mb-1"></i>
-                                    <small>Generate Invoice</small>
+                                    <small>Invoice Management</small>
                                 </a>
                             </div>
                         }

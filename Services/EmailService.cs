@@ -11,7 +11,7 @@ namespace License_Tracking.Services
     {
         Task SendRenewalAlertAsync(Alert alert);
         Task SendPipelineAlertAsync(Alert alert);
-        Task SendPaymentReminderAsync(string recipientEmail, string recipientName, Invoice invoice);
+        Task SendPaymentReminderAsync(string recipientEmail, string recipientName, CbmsInvoice invoice);
         Task SendBulkAlertsAsync(List<Alert> alerts);
     }
 
@@ -98,7 +98,7 @@ namespace License_Tracking.Services
             }
         }
 
-        public async Task SendPaymentReminderAsync(string recipientEmail, string recipientName, Invoice invoice)
+        public async Task SendPaymentReminderAsync(string recipientEmail, string recipientName, CbmsInvoice invoice)
         {
             try
             {
@@ -378,7 +378,7 @@ This is an automated message from License Tracking System.
             ";
         }
 
-        private string GeneratePaymentReminderEmailBody(Invoice invoice)
+        private string GeneratePaymentReminderEmailBody(CbmsInvoice invoice)
         {
             return $@"
                 <html>
@@ -425,7 +425,7 @@ This is an automated message from License Tracking System.
                 </html>";
         }
 
-        private string GeneratePaymentReminderTextBody(Invoice invoice)
+        private string GeneratePaymentReminderTextBody(CbmsInvoice invoice)
         {
             return $@"
 PAYMENT REMINDER

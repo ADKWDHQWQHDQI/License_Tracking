@@ -110,14 +110,15 @@ namespace License_Tracking.Models
             set => ScheduledDate = value;
         }
 
-        // Navigation Properties - can be related to Company, Deal, or ContactPerson
-        [ForeignKey("EntityId")]
+        // Navigation Properties - Polymorphic relationships (no explicit ForeignKey)
+        // These are populated manually based on RelatedEntityType and RelatedEntityId
+        [NotMapped]
         public virtual Deal? Deal { get; set; }
 
-        [ForeignKey("EntityId")]
+        [NotMapped]
         public virtual Company? Company { get; set; }
 
-        [ForeignKey("EntityId")]
+        [NotMapped]
         public virtual ContactPerson? ContactPerson { get; set; }
     }
 }

@@ -2,11 +2,11 @@
 @{
     ViewData["Title"] = "Financial Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    
+
     decimal totalRevenue = 0;
     decimal totalMargin = 0;
     int totalLicenses = 0;
-    
+
     if (Model != null)
     {
         totalRevenue = Model.Sum(x => (decimal)x.TotalAmount);
@@ -21,8 +21,8 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2><i class="fas fa-dollar-sign"></i> Financial Dashboard</h2>
                 <div class="btn-group" role="group">
-                    <a href="@Url.Action("Index", "Billing")" class="btn btn-outline-primary">
-                        <i class="fas fa-file-invoice"></i> Billing Management
+                    <a href="@Url.Action("Index", "InvoiceManagement")" class="btn btn-outline-primary">
+                        <i class="fas fa-file-invoice"></i> Invoice Management
                     </a>
                     <a href="@Url.Action("Index", "Report")" class="btn btn-outline-success">
                         <i class="fas fa-chart-line"></i> Financial Reports
@@ -87,7 +87,8 @@
                 <div class="card-body text-center">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="card-title">@((totalMargin / (totalRevenue > 0 ? totalRevenue : 1)) * 100).ToString("F1")%</h3>
+                            <h3 class="card-title">@((totalMargin / (totalRevenue > 0 ? totalRevenue : 1)) *
+                                                                100).ToString("F1")%</h3>
                             <p class="card-text">Average Margin</p>
                         </div>
                         <div class="align-self-center">
@@ -181,7 +182,8 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-3 col-md-6 mb-3">
-                            <a href="@Url.Action("Index", "Billing")" class="btn btn-primary btn-lg btn-block">
+                            <a href="@Url.Action("Index", "InvoiceManagement")"
+                                class="btn btn-primary btn-lg btn-block">
                                 <i class="fas fa-file-invoice"></i><br>
                                 Manage Invoices
                             </a>
@@ -211,50 +213,50 @@
     <script>
         // Payment Status Chart
         @if (Model != null && Model.Any())
-        {
-            <text>
-            const paymentCtx = document.getElementById('paymentStatusChart').getContext('2d');
-            const paymentChart = new Chart(paymentCtx, {
-                type: 'bar',
-                data: {
-                    labels: [@Html.Raw(string.Join(",", Model.Select(x => $"'{x.Status}'")))],
+            {
+                <text>
+                    const paymentCtx = document.getElementById('paymentStatusChart').getContext('2d');
+                    const paymentChart = new Chart(paymentCtx, {
+                        type: 'bar',
+                    data: {
+                        labels: [@Html.Raw(string.Join(",", Model.Select(x => $"'{x.Status}'")))],
                     datasets: [{
                         label: 'Total Amount',
-                        data: [@Html.Raw(string.Join(",", Model.Select(x => x.TotalAmount)))],
-                        backgroundColor: [
-                            @Html.Raw(string.Join(",", Model.Select(x => 
-                                x.Status == "Completed" ? "'#28a745'" :
-                                x.Status == "Pending" ? "'#ffc107'" :
-                                x.Status == "Overdue" ? "'#dc3545'" : "'#6c757d'")))
-                        ],
-                        borderWidth: 1
+                    data: [@Html.Raw(string.Join(",", Model.Select(x => x.TotalAmount)))],
+                    backgroundColor: [
+                                    @Html.Raw(string.Join(",", Model.Select(x =>
+                                        x.Status == "Completed" ? "'#28a745'" :
+                                        x.Status == "Pending" ? "'#ffc107'" :
+                                        x.Status == "Overdue" ? "'#dc3545'" : "'#6c757d'")))
+            ],
+            borderWidth: 1
                     }]
                 },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value, index, values) {
+            options: {
+                responsive: true,
+            scales: {
+                y: {
+                beginAtZero: true,
+            ticks: {
+                callback: function(value, index, values) {
                                     return '$' + value.toLocaleString('en-US', {
-                                        minimumFractionDigits: 0,
-                                        maximumFractionDigits: 0
+                minimumFractionDigits: 0,
+            maximumFractionDigits: 0
                                     });
                                 }
                             }
                         }
                     },
-                    plugins: {
-                        legend: {
-                            display: false
+            plugins: {
+                legend: {
+                display: false
                         },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
+            tooltip: {
+                callbacks: {
+                label: function(context) {
                                     return 'Amount: $' + context.parsed.y.toLocaleString('en-US', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
+                minimumFractionDigits: 2,
+            maximumFractionDigits: 2
                                     });
                                 }
                             }
@@ -262,7 +264,7 @@
                     }
                 }
             });
-            </text>
+        </text>
         }
     </script>
 }

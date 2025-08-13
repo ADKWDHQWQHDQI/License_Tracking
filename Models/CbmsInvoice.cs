@@ -76,6 +76,18 @@ namespace License_Tracking.Models
         [StringLength(100)]
         public string? CreatedBy { get; set; }
 
+        public DateTime? ModifiedDate { get; set; }
+
+        [StringLength(100)]
+        public string? ModifiedBy { get; set; }
+
+        // Attachment properties
+        [StringLength(500)]
+        public string? AttachmentPath { get; set; }
+
+        [StringLength(255)]
+        public string? AttachmentFileName { get; set; }
+
         // Navigation Properties
         [ForeignKey("DealId")]
         public virtual Deal Deal { get; set; } = null!;

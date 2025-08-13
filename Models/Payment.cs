@@ -21,6 +21,6 @@ namespace License_Tracking.Models
         [StringLength(200)]
         public string Remarks { get; set; }
 
-        public Invoice Invoice { get; set; }
+        public CbmsInvoice CbmsInvoice { get; set; }
     }
 }

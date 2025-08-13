@@ -30,9 +30,18 @@
                     <form method="get" asp-action="AgingSummary">
                         <div class="input-group">
                             <select name="invoiceType" class="form-select">
-                                @foreach (var option in ViewBag.InvoiceTypes as SelectList)
+                                @if (ViewBag.InvoiceTypes != null)
                                 {
-                                    <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+                                    @foreach (var option in ViewBag.InvoiceTypes as SelectList)
+                                    {
+                                        <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="all">All Invoice Types</option>
+                                    <option value="Customer_To_Canarys">Customer Invoices</option>
+                                    <option value="OEM_To_Canarys">OEM Invoices</option>
                                 }
                             </select>
                             <button type="submit" class="btn btn-outline-primary">
