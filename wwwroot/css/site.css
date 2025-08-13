@@ -1552,3 +1552,41 @@ input[list]::-webkit-calendar-picker-indicator {
         font-size: 0.9rem;
     }
 }
+
+/* Additional Bigin.com-inspired color classes */
+.text-purple {
+    color: #8b5cf6 !important;
+}
+
+.bg-purple {
+    background-color: #8b5cf6 !important;
+}
+
+.bg-orange {
+    background-color: #f97316 !important;
+}
+
+.text-orange {
+    color: #f97316 !important;
+}
+
+.badge.bg-orange {
+    background-color: #f97316 !important;
+    color: white !important;
+}
+
+/* Bigin.com gradient utility */
+.bigin-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* Enterprise dashboard spacing */
+.dashboard-spacing {
+    padding: 2rem 0;
+}
+
+/* Animation delays for dashboard cards */
+.animate-delay-1 { animation-delay: 0.1s; }
+.animate-delay-2 { animation-delay: 0.2s; }
+.animate-delay-3 { animation-delay: 0.3s; }
+.animate-delay-4 { animation-delay: 0.4s; }

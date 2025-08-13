@@ -11,6 +11,8 @@ namespace License_Tracking.ViewModels
         // CBMS Key Metrics
         public int TotalActiveDeals { get; set; }
         public int TotalCustomers { get; set; }
+        public int TotalCompanies { get; set; } // Added for new dashboard
+        public int TotalDeals { get; set; } // Added for new dashboard
         public int TotalOEMs { get; set; }
         public decimal TotalPipelineValue { get; set; }
         public decimal MonthlyRevenue { get; set; }
@@ -22,6 +24,8 @@ namespace License_Tracking.ViewModels
         public decimal TotalRevenue { get; set; }
         public decimal TotalMargin { get; set; }
         public int PendingPayments { get; set; }
+        public int PendingInvoices { get; set; } // Added for new dashboard
+        public int ActiveCustomers { get; set; } // Added for new dashboard
         public int TotalUsers { get; set; }
 
         // Deal Stage Distribution

@@ -600,6 +600,226 @@ namespace License_Tracking.Controllers
             return Json(deals);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> BillingDashboard()
+        {
+            var viewModel = new BillingDashboardViewModel();
+
+            // Get total counts by invoice type
+            viewModel.TotalCustomerInvoices = await _context.CbmsInvoices
+                .CountAsync(i => i.InvoiceType == "Customer_To_Canarys");
+
+            viewModel.TotalOemInvoices = await _context.CbmsInvoices
+                .CountAsync(i => i.InvoiceType == "OEM_To_Canarys");
+
+            // Get pending amounts (unpaid invoices)
+            viewModel.PendingCustomerAmount = await _context.CbmsInvoices
+                .Where(i => i.InvoiceType == "Customer_To_Canarys" && i.PaymentStatus != "Paid")
+                .SumAsync(i => i.TotalAmount);
+
+            viewModel.PendingOemAmount = await _context.CbmsInvoices
+                .Where(i => i.InvoiceType == "OEM_To_Canarys" && i.PaymentStatus != "Paid")
+                .SumAsync(i => i.TotalAmount);
+
+            // Get overdue counts (invoices past due date)
+            var today = DateTime.Today;
+            viewModel.OverdueCustomerInvoices = await _context.CbmsInvoices
+                .CountAsync(i => i.InvoiceType == "Customer_To_Canarys" &&
+                               i.DueDate < today &&
+                               i.PaymentStatus != "Paid");
+
+            viewModel.OverdueOemInvoices = await _context.CbmsInvoices
+                .CountAsync(i => i.InvoiceType == "OEM_To_Canarys" &&
+                               i.DueDate < today &&
+                               i.PaymentStatus != "Paid");
+
+            // Get total revenue (paid invoices)
+            viewModel.CustomerPaidAmount = await _context.CbmsInvoices
+                .Where(i => i.InvoiceType == "Customer_To_Canarys" && i.PaymentStatus == "Paid")
+                .SumAsync(i => i.TotalAmount);
+
+            viewModel.OemPaidAmount = await _context.CbmsInvoices
+                .Where(i => i.InvoiceType == "OEM_To_Canarys" && i.PaymentStatus == "Paid")
+                .SumAsync(i => i.TotalAmount);
+
+            viewModel.CustomerRevenue = viewModel.CustomerPaidAmount;
+            viewModel.OemRevenue = viewModel.OemPaidAmount;
+            viewModel.TotalRevenue = viewModel.CustomerRevenue + viewModel.OemRevenue;
+
+            // Get recent invoices (last 10)
+            var recentInvoices = await _context.CbmsInvoices
+                .Include(i => i.Deal)
+                .ThenInclude(d => d.Company)
+                .OrderByDescending(i => i.InvoiceDate)
+                .Take(10)
+                .Select(i => new RecentInvoiceViewModel
+                {
+                    Id = i.InvoiceId,
+                    InvoiceNumber = i.InvoiceNumber ?? "",
+                    InvoiceType = i.InvoiceType ?? "",
+                    Amount = i.TotalAmount,
+                    InvoiceDate = i.InvoiceDate,
+                    Status = i.PaymentStatus ?? "Pending",
+                    DealName = i.Deal != null ? i.Deal.DealName : "N/A"
+                })
+                .ToListAsync();
+
+            viewModel.RecentInvoices = recentInvoices;
+
+            // Get overdue invoices for quick view
+            var overdueInvoices = await _context.CbmsInvoices
+                .Include(i => i.Deal)
+                .ThenInclude(d => d.Company)
+                .Where(i => i.DueDate < today && i.PaymentStatus != "Paid")
+                .OrderBy(i => i.DueDate)
+                .Take(5)
+                .Select(i => new OverdueInvoiceViewModel
+                {
+                    Id = i.InvoiceId,
+                    InvoiceNumber = i.InvoiceNumber ?? "",
+                    InvoiceType = i.InvoiceType ?? "",
+                    Amount = i.TotalAmount,
+                    DueDate = i.DueDate ?? DateTime.Today,
+                    DaysOverdue = i.DueDate.HasValue ? (int)(today - i.DueDate.Value).TotalDays : 0,
+                    DealName = i.Deal != null ? i.Deal.DealName : "N/A"
+                })
+                .ToListAsync();
+
+            viewModel.OverdueInvoices = overdueInvoices;
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AgingSummary(string invoiceType = "all")
+        {
+            var viewModel = new AgingSummaryViewModel
+            {
+                InvoiceType = invoiceType
+            };
+
+            // Build base query
+            var query = _context.CbmsInvoices
+                .Include(i => i.Deal)
+                .ThenInclude(d => d.Company)
+                .Where(i => i.PaymentStatus != "Paid");
+
+            // Filter by invoice type if specified
+            if (invoiceType != "all")
+            {
+                query = query.Where(i => i.InvoiceType == invoiceType);
+            }
+
+            var today = DateTime.Today;
+            var invoices = await query.ToListAsync();
+
+            // Calculate aging buckets
+            foreach (var invoice in invoices)
+            {
+                var daysOverdue = invoice.DueDate.HasValue ? (today - invoice.DueDate.Value).Days : 0;
+                var amount = invoice.TotalAmount;
+
+                if (daysOverdue <= 0)
+                {
+                    viewModel.Current.Count++;
+                    viewModel.Current.Amount += amount;
+                }
+                else if (daysOverdue <= 30)
+                {
+                    viewModel.Days1To30.Count++;
+                    viewModel.Days1To30.Amount += amount;
+                }
+                else if (daysOverdue <= 60)
+                {
+                    viewModel.Days31To60.Count++;
+                    viewModel.Days31To60.Amount += amount;
+                }
+                else if (daysOverdue <= 90)
+                {
+                    viewModel.Days61To90.Count++;
+                    viewModel.Days61To90.Amount += amount;
+                }
+                else
+                {
+                    viewModel.Days90Plus.Count++;
+                    viewModel.Days90Plus.Amount += amount;
+                }
+
+                // Add to detailed list
+                var agingCategory = "";
+                var agingCssClass = "";
+
+                if (daysOverdue <= 0)
+                {
+                    agingCategory = "Current";
+                    agingCssClass = "success";
+                }
+                else if (daysOverdue <= 30)
+                {
+                    agingCategory = "1-30 Days";
+                    agingCssClass = "warning";
+                }
+                else if (daysOverdue <= 60)
+                {
+                    agingCategory = "31-60 Days";
+                    agingCssClass = "orange";
+                }
+                else if (daysOverdue <= 90)
+                {
+                    agingCategory = "61-90 Days";
+                    agingCssClass = "danger";
+                }
+                else
+                {
+                    agingCategory = "90+ Days";
+                    agingCssClass = "dark";
+                }
+
+                viewModel.InvoiceDetails.Add(new AgingInvoiceDetailViewModel
+                {
+                    Id = invoice.InvoiceId,
+                    InvoiceNumber = invoice.InvoiceNumber ?? "",
+                    InvoiceType = invoice.InvoiceType ?? "",
+                    DealName = invoice.Deal?.DealName ?? "N/A",
+                    Amount = amount,
+                    InvoiceDate = invoice.InvoiceDate,
+                    DueDate = invoice.DueDate ?? DateTime.Today,
+                    DaysOverdue = Math.Max(0, daysOverdue),
+                    Status = invoice.PaymentStatus ?? "Pending",
+                    AgingCategory = agingCategory,
+                    AgingCssClass = agingCssClass
+                });
+            }
+
+            // Calculate total outstanding
+            viewModel.TotalOutstandingAmount = invoices.Sum(i => i.TotalAmount);
+
+            // Calculate percentages
+            if (viewModel.TotalOutstandingAmount > 0)
+            {
+                viewModel.Current.Percentage = (viewModel.Current.Amount / viewModel.TotalOutstandingAmount) * 100;
+                viewModel.Days1To30.Percentage = (viewModel.Days1To30.Amount / viewModel.TotalOutstandingAmount) * 100;
+                viewModel.Days31To60.Percentage = (viewModel.Days31To60.Amount / viewModel.TotalOutstandingAmount) * 100;
+                viewModel.Days61To90.Percentage = (viewModel.Days61To90.Amount / viewModel.TotalOutstandingAmount) * 100;
+                viewModel.Days90Plus.Percentage = (viewModel.Days90Plus.Amount / viewModel.TotalOutstandingAmount) * 100;
+            }
+
+            // Sort invoice details by due date
+            viewModel.InvoiceDetails = viewModel.InvoiceDetails
+                .OrderBy(i => i.DueDate)
+                .ToList();
+
+            // Set up ViewBag for invoice type filter
+            ViewBag.InvoiceTypes = new SelectList(new[]
+            {
+                new { Value = "all", Text = "All Invoice Types" },
+                new { Value = "Customer_To_Canarys", Text = "Customer Invoices" },
+                new { Value = "OEM_To_Canarys", Text = "OEM Invoices" }
+            }, "Value", "Text", invoiceType);
+
+            return View(viewModel);
+        }
+
         private string GenerateInvoiceNumber(string invoiceType)
         {
             var prefix = invoiceType == "Customer_To_Canarys" ? "CUST" : "OEM";

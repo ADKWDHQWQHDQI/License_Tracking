@@ -41,27 +41,64 @@ namespace License_Tracking.Controllers
 
             var userRoles = await _userManager.GetRolesAsync(currentUser);
 
-            // Get all licenses, handling potential null values
-            var allLicenses = await _context.Deals
-                .Include(l => l.Product)
-                .Include(l => l.Oem)
-                .Include(l => l.Company)
-                .Where(l => l.Product != null && l.Oem != null && l.Company != null)
+            // Get all deals data
+            var allDeals = await _context.Deals
+                .Include(d => d.Product)
+                .Include(d => d.Oem)
+                .Include(d => d.Company)
+                .Where(d => d.Product != null && d.Oem != null && d.Company != null)
                 .ToListAsync();
+
+            // Get companies data
+            var totalCompanies = await _context.Companies.CountAsync();
+            var activeCustomers = await _context.Companies
+                .Where(c => _context.Deals.Any(d => d.CompanyId == c.CompanyId))
+                .CountAsync();
 
             // Get pipeline projects data
             var allPipelineProjects = await _context.ProjectPipelines.ToListAsync();
             var activePipelineProjects = allPipelineProjects.Where(p => p.ProjectStatus != "Lost" && p.ConvertedToLicenseId == null).ToList();
 
+            // Get invoice data
+            var pendingInvoices = await _context.CbmsInvoices
+                .CountAsync(i => i.PaymentStatus != "Paid");
+
+            // Get recent activities
+            var recentActivities = await _context.Activities
+                .OrderByDescending(a => a.CreatedDate)
+                .Take(6)
+                .ToListAsync();
+
+            // Calculate deal stage distribution
+            var dealsByStage = allDeals
+                .GroupBy(d => d.DealStage ?? "Unknown")
+                .ToDictionary(g => g.Key, g => g.Count());
+
             var dashboardData = new DashboardViewModel
             {
                 UserEmail = currentUser.Email ?? "Unknown",
                 UserRoles = userRoles.ToList(),
-                TotalLicenses = allLicenses.Count,
-                ActiveLicenses = allLicenses.Count(l => l.LicenseStatus == "Active"),
-                ExpiringLicenses = allLicenses.Count(l => l.ExpiryDate <= DateTime.Now.AddDays(30) && l.LicenseStatus == "Active"),
-                TotalRevenue = allLicenses.Sum(l => l.AmountReceived ?? 0),
-                TotalMargin = allLicenses.Sum(l => l.Margin), // Ensure Margin is computed correctly
+
+                // New dashboard metrics
+                TotalCompanies = totalCompanies,
+                TotalDeals = allDeals.Count,
+                TotalActiveDeals = allDeals.Count(d => d.DealStage == "Lead" || d.DealStage == "Quoted" || d.DealStage == "Negotiation"),
+                ActiveCustomers = activeCustomers,
+                PendingInvoices = pendingInvoices,
+
+                // Legacy metrics for backward compatibility
+                TotalLicenses = allDeals.Count,
+                ActiveLicenses = allDeals.Count(d => d.LicenseDeliveryStatus == "Active"),
+                ExpiringLicenses = allDeals.Count(d => d.LicenseEndDate <= DateTime.Now.AddDays(30) && d.LicenseDeliveryStatus == "Active"),
+                TotalRevenue = allDeals.Sum(d => d.AmountReceived ?? 0),
+                TotalMargin = allDeals.Sum(d => d.Margin),
+
+                // Deal stage distribution
+                DealsByStage = dealsByStage,
+
+                // Recent activities
+                RecentActivities = recentActivities,
+
                 // Pipeline data
                 TotalPipelineProjects = allPipelineProjects.Count,
                 ActivePipelineProjects = activePipelineProjects.Count,
@@ -71,7 +108,7 @@ namespace License_Tracking.Controllers
 
             if (User.IsInRole("Admin"))
             {
-                dashboardData.PendingPayments = allLicenses.Count(l => l.PaymentStatus != "Completed");
+                dashboardData.PendingPayments = allDeals.Count(d => d.PaymentStatus != "Completed");
                 dashboardData.TotalUsers = await _userManager.Users.CountAsync();
             }
 

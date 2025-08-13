@@ -517,5 +517,21 @@ namespace License_Tracking.Controllers
 
             return View(breakdown.OrderByDescending(r => r.TotalMargin).ToList());
         }
+
+        // Sales Report Action
+        [Authorize(Roles = "Admin,Management,Sales")]
+        public IActionResult SalesReport(DateTime? startDate = null, DateTime? endDate = null)
+        {
+            // Redirect to existing CustomerProfitability report which is essentially a sales report
+            return RedirectToAction("CustomerProfitability", new { startDate, endDate });
+        }
+
+        // Financial Report Action  
+        [Authorize(Roles = "Admin,Management,Finance")]
+        public IActionResult FinancialReport(DateTime? startDate = null, DateTime? endDate = null)
+        {
+            // Redirect to existing MarginBreakup report which is essentially a financial report
+            return RedirectToAction("MarginBreakup", new { startDate, endDate });
+        }
     }
 }
