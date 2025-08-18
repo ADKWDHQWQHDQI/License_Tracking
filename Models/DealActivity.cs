@@ -8,15 +8,15 @@ namespace License_Tracking.Models
         [Key]
         public int ActivityId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Deal ID is required")]
         public int DealId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Activity Type is required")]
         [StringLength(100)]
         [Display(Name = "Activity Type")]
         public string ActivityType { get; set; } = string.Empty; // "Comment", "Status_Change", "Assignment", "Invoice_Generated", "Payment_Received", "Email_Sent", "Call_Made", "Meeting_Scheduled"
 
-        [Required]
+        [Required(ErrorMessage = "Activity Title is required")]
         [StringLength(200)]
         [Display(Name = "Activity Title")]
         public string ActivityTitle { get; set; } = string.Empty;

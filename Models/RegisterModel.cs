@@ -4,15 +4,15 @@ namespace License_Tracking.Models
 {
     public class RegisterModel
     {
-        [Required]
+        [Required(ErrorMessage = "Email is required")]
         [EmailAddress]
         public required string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
         public required string Password { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Role is required")]
         [StringLength(50)]
         public required string Role { get; set; } // Admin, Sales, Finance, Operations, Management
     }

@@ -8,27 +8,27 @@ namespace License_Tracking.Models
         [Key]
         public int InvoiceId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Deal ID is required")]
         public int DealId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Invoice Type is required")]
         [StringLength(50)]
         [Display(Name = "Invoice Type")]
         public string InvoiceType { get; set; } = string.Empty; // "Customer_To_Canarys", "Canarys_To_OEM", "OEM_To_Canarys"
 
-        [Required]
+        [Required(ErrorMessage = "Invoice Number is required")]
         [StringLength(100)]
         [Display(Name = "Invoice Number")]
         public string InvoiceNumber { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "Invoice Date is required")]
         [Display(Name = "Invoice Date")]
         public DateTime InvoiceDate { get; set; } = DateTime.Now;
 
         [Display(Name = "Due Date")]
         public DateTime? DueDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Invoice Amount is required")]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
@@ -36,7 +36,7 @@ namespace License_Tracking.Models
         [Display(Name = "Tax Amount")]
         public decimal TaxAmount { get; set; } = 0;
 
-        [Required]
+        [Required(ErrorMessage = "Total Amount is required")]
         [Column(TypeName = "decimal(18,2)")]
         [Display(Name = "Total Amount")]
         public decimal TotalAmount { get; set; }
@@ -64,7 +64,7 @@ namespace License_Tracking.Models
         [Display(Name = "Reference")]
         public string? Reference { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Business Phase is required")]
         [Display(Name = "Business Phase")]
         public int BusinessPhase { get; set; } // 1, 2, 3, 4
 

@@ -4,6 +4,236 @@
     ViewData["Title"] = "OEM Reference Data Management";
 }
 
+@section Styles {
+    <style>
+        /* Bigin.com-inspired OEM Action Styles */
+        .bigin-quick-actions-container {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid #e8ecff;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .bigin-action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #f1f3f7;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bigin-action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .bigin-action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--action-color, #667eea) 0%, var(--action-color-light, #764ba2) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .bigin-action-card:hover::before {
+            opacity: 1;
+        }
+
+        .bigin-action-card.primary {
+            --action-color: #667eea;
+            --action-color-light: #764ba2;
+        }
+
+        .bigin-action-card.primary:hover {
+            border-color: #e0e6ff;
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+        }
+
+        .bigin-action-card.success {
+            --action-color: #28a745;
+            --action-color-light: #20c997;
+        }
+
+        .bigin-action-card.success:hover {
+            border-color: #d4edda;
+            background: linear-gradient(135deg, #f8fff9 0%, #fff 100%);
+        }
+
+        .bigin-action-card.info {
+            --action-color: #17a2b8;
+            --action-color-light: #20c997;
+        }
+
+        .bigin-action-card.info:hover {
+            border-color: #d1ecf1;
+            background: linear-gradient(135deg, #f7fcfd 0%, #fff 100%);
+        }
+
+        .bigin-action-card.warning {
+            --action-color: #ffc107;
+            --action-color-light: #ff9800;
+        }
+
+        .bigin-action-card.warning:hover {
+            border-color: #fff3cd;
+            background: linear-gradient(135deg, #fffcf5 0%, #fff 100%);
+        }
+
+        .bigin-action-card.purple {
+            --action-color: #6f42c1;
+            --action-color-light: #9c27b0;
+        }
+
+        .bigin-action-card.purple:hover {
+            border-color: #e2d9f3;
+            background: linear-gradient(135deg, #faf9fc 0%, #fff 100%);
+        }
+
+        .bigin-action-card.secondary {
+            --action-color: #6c757d;
+            --action-color-light: #495057;
+        }
+
+        .bigin-action-card.secondary:hover {
+            border-color: #e9ecef;
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+        }
+
+        .bigin-action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+            background: linear-gradient(135deg, var(--action-color, #667eea) 0%, var(--action-color-light, #764ba2) 100%);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .bigin-action-card:hover .bigin-action-icon {
+            transform: scale(1.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .bigin-action-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+            text-align: center;
+            color: #2d3748;
+        }
+
+        .bigin-action-description {
+            font-size: 0.75rem;
+            color: #718096;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .bigin-dropdown-card {
+            position: relative;
+        }
+
+        .bigin-dropdown-card .dropdown-toggle::after {
+            display: none;
+        }
+
+        .bigin-dropdown-icon {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--action-color, #667eea);
+            transition: all 0.3s ease;
+        }
+
+        .bigin-action-card:hover .bigin-dropdown-icon {
+            background: var(--action-color, #667eea);
+            color: white;
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+            margin-bottom: 0.25rem;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+            transform: translateX(4px);
+        }
+
+        .dropdown-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Soft background colors */
+        .bg-primary-soft {
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+
+        /* Animation for action cards */
+        .bigin-action-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stagger animation for multiple cards */
+        .bigin-action-card:nth-child(1) { animation-delay: 0.1s; }
+        .bigin-action-card:nth-child(2) { animation-delay: 0.2s; }
+        .bigin-action-card:nth-child(3) { animation-delay: 0.3s; }
+        .bigin-action-card:nth-child(4) { animation-delay: 0.4s; }
+        .bigin-action-card:nth-child(5) { animation-delay: 0.5s; }
+        .bigin-action-card:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+}
+
 <div class="container-fluid">
     <!-- Header Section -->
     <div class="row mb-4">
@@ -13,7 +243,6 @@
                     <h2 class="text-primary mb-1">
                         <i class="fas fa-building"></i> OEM Reference Data Management
                     </h2>
-                    <p class="text-muted mb-0">Phase 2 Week 4: Manage OEM partners with dropdown functionality, performance ratings & service level tracking</p>
                 </div>
                 <div class="d-flex gap-2">
                     <a asp-action="Create" class="btn btn-primary">
@@ -27,76 +256,106 @@
         </div>
     </div>
 
-    <!-- Quick Actions Bar -->
+    <!-- Enhanced Bigin-Style Quick Actions -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-bolt text-warning"></i> Quick OEM Actions
+            <div class="bigin-quick-actions-container">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="mb-1 text-dark fw-bold">
+                            <i class="fas fa-bolt text-warning me-2"></i>
+                            Quick OEM Actions
                         </h5>
-                        <small class="text-muted">Frequently used OEM management actions</small>
+                        <p class="text-muted mb-0 small">Streamlined OEM management tools and shortcuts</p>
+                    </div>
+                    <div class="badge bg-primary-soft text-primary rounded-pill px-3 py-2">
+                        <i class="fas fa-rocket me-1"></i>
+                        Power Tools
                     </div>
                 </div>
-                <div class="card-body py-3">
-                    <div class="row g-2">
-                        <div class="col-lg-2 col-md-3 col-sm-6">
-                            <a asp-action="Create" class="btn btn-primary w-100 d-flex flex-column align-items-center py-2">
-                                <i class="fas fa-building fa-lg mb-1"></i>
-                                <small>Add OEM</small>
-                            </a>
-                        </div>
-                        <div class="col-lg-2 col-md-3 col-sm-6">
-                            <a asp-controller="Products" asp-action="Create" class="btn btn-success w-100 d-flex flex-column align-items-center py-2">
-                                <i class="fas fa-box fa-lg mb-1"></i>
-                                <small>Add Product</small>
-                            </a>
-                        </div>
-                        <div class="col-lg-2 col-md-3 col-sm-6">
-                            <a asp-action="Import" class="btn btn-info w-100 d-flex flex-column align-items-center py-2">
-                                <i class="fas fa-upload fa-lg mb-1"></i>
-                                <small>Import OEMs</small>
-                            </a>
-                        </div>
-                        <div class="col-lg-2 col-md-3 col-sm-6">
-                            <div class="dropdown">
-                                <button class="btn btn-warning w-100 d-flex flex-column align-items-center py-2 dropdown-toggle" 
-                                        type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-download fa-lg mb-1"></i>
-                                    <small>Export Data</small>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="exportDropdown">
-                                    <li>
-                                        <a class="dropdown-item" asp-action="Export" asp-route-format="csv">
-                                            <i class="fas fa-file-csv text-success me-2"></i>Export CSV
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-action="Export" asp-route-format="excel">
-                                            <i class="fas fa-file-excel text-success me-2"></i>Export Excel
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-action="Export" asp-route-format="json">
-                                            <i class="fas fa-file-code text-info me-2"></i>Export JSON
-                                        </a>
-                                    </li>
-                                </ul>
+                
+                <div class="row g-3">
+                    <div class="col-lg-2 col-md-3 col-sm-6">
+                        <a asp-action="Create" class="bigin-action-card primary">
+                            <div class="bigin-action-icon">
+                                <i class="fas fa-building"></i>
                             </div>
-                        </div>
-                        <div class="col-lg-2 col-md-3 col-sm-6">
-                            <a asp-controller="Companies" asp-action="OemRelationships" class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-2">
-                                <i class="fas fa-handshake fa-lg mb-1"></i>
-                                <small>Relationships</small>
-                            </a>
-                        </div>
-                        <div class="col-lg-2 col-md-3 col-sm-6">
-                            <button class="btn btn-outline-secondary w-100 d-flex flex-column align-items-center py-2" onclick="toggleView()">
-                                <i class="fas fa-eye fa-lg mb-1"></i>
-                                <small>Toggle View</small>
+                            <div class="bigin-action-title">Add New OEM</div>
+                            <div class="bigin-action-description">Register new OEM partner</div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-lg-2 col-md-3 col-sm-6">
+                        <a asp-controller="Products" asp-action="Create" class="bigin-action-card success">
+                            <div class="bigin-action-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="bigin-action-title">Add Product</div>
+                            <div class="bigin-action-description">Create new product entry</div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-lg-2 col-md-3 col-sm-6">
+                        <a asp-action="Import" class="bigin-action-card info">
+                            <div class="bigin-action-icon">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <div class="bigin-action-title">Import OEMs</div>
+                            <div class="bigin-action-description">Bulk import from file</div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-lg-2 col-md-3 col-sm-6">
+                        <div class="bigin-dropdown-card">
+                            <button class="bigin-action-card warning dropdown-toggle w-100 border-0 bg-transparent" 
+                                    type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="bigin-action-icon">
+                                    <i class="fas fa-download"></i>
+                                </div>
+                                <div class="bigin-action-title">Export Data</div>
+                                <div class="bigin-action-description">Download OEM data</div>
+                                <div class="bigin-dropdown-icon">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
                             </button>
+                            <ul class="dropdown-menu shadow-lg" aria-labelledby="exportDropdown">
+                                <li>
+                                    <a class="dropdown-item" asp-action="Export" asp-route-format="csv">
+                                        <i class="fas fa-file-csv text-success me-2"></i>Export CSV
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-action="Export" asp-route-format="excel">
+                                        <i class="fas fa-file-excel text-success me-2"></i>Export Excel
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-action="Export" asp-route-format="json">
+                                        <i class="fas fa-file-code text-info me-2"></i>Export JSON
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
+                    </div>
+                    
+                    <div class="col-lg-2 col-md-3 col-sm-6">
+                        <a asp-controller="Companies" asp-action="OemRelationships" class="bigin-action-card purple">
+                            <div class="bigin-action-icon">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                            <div class="bigin-action-title">Relationships</div>
+                            <div class="bigin-action-description">Manage partnerships</div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-lg-2 col-md-3 col-sm-6">
+                        <button class="bigin-action-card secondary border-0 bg-transparent w-100" onclick="toggleView()">
+                            <div class="bigin-action-icon">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="bigin-action-title">Toggle View</div>
+                            <div class="bigin-action-description">Switch display mode</div>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -626,7 +885,7 @@
                     });
                 }, 1500);
             } else {
-                alert('Excel export feature will be implemented in the next phase.');
+                alert('Excel export feature will be implemented in the next versions.');
             }
         }
         
@@ -650,12 +909,64 @@
                     });
                 }, 2000);
             } else {
-                alert('PDF export feature will be implemented in the next phase.');
+                alert('PDF export feature will be implemented in the next versions.');
             }
         }
         
+        // Bigin-style interaction enhancements
+        function initializeBiginInteractions() {
+            // Add ripple effect to action cards
+            document.querySelectorAll('.bigin-action-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (!this.classList.contains('dropdown-toggle')) {
+                        const ripple = document.createElement('div');
+                        const rect = this.getBoundingClientRect();
+                        const size = Math.max(rect.width, rect.height);
+                        const x = e.clientX - rect.left - size / 2;
+                        const y = e.clientY - rect.top - size / 2;
+
+                        ripple.style.cssText = `
+                            position: absolute;
+                            width: ${size}px;
+                            height: ${size}px;
+                            left: ${x}px;
+                            top: ${y}px;
+                            background: rgba(102, 126, 234, 0.2);
+                            border-radius: 50%;
+                            transform: scale(0);
+                            animation: ripple 0.6s ease-out;
+                            pointer-events: none;
+                            z-index: 1;
+                        `;
+
+                        this.style.position = 'relative';
+                        this.style.overflow = 'hidden';
+                        this.appendChild(ripple);
+
+                        setTimeout(() => {
+                            ripple.remove();
+                        }, 600);
+                    }
+                });
+            });
+
+            // Enhanced hover animations for action icons
+            document.querySelectorAll('.bigin-action-icon').forEach(icon => {
+                icon.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1) rotate(5deg)';
+                });
+                
+                icon.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1) rotate(0deg)';
+                });
+            });
+        }
+
         // Initialize modern UI components
         $(document).ready(function() {
+            // Initialize Bigin interactions
+            initializeBiginInteractions();
+            
             // Initialize tooltips
             if (typeof bootstrap !== 'undefined') {
                 $('[data-bs-toggle="tooltip"]').tooltip();
@@ -667,7 +978,44 @@
                     $(this).addClass('border-primary');
                 }
             });
+
+            // Add staggered animation to action cards
+            $('.bigin-action-card').each(function(index) {
+                $(this).css('animation-delay', (index * 0.1) + 's');
+            });
+
+            // Enhanced notification for actions
+            $('.bigin-action-card:not(.dropdown-toggle)').on('click', function(e) {
+                const title = $(this).find('.bigin-action-title').text();
+                
+                // Show success toast
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'info',
+                        title: `Navigating to ${title}...`,
+                        showConfirmButton: false,
+                        timer: 1500,
+                        timerProgressBar: true,
+                        background: '#f8f9ff',
+                        color: '#667eea'
+                    });
+                }
+            });
         });
+
+        // CSS for ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @@keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
         
         // Enhanced hover effects for modern cards
         $('.hover-shadow').hover(

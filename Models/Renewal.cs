@@ -11,7 +11,7 @@ namespace License_Tracking.Models
         [Column("LicenseId")]
         public int DealId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Renewal Date is required")]
         public DateTime RenewalDate { get; set; }
 
         public decimal RenewalAmount { get; set; }

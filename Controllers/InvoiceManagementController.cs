@@ -8,6 +8,24 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace License_Tracking.Controllers
 {
+    /// <summary>
+    /// InvoiceManagementController handles comprehensive invoice management across all 4 CBMS business phases
+    /// 
+    /// Business Process Coverage:
+    /// - Phase 1: Customer → Canarys invoices (InvoiceType: "Customer_To_Canarys", BusinessPhase = 1)
+    /// - Phase 2: Canarys → OEM invoices (InvoiceType: "Canarys_To_OEM", BusinessPhase = 2)
+    /// - Phase 3: License delivery related invoicing (BusinessPhase = 3)  
+    /// - Phase 4: OEM → Canarys settlement invoices (InvoiceType: "OEM_To_Canarys", BusinessPhase = 4)
+    /// 
+    /// Integration with Procurement:
+    /// - RecordPayment handles comprehensive payment recording for CbmsInvoice entities
+    /// - Procurement.TrackPayment handles specific PurchaseOrder payment tracking (Phase 2 only)
+    /// - Both payment systems are necessary: RecordPayment for invoice settlements, TrackPayment for PO management
+    /// 
+    /// Entity Relationship:
+    /// - CbmsInvoice → Deal relationship enables cross-phase invoice tracking
+    /// - BusinessPhase field maps invoices to specific workflow phases
+    /// </summary>
     [Authorize]
     public class InvoiceManagementController : Controller
     {
@@ -476,6 +494,11 @@ namespace License_Tracking.Controllers
         {
             var invoice = await _context.CbmsInvoices
                 .Include(i => i.Deal)
+                    .ThenInclude(d => d!.Company)
+                .Include(i => i.Deal)
+                    .ThenInclude(d => d!.Product)
+                .Include(i => i.Deal)
+                    .ThenInclude(d => d!.Oem)
                 .FirstOrDefaultAsync(i => i.InvoiceId == id);
 
             if (invoice == null)
@@ -484,11 +507,19 @@ namespace License_Tracking.Controllers
                 return RedirectToAction("Index");
             }
 
+            // Check if invoice is fully paid
+            if (invoice.PaymentStatus == "Paid")
+            {
+                TempData["ErrorMessage"] = "This invoice has already been fully paid.";
+                return RedirectToAction("Details", new { id });
+            }
+
             var model = new PaymentRecordViewModel
             {
                 InvoiceId = invoice.InvoiceId,
                 Invoice = invoice,
-                OutstandingAmount = invoice.TotalAmount - (invoice.PaymentReceived ?? 0)
+                OutstandingAmount = invoice.TotalAmount - (invoice.PaymentReceived ?? 0),
+                PaymentDate = DateTime.Now
             };
 
             return View(model);
@@ -501,6 +532,22 @@ namespace License_Tracking.Controllers
         {
             if (!ModelState.IsValid)
             {
+                // Reload invoice data for view
+                var invoiceForView = await _context.CbmsInvoices
+                    .Include(i => i.Deal)
+                        .ThenInclude(d => d!.Company)
+                    .Include(i => i.Deal)
+                        .ThenInclude(d => d!.Product)
+                    .Include(i => i.Deal)
+                        .ThenInclude(d => d!.Oem)
+                    .FirstOrDefaultAsync(i => i.InvoiceId == model.InvoiceId);
+
+                if (invoiceForView != null)
+                {
+                    model.Invoice = invoiceForView;
+                    model.OutstandingAmount = invoiceForView.TotalAmount - (invoiceForView.PaymentReceived ?? 0);
+                }
+
                 return View(model);
             }
 
@@ -514,7 +561,51 @@ namespace License_Tracking.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Update payment information
+            // Validate payment amount doesn't exceed outstanding amount
+            var outstandingAmount = invoice.TotalAmount - (invoice.PaymentReceived ?? 0);
+            if (model.PaymentAmount > outstandingAmount)
+            {
+                ModelState.AddModelError("PaymentAmount", $"Payment amount cannot exceed outstanding amount of {outstandingAmount:C}");
+
+                // Reload invoice data for view
+                var invoiceForView = await _context.CbmsInvoices
+                    .Include(i => i.Deal)
+                        .ThenInclude(d => d!.Company)
+                    .Include(i => i.Deal)
+                        .ThenInclude(d => d!.Product)
+                    .Include(i => i.Deal)
+                        .ThenInclude(d => d!.Oem)
+                    .FirstOrDefaultAsync(i => i.InvoiceId == model.InvoiceId);
+
+                if (invoiceForView != null)
+                {
+                    model.Invoice = invoiceForView;
+                    model.OutstandingAmount = outstandingAmount;
+                }
+
+                return View(model);
+            }
+
+            // Validate payment amount is positive
+            if (model.PaymentAmount <= 0)
+            {
+                ModelState.AddModelError("PaymentAmount", "Payment amount must be greater than zero");
+                return View(model);
+            }
+
+            // Create payment record
+            var payment = new Payment
+            {
+                InvoiceId = model.InvoiceId,
+                Amount = model.PaymentAmount,
+                PaymentDate = model.PaymentDate,
+                PaymentMethod = model.PaymentMethod ?? "Bank Transfer",
+                Remarks = model.ReferenceNumber ?? ""
+            };
+
+            _context.Payments.Add(payment);
+
+            // Update invoice payment information
             invoice.PaymentReceived = (invoice.PaymentReceived ?? 0) + model.PaymentAmount;
             invoice.PaymentMethod = model.PaymentMethod;
             invoice.PaymentReference = model.ReferenceNumber;
@@ -548,7 +639,7 @@ namespace License_Tracking.Controllers
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = $"Payment of {model.PaymentAmount:C} recorded successfully!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Details", new { id = model.InvoiceId });
         }
 
         // Simple Delete Invoice
@@ -828,6 +919,21 @@ namespace License_Tracking.Controllers
                                                    i.InvoiceDate.Year == DateTime.Now.Year &&
                                                    i.InvoiceDate.Month == DateTime.Now.Month) + 1;
             return $"{prefix}-{date}-{count:D3}";
+        }
+
+        // Add method to get invoice metrics for summary
+        private async Task<(int TotalInvoices, decimal TotalRevenue, decimal PendingPayments, int OverdueInvoices)> GetInvoiceMetricsAsync()
+        {
+            var invoices = await _context.CbmsInvoices.ToListAsync();
+
+            var totalInvoices = invoices.Count;
+            var totalRevenue = invoices.Sum(i => i.TotalAmount);
+            var pendingPayments = invoices.Where(i => i.PaymentStatus != "Paid")
+                .Sum(i => i.TotalAmount - (i.PaymentReceived ?? 0));
+            var overdueInvoices = invoices.Count(i => i.DueDate.HasValue &&
+                i.DueDate.Value < DateTime.Now && i.PaymentStatus != "Paid");
+
+            return (totalInvoices, totalRevenue, pendingPayments, overdueInvoices);
         }
     }
 }

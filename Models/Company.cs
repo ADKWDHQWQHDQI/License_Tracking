@@ -8,7 +8,7 @@ namespace License_Tracking.Models
         [Key]
         public int CompanyId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Company Name is required")]
         [StringLength(200)]
         [Display(Name = "Company Name")]
         public string CompanyName { get; set; } = string.Empty;

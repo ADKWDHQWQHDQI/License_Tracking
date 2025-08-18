@@ -4,11 +4,11 @@ namespace License_Tracking.Models
 {
     public class LoginModel
     {
-        [Required]
+        [Required(ErrorMessage = "Email is required")]
         [EmailAddress]
         public required string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
         public required string Password { get; set; }
     }

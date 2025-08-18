@@ -8,10 +8,10 @@ namespace License_Tracking.Models
         [Key]
         public int ProductId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "OEM is required")]
         public int OemId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Product Name is required")]
         [StringLength(200)]
         [Display(Name = "Product Name")]
         public string ProductName { get; set; } = string.Empty;

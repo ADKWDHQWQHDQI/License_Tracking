@@ -9,10 +9,10 @@ namespace License_Tracking.Models
 
         public int InvoiceId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Payment Date is required")]
         public DateTime PaymentDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Payment Amount is required")]
         public decimal Amount { get; set; }
 
         [StringLength(50)]

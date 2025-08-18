@@ -7,24 +7,24 @@ namespace License_Tracking.Models
     {
         public int AlertConfigurationId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Configuration Name is required")]
         [StringLength(100)]
         public required string ConfigurationName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Alert Thresholds are required")]
         [StringLength(500)]
         public required string AlertThresholds { get; set; } // JSON string: "[45,30,15,7,3,1]"
 
-        [Required]
+        [Required(ErrorMessage = "Is Default setting is required")]
         public bool IsDefault { get; set; } = false;
 
-        [Required]
+        [Required(ErrorMessage = "Is Active setting is required")]
         public bool IsActive { get; set; } = true;
 
         [StringLength(1000)]
         public string? Description { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Created Date is required")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         public DateTime? ModifiedDate { get; set; }

@@ -8,27 +8,23 @@ namespace License_Tracking.Models
         [Key]
         public int PurchaseOrderId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Deal ID is required")]
         [Column("LicenseId")]
         public int DealId { get; set; }
 
-        [Required]
         [StringLength(50)]
         public string OemPoNumber { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "OEM PO Amount is required")]
         [DataType(DataType.Currency)]
         public decimal OemPoAmount { get; set; }
 
-        [Required]
         [StringLength(50)]
         public string PaymentStatus { get; set; } = "Pending";
 
-        [Required]
         [StringLength(50)]
         public string OemInvoiceNumber { get; set; } = string.Empty;
 
-        [Required]
         [DataType(DataType.Currency)]
         public decimal AmountPaid { get; set; }
 
@@ -50,7 +46,7 @@ namespace License_Tracking.Models
         // Navigation property
         public virtual Deal Deal { get; set; } = null!;
 
-        [Required]
+        [Required(ErrorMessage = "Created Date is required")]
         [DataType(DataType.DateTime)]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 

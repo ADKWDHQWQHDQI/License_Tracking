@@ -8,13 +8,13 @@ namespace License_Tracking.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Company is required")]
         public int CompanyId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "OEM is required")]
         public int OemId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Product is required")]
         public int ProductId { get; set; }
 
         [Display(Name = "Quantity")]

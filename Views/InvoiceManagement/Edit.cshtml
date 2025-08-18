@@ -1,0 +1,310 @@
+@model License_Tracking.ViewModels.InvoiceGenerationViewModel
+
+@{
+    ViewData["Title"] = $"Edit Invoice - {Model.InvoiceNumber}";
+    var invoiceId = ViewBag.InvoiceId;
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a asp-action="Index">Invoice Management</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@invoiceId">@Model.InvoiceNumber</a></li>
+                    <li class="breadcrumb-item active">Edit</li>
+                </ol>
+            </nav>
+            <h3 class="mb-0">Edit Invoice</h3>
+            <p class="text-muted mb-0">
+                <i class="fas fa-edit"></i> Modifying @Model.InvoiceNumber
+            </p>
+        </div>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <h6><i class="fas fa-exclamation-triangle"></i> Please correct the following errors:</h6>
+            <ul class="mb-0">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <form asp-action="Edit" asp-route-id="@invoiceId" method="post" enctype="multipart/form-data">
+        <div class="row">
+            <!-- Main Edit Form -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0 fw-semibold">
+                            <i class="fas fa-file-invoice"></i> Invoice Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <input type="hidden" asp-for="DealId" />
+                        <input type="hidden" asp-for="InvoiceType" />
+                        <input type="hidden" asp-for="BusinessPhase" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="InvoiceNumber" class="form-label fw-semibold">Invoice Number</label>
+                                    <input asp-for="InvoiceNumber" class="form-control" readonly />
+                                    <div class="form-text">Invoice number cannot be changed after creation.</div>
+                                    <span asp-validation-for="InvoiceNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">Invoice Type</label>
+                                    <div>
+                                        @if (Model.InvoiceType == "Customer_To_Canarys")
+                                        {
+                                            <span class="badge bg-primary">Customer Invoice (Phase 1)</span>
+                                        }
+                                        else if (Model.InvoiceType == "OEM_To_Canarys")
+                                        {
+                                            <span class="badge bg-warning text-dark">OEM Invoice (Phase 4)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@Model.InvoiceType</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="InvoiceDate" class="form-label fw-semibold">Invoice Date</label>
+                                    <input asp-for="InvoiceDate" type="date" class="form-control" />
+                                    <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="DueDate" class="form-label fw-semibold">Due Date</label>
+                                    <input asp-for="DueDate" type="date" class="form-control" />
+                                    <span asp-validation-for="DueDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="TotalAmount" class="form-label fw-semibold">Total Amount</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input asp-for="TotalAmount" type="number" step="0.01" class="form-control" min="0" />
+                                    </div>
+                                    <span asp-validation-for="TotalAmount" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="AttachmentFile" class="form-label fw-semibold">Update Attachment (Optional)</label>
+                                    <input asp-for="AttachmentFile" type="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png" />
+                                    <div class="form-text">Accepted formats: PDF, DOC, DOCX, JPG, PNG (Max 5MB)</div>
+                                    <span asp-validation-for="AttachmentFile" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-semibold">Description/Notes</label>
+                            <textarea asp-for="Description" class="form-control" rows="4" 
+                                placeholder="Enter invoice description, terms, or additional notes..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Invoice
+                            </button>
+                            <a asp-action="Details" asp-route-id="@invoiceId" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deal Information & Summary -->
+            <div class="col-lg-4">
+                @if (Model.Deal != null)
+                {
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-bottom">
+                            <h6 class="mb-0 fw-semibold">
+                                <i class="fas fa-handshake"></i> Deal Information
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Deal Name</label>
+                                <div class="fw-semibold">@Model.Deal.DealName</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Customer</label>
+                                <div class="fw-semibold">@Model.CustomerName</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">OEM Partner</label>
+                                <div class="fw-semibold">@Model.OemName</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Product</label>
+                                <div class="fw-semibold">@Model.ProductName</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Business Phase</label>
+                                <div>
+                                    @if (Model.BusinessPhase == 1)
+                                    {
+                                        <span class="badge bg-primary">Phase 1 - Customer PO</span>
+                                    }
+                                    else if (Model.BusinessPhase == 4)
+                                    {
+                                        <span class="badge bg-warning text-dark">Phase 4 - OEM Settlement</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Phase @Model.BusinessPhase</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Edit Guidelines -->
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-warning bg-opacity-10 border-bottom">
+                        <h6 class="mb-0 fw-semibold text-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Edit Guidelines
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="fas fa-info-circle text-info me-2"></i>
+                                <small>Invoice number cannot be changed</small>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-info-circle text-info me-2"></i>
+                                <small>Editing is only allowed for unpaid invoices</small>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-info-circle text-info me-2"></i>
+                                <small>Changes will update the deal's financial records</small>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-info-circle text-info me-2"></i>
+                                <small>New attachments will replace existing ones</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h6 class="mb-0 fw-semibold">
+                            <i class="fas fa-bolt"></i> Quick Actions
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a asp-action="Details" asp-route-id="@invoiceId" class="btn btn-outline-primary">
+                                <i class="fas fa-eye"></i> View Invoice
+                            </a>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-list"></i> All Invoices
+                            </a>
+                            @if (Model.Deal != null)
+                            {
+                                <a asp-controller="Deals" asp-action="Details" asp-route-id="@Model.Deal.DealId" class="btn btn-outline-info">
+                                    <i class="fas fa-handshake"></i> View Deal
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set minimum due date to invoice date
+            const invoiceDate = document.getElementById('InvoiceDate');
+            const dueDate = document.getElementById('DueDate');
+            
+            function updateDueDateMin() {
+                if (invoiceDate.value) {
+                    dueDate.min = invoiceDate.value;
+                    
+                    // If due date is before invoice date, update it
+                    if (dueDate.value && dueDate.value < invoiceDate.value) {
+                        dueDate.value = invoiceDate.value;
+                    }
+                }
+            }
+            
+            // Update on load and when invoice date changes
+            updateDueDateMin();
+            invoiceDate.addEventListener('change', updateDueDateMin);
+            
+            // Validate amount is positive
+            const amountInput = document.getElementById('TotalAmount');
+            amountInput.addEventListener('input', function() {
+                if (parseFloat(this.value) <= 0) {
+                    this.setCustomValidity('Amount must be greater than zero');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+            
+            // File upload validation
+            const fileInput = document.getElementById('AttachmentFile');
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    const file = this.files[0];
+                    if (file) {
+                        // Check file size (5MB limit)
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('File size must be less than 5MB');
+                            this.value = '';
+                            return;
+                        }
+                        
+                        // Check file type
+                        const allowedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'];
+                        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                        
+                        if (!allowedTypes.includes(fileExtension)) {
+                            alert('Please select a valid file type (PDF, DOC, DOCX, JPG, PNG)');
+                            this.value = '';
+                            return;
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

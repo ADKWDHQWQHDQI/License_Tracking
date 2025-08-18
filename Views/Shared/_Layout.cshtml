@@ -35,10 +35,12 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-bigin">
             <div class="container-fluid px-4">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-handshake"></i>
-                    <span>CBMS</span>
-                    <small class="text-muted ms-1" style="font-size: 0.75rem; font-weight: 400;">B2B2B CRM</small>
+                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-handshake me-2"></i>
+                    <div class="d-flex flex-column">
+                        <span style="font-size: 1.25rem; font-weight: 500;">CBMS</span>
+                        <small class="text-white" style="font-size: 0.65rem; font-weight: 400; line-height: 1;">B2B2B CRM</small>
+                    </div>
                 </a>
                 
                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -313,6 +315,12 @@
                                             <span>Manage OEMs</span>
                                         </a>
                                     </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Procurement" asp-action="Index">
+                                            <i class="fas fa-shopping-cart"></i>
+                                            <span>Procurement Center</span>
+                                        </a>
+                                    </li>
                                     <li><div class="dropdown-divider"></div></li>
                                     <li>
                                         <a class="dropdown-item" asp-controller="ProjectPipeline" asp-action="Create">
@@ -381,55 +389,11 @@
         @RenderBody()
     </main>
 
-    @if (User.Identity?.IsAuthenticated == true)
-    {
-        <!-- Floating Quick Access Button -->
-        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
-            <div class="dropdown dropup">
-                <button class="btn btn-primary rounded-circle p-3 shadow-lg" type="button" id="quickAccessDropdown"
-                    data-bs-toggle="dropdown" aria-expanded="false" title="Quick Access">
-                    <i class="fas fa-bolt fa-lg"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end mb-2" aria-labelledby="quickAccessDropdown">
-                    <li>
-                        <h6 class="dropdown-header">
-                            <i class="fas fa-tachometer-alt"></i> Quick Access
-                        </h6>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="/Notification/Dashboard">
-                            <i class="fas fa-bell text-warning"></i> Notification Center
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="/Dashboard/Index">
-                            <i class="fas fa-chart-line text-info"></i> Analytics Dashboard
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="/License/Index">
-                            <i class="fas fa-key text-primary"></i> Manage Licenses
-                        </a>
-                    </li>
-                    @if (User.IsInRole("Admin") || User.IsInRole("Sales") || User.IsInRole("Management"))
-                    {
-                        <li>
-                            <a class="dropdown-item" href="/ProjectPipeline/Index">
-                                <i class="fas fa-project-diagram text-success"></i> Project Pipeline
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </div>
-        </div>
-    }
+    
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - License Tracking
+            &copy; 2025 - CBMS License Tracking
         </div>
     </footer>
     <!-- Bootstrap and jQuery -->

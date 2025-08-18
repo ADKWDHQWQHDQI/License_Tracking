@@ -8,10 +8,10 @@ namespace License_Tracking.Models
         [Key]
         public int ContactId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Company is required")]
         public int CompanyId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Contact Name is required")]
         [StringLength(200)]
         [Display(Name = "Full Name")]
         public string Name { get; set; } = string.Empty; // Combined First + Last Name

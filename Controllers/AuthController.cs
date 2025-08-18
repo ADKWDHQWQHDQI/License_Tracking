@@ -32,7 +32,7 @@ namespace License_Tracking.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    return RedirectToLocal(returnUrl ?? Url.Action("Index", "Dashboard"));
+                    return RedirectToLocal(returnUrl ?? Url.Action("Index", "Dashboard") ?? "/Dashboard");
                 }
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             }
@@ -67,8 +67,8 @@ namespace License_Tracking.Controllers
             return View(model);
         }
 
+        [HttpGet]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
@@ -81,13 +81,13 @@ namespace License_Tracking.Controllers
             return View();
         }
 
-        private IActionResult RedirectToLocal(string returnUrl)
+        private IActionResult RedirectToLocal(string? returnUrl)
         {
-            if (Url.IsLocalUrl(returnUrl))
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "License");
+            return RedirectToAction("Index", "Dashboard");
         }
     }
 }

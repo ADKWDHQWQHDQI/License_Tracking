@@ -2,176 +2,664 @@
     ViewData["Title"] = "Procurement Dashboard";
 }
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <h2 class="text-primary mb-4">
-                <i class="fas fa-shopping-cart"></i> Procurement & OEM Management
-            </h2>
+<style>
+    :root {
+        --primary-color: #3B82F6;
+        --secondary-color: #1E40AF;
+        --success-color: #059669;
+        --warning-color: #D97706;
+        --danger-color: #DC2626;
+        --info-color: #0EA5E9;
+        --dark-color: #1F2937;
+        --light-color: #F8FAFC;
+        --border-color: #E5E7EB;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    .bigin-container {
+        padding: 1.5rem;
+        background: #F8FAFC;
+        min-height: 100vh;
+    }
+
+    .procurement-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .procurement-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+
+    .procurement-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .procurement-header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+
+    .bigin-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--border-color);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bigin-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .metric-card {
+        text-align: center;
+        padding: 2rem 1.5rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--border-color);
+        position: relative;
+        overflow: hidden;
+        height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+    }
+
+    .metric-card.primary {
+        --gradient-start: #3B82F6;
+        --gradient-end: #1E40AF;
+    }
+
+    .metric-card.success {
+        --gradient-start: #059669;
+        --gradient-end: #047857;
+    }
+
+    .metric-card.warning {
+        --gradient-start: #D97706;
+        --gradient-end: #B45309;
+    }
+
+    .metric-card.info {
+        --gradient-start: #0EA5E9;
+        --gradient-end: #0284C7;
+    }
+
+    .metric-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 1rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .metric-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .quick-actions {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .action-card {
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .action-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .action-card:hover::before {
+        left: 100%;
+    }
+
+    .action-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: var(--shadow-xl);
+        color: white;
+        text-decoration: none;
+    }
+
+    .action-card.blue {
+        --gradient-start: #3B82F6;
+        --gradient-end: #1E40AF;
+    }
+
+    .action-card.green {
+        --gradient-start: #059669;
+        --gradient-end: #047857;
+    }
+
+    .action-card.orange {
+        --gradient-start: #D97706;
+        --gradient-end: #B45309;
+    }
+
+    .action-card.purple {
+        --gradient-start: #7C3AED;
+        --gradient-end: #5B21B6;
+    }
+
+    .action-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .action-content h5 {
+        margin: 0 0 0.25rem 0;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .action-content p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 0.85rem;
+    }
+
+    .data-table {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+
+    .table-header {
+        background: var(--light-color);
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-header h5 {
+        margin: 0;
+        color: var(--text-primary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .table-content {
+        padding: 0;
+    }
+
+    .custom-table {
+        margin: 0;
+        border: none;
+    }
+
+    .custom-table th {
+        background: var(--light-color);
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-primary);
+        font-weight: 600;
+        padding: 1rem;
+    }
+
+    .custom-table td {
+        border: none;
+        border-bottom: 1px solid #F3F4F6;
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .custom-table tbody tr:hover {
+        background: #F9FAFB;
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .status-badge.paid {
+        background: #DCFCE7;
+        color: #166534;
+    }
+
+    .status-badge.partial {
+        background: #FEF3C7;
+        color: #92400E;
+    }
+
+    .status-badge.pending {
+        background: #E5E7EB;
+        color: #374151;
+    }
+
+    .bigin-btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bigin-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .bigin-btn:hover::before {
+        left: 100%;
+    }
+
+    .bigin-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        color: white;
+        text-decoration: none;
+    }
+
+    .bigin-btn.outline {
+        background: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+
+    .bigin-btn.outline:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+    }
+
+    .empty-state-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--info-color), #0284C7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+    }
+
+    .empty-state h5 {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .fade-in-up:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .fade-in-up:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .fade-in-up:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .fade-in-up:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+</style>
+
+<div class="bigin-container">
+    <!-- Header Section -->
+    <div class="procurement-header fade-in-up">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="fas fa-shopping-cart me-3"></i>Procurement Center</h1>
+                <p>Manage OEM purchase orders, track payments, and monitor procurement activities</p>
+            </div>
+            <div class="d-none d-md-block">
+                <i class="fas fa-chart-line" style="font-size: 4rem; opacity: 0.3;"></i>
+            </div>
         </div>
     </div>
 
-    <!-- Summary Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title">Total Purchase Orders</h5>
-                            <h3 class="mb-0">@ViewBag.OemSummary.TotalPurchaseOrders</h3>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-file-invoice fa-2x"></i>
-                        </div>
-                    </div>
+    <!-- Metrics Dashboard -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card primary fade-in-up">
+                <div class="metric-icon">
+                    <i class="fas fa-file-invoice"></i>
                 </div>
+                <div class="metric-value">@ViewBag.OemSummary.TotalPurchaseOrders</div>
+                <div class="metric-label">Total Purchase Orders</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title">Total Cost</h5>
-                            <h3 class="mb-0">@ViewBag.OemSummary.TotalCost.ToString("C")</h3>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-dollar-sign fa-2x"></i>
-                        </div>
-                    </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card success fade-in-up">
+                <div class="metric-icon">
+                    <i class="fas fa-dollar-sign"></i>
                 </div>
+                <div class="metric-value">@ViewBag.OemSummary.TotalCost.ToString("C0")</div>
+                <div class="metric-label">Total Investment</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title">Pending Payments</h5>
-                            <h3 class="mb-0">@ViewBag.OemSummary.PendingPayments.ToString("C")</h3>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-clock fa-2x"></i>
-                        </div>
-                    </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card warning fade-in-up">
+                <div class="metric-icon">
+                    <i class="fas fa-clock"></i>
                 </div>
+                <div class="metric-value">@ViewBag.OemSummary.PendingPayments.ToString("C0")</div>
+                <div class="metric-label">Pending Payments</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title">Active OEMs</h5>
-                            <h3 class="mb-0">@ViewBag.OemSummary.UniqueOems</h3>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-handshake fa-2x"></i>
-                        </div>
-                    </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card info fade-in-up">
+                <div class="metric-icon">
+                    <i class="fas fa-handshake"></i>
                 </div>
+                <div class="metric-value">@ViewBag.OemSummary.UniqueOems</div>
+                <div class="metric-label">Active OEM Partners</div>
             </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions fade-in-up">
+        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+        <div class="action-grid">
+            <a href="@Url.Action("PurchaseOrders", "Procurement")" class="action-card blue">
+                <div class="action-icon">
+                    <i class="fas fa-list"></i>
+                </div>
+                <div class="action-content">
+                    <h5>View All Orders</h5>
+                    <p>Browse and manage purchase orders</p>
+                </div>
+            </a>
+            <a href="@Url.Action("TrackPayment", "Procurement")" class="action-card green">
+                <div class="action-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="action-content">
+                    <h5>Track Payment</h5>
+                    <p>Add new payment tracking</p>
+                </div>
+            </a>
+            <a href="@Url.Action("Index", "Oems")" class="action-card orange">
+                <div class="action-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="action-content">
+                    <h5>Manage OEMs</h5>
+                    <p>View and edit OEM partners</p>
+                </div>
+            </a>
+            <a href="@Url.Action("Index", "InvoiceManagement")" class="action-card purple">
+                <div class="action-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div class="action-content">
+                    <h5>Invoice Management</h5>
+                    <p>Manage multi-phase invoices</p>
+                </div>
+            </a>
         </div>
     </div>
 
     <!-- Recent Purchase Orders -->
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-history"></i> Recent Purchase Orders
-                    </h5>
+    <div class="data-table fade-in-up">
+        <div class="table-header">
+            <h5><i class="fas fa-history me-2"></i>Recent Purchase Orders</h5>
+        </div>
+        <div class="table-content">
+            @if (ViewBag.RecentPurchaseOrders != null &&
+                        ((List<License_Tracking.Models.PurchaseOrder>)ViewBag.RecentPurchaseOrders).Any())
+            {
+                <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th>PO Number</th>
+                            <th>OEM Partner</th>
+                            <th>Product</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var po in (List<License_Tracking.Models.PurchaseOrder>)ViewBag.RecentPurchaseOrders)
+                        {
+                            <tr>
+                                <td><strong>@po.OemPoNumber</strong></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-2">
+                                            <i class="fas fa-building text-muted"></i>
+                                        </div>
+                                        <span>@(po.Deal?.Oem?.OemName ?? "N/A")</span>
+                                    </div>
+                                </td>
+                                <td>@(po.Deal?.Product?.ProductName ?? "N/A")</td>
+                                <td><strong>@po.OemPoAmount.ToString("C")</strong></td>
+                                <td>
+                                    <span
+                                        class="status-badge @(po.PaymentStatus.ToLower() == "paid" ? "paid" : po.PaymentStatus.ToLower() == "partial" ? "partial" : "pending")">
+                                        @po.PaymentStatus
+                                    </span>
+                                </td>
+                                <td>@po.CreatedDate.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    <a asp-action="TrackPayment" asp-route-id="@po.PurchaseOrderId" class="bigin-btn outline"
+                                        style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="p-3 border-top">
+                    <div class="text-center">
+                        <a asp-action="PurchaseOrders" class="bigin-btn">
+                            <i class="fas fa-list"></i>
+                            View All Purchase Orders
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body">
-                    @if (ViewBag.RecentPurchaseOrders != null &&
-                                        ((List<License_Tracking.Models.PurchaseOrder>)ViewBag.RecentPurchaseOrders).Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>PO Number</th>
-                                        <th>OEM</th>
-                                        <th>Product</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var po in
-                                                                    (List<License_Tracking.Models.PurchaseOrder>)ViewBag.RecentPurchaseOrders)
-                                    {
-                                        <tr>
-                                            <td><strong>@po.OemPoNumber</strong></td>
-                                            <td>@(po.Deal?.Oem?.OemName ?? "N/A")</td>
-                                            <td>@(po.Deal?.Product?.ProductName ?? "N/A")</td>
-                                            <td>@po.OemPoAmount.ToString("C")</td>
-                                            <td>
-                                                <span
-                                                    class="badge @(po.PaymentStatus == "Paid" ? "bg-success" : po.PaymentStatus == "Partial" ? "bg-warning" : "bg-secondary")">
-                                                    @po.PaymentStatus
-                                                </span>
-                                            </td>
-                                            <td>@po.CreatedDate.ToString("MMM dd, yyyy")</td>
-                                            <td>
-                                                <a asp-action="TrackPayment" asp-route-id="@po.PurchaseOrderId"
-                                                    class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-edit"></i> Edit
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="text-center mt-3">
-                            <a asp-action="PurchaseOrders" class="btn btn-primary">
-                                <i class="fas fa-list"></i> View All Purchase Orders
-                            </a>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info text-center">
-                            <h5><i class="fas fa-info-circle"></i> No Purchase Orders Found</h5>
-                            <p>Start by tracking your first OEM purchase order.</p>
-                            <a asp-action="TrackPayment" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Track First Payment
-                            </a>
-                        </div>
-                    }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h5>No Purchase Orders Yet</h5>
+                    <p>Start tracking your OEM procurement activities by adding your first purchase order.</p>
+                    <a asp-action="TrackPayment" class="bigin-btn">
+                        <i class="fas fa-plus"></i>
+                        Track First Payment
+                    </a>
                 </div>
-            </div>
+            }
         </div>
     </div>
 </div>
 
-<style>
-    .card {
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border: none;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add ripple effect to action cards
+        const actionCards = document.querySelectorAll('.action-card');
+        actionCards.forEach(card => {
+            card.addEventListener('click', function (e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
 
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
 
-    .btn {
-        border-radius: 6px;
-    }
+                this.appendChild(ripple);
 
-    .alert {
-        border-radius: 6px;
-    }
+                setTimeout(() => {
+                    ripple.remove();
+                }, 1000);
+            });
+        });
 
-    .border-primary {
-        border: 2px solid #0d6efd !important;
-    }
-</style>
+        // Animate metric values
+        const metricValues = document.querySelectorAll('.metric-value');
+        metricValues.forEach(value => {
+            const text = value.textContent;
+            const number = parseFloat(text.replace(/[^0-9.-]/g, ''));
+            if (!isNaN(number)) {
+                value.textContent = '0';
+                let current = 0;
+                const increment = number / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= number) {
+                        current = number;
+                        clearInterval(timer);
+                    }
+                    value.textContent = text.replace(number.toString(), Math.floor(current).toString());
+                }, 30);
+            }
+        });
+    });
+</script>

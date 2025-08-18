@@ -1,0 +1,398 @@
+@model License_Tracking.Models.CbmsInvoice
+
+@{
+    ViewData["Title"] = $"Invoice Details - {Model.InvoiceNumber}";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a asp-action="Index">Invoice Management</a></li>
+                    <li class="breadcrumb-item active">@Model.InvoiceNumber</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-1">Invoice Details</h3>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-file-invoice"></i> @Model.InvoiceNumber
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    @if (User.IsInRole("Admin") || User.IsInRole("Finance"))
+                    {
+                        @if ((Model.PaymentReceived ?? 0) < Model.TotalAmount)
+                        {
+                            <a asp-action="RecordPayment" asp-route-id="@Model.InvoiceId" class="btn btn-success">
+                                <i class="fas fa-money-bill"></i> Record Payment
+                            </a>
+                        }
+                        @if ((Model.PaymentReceived ?? 0) == 0)
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.InvoiceId" class="btn btn-outline-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        }
+                    }
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="window.print()">
+                                <i class="fas fa-print"></i> Print Invoice
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-download"></i> Export PDF
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-envelope"></i> Email Invoice
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Invoice Details -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="fas fa-info-circle"></i> Invoice Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Invoice Number</label>
+                                <div class="fw-semibold fs-5">@Model.InvoiceNumber</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Invoice Type</label>
+                                <div>
+                                    @if (Model.InvoiceType == "Customer_To_Canarys")
+                                    {
+                                        <span class="badge bg-primary">Customer Invoice</span>
+                                    }
+                                    else if (Model.InvoiceType == "OEM_To_Canarys")
+                                    {
+                                        <span class="badge bg-warning text-dark">OEM Invoice</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@Model.InvoiceType</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Business Phase</label>
+                                <div>
+                                    @if (Model.BusinessPhase == 1)
+                                    {
+                                        <span class="badge bg-primary">Phase 1 - Customer PO</span>
+                                    }
+                                    else if (Model.BusinessPhase == 4)
+                                    {
+                                        <span class="badge bg-warning text-dark">Phase 4 - OEM Settlement</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Phase @Model.BusinessPhase</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Invoice Date</label>
+                                <div class="fw-semibold">@Model.InvoiceDate.ToString("MMMM dd, yyyy")</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Due Date</label>
+                                <div class="fw-semibold">
+                                    @if (Model.DueDate.HasValue)
+                                    {
+                                        @Model.DueDate.Value.ToString("MMMM dd, yyyy")
+                                        @if (Model.DueDate < DateTime.Today && Model.PaymentStatus != "Paid")
+                                        {
+                                            <span class="badge bg-danger ms-2">Overdue</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not set</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Payment Status</label>
+                                <div>
+                                    @if (Model.PaymentStatus == "Paid")
+                                    {
+                                        <span class="badge bg-success">Paid</span>
+                                    }
+                                    else if (Model.PaymentStatus == "Partial")
+                                    {
+                                        <span class="badge bg-warning text-dark">Partial Payment</span>
+                                    }
+                                    else if (Model.PaymentStatus == "Overdue")
+                                    {
+                                        <span class="badge bg-danger">Overdue</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Unpaid</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Notes</label>
+                            <div class="border rounded p-3 bg-light">
+                                @Model.Notes
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Reference))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Reference</label>
+                            <div class="fw-semibold">@Model.Reference</div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Deal Information -->
+            @if (Model.Deal != null)
+            {
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0 fw-semibold">
+                            <i class="fas fa-handshake"></i> Related Deal Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Deal Name</label>
+                                    <div class="fw-semibold">
+                                        <a asp-controller="Deals" asp-action="Details" asp-route-id="@Model.Deal.DealId" class="text-decoration-none">
+                                            @Model.Deal.DealName
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Customer</label>
+                                    <div class="fw-semibold">
+                                        @if (Model.Deal.Company != null)
+                                        {
+                                            <a asp-controller="Companies" asp-action="Details" asp-route-id="@Model.Deal.Company.CompanyId" class="text-decoration-none">
+                                                @Model.Deal.Company.CompanyName
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">OEM Partner</label>
+                                    <div class="fw-semibold">
+                                        @if (Model.Deal.Oem != null)
+                                        {
+                                            <a asp-controller="Oems" asp-action="Details" asp-route-id="@Model.Deal.Oem.OemId" class="text-decoration-none">
+                                                @Model.Deal.Oem.OemName
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Product</label>
+                                    <div class="fw-semibold">
+                                        @if (Model.Deal.Product != null)
+                                        {
+                                            @Model.Deal.Product.ProductName
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Attachment -->
+            @if (!string.IsNullOrEmpty(Model.AttachmentPath))
+            {
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0 fw-semibold">
+                            <i class="fas fa-paperclip"></i> Attachment
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-file-pdf text-danger me-2"></i>
+                            <div>
+                                <div class="fw-semibold">@Model.AttachmentFileName</div>
+                                <small class="text-muted">Click to download</small>
+                            </div>
+                            <a href="@Model.AttachmentPath" class="btn btn-sm btn-outline-primary ms-auto" target="_blank">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="fas fa-calculator"></i> Financial Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Amount</span>
+                            <span class="fw-semibold">@Model.Amount.ToString("C")</span>
+                        </div>
+                    </div>
+                    @if (Model.TaxAmount > 0)
+                    {
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Tax Amount</span>
+                                <span class="fw-semibold">@Model.TaxAmount.ToString("C")</span>
+                            </div>
+                        </div>
+                    }
+                    <hr>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-semibold">Total Amount</span>
+                            <span class="fw-bold fs-5">@Model.TotalAmount.ToString("C")</span>
+                        </div>
+                    </div>
+                    
+                    @if ((Model.PaymentReceived ?? 0) > 0)
+                    {
+                        var paymentPercentage = Math.Round(((Model.PaymentReceived ?? 0) / Model.TotalAmount) * 100, 1);
+                        
+                        <hr>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-success">Paid Amount</span>
+                                <span class="fw-semibold text-success">@((Model.PaymentReceived ?? 0).ToString("C"))</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-warning">Outstanding</span>
+                                <span class="fw-bold text-warning">@((Model.TotalAmount - (Model.PaymentReceived ?? 0)).ToString("C"))</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Progress -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Payment Progress</span>
+                                <span class="fw-semibold small">@paymentPercentage%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: @paymentPercentage%"
+                                    aria-valuenow="@paymentPercentage" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Payment Information -->
+            @if (Model.PaymentDate.HasValue)
+            {
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0 fw-semibold">
+                            <i class="fas fa-credit-card"></i> Payment Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Payment Date</label>
+                            <div class="fw-semibold">@Model.PaymentDate.Value.ToString("MMMM dd, yyyy")</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.PaymentMethod))
+                        {
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Payment Method</label>
+                                <div class="fw-semibold">@Model.PaymentMethod</div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.PaymentReference))
+                        {
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Reference Number</label>
+                                <div class="fw-semibold">@Model.PaymentReference</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="Index" class="btn btn-outline-primary">
+                            <i class="fas fa-list"></i> All Invoices
+                        </a>
+                        @if (Model.Deal != null)
+                        {
+                            <a asp-controller="Deals" asp-action="Details" asp-route-id="@Model.Deal.DealId" class="btn btn-outline-info">
+                                <i class="fas fa-handshake"></i> View Deal
+                            </a>
+                        }
+                        @if (User.IsInRole("Admin") || User.IsInRole("Finance"))
+                        {
+                            <a asp-action="Create" asp-route-dealId="@Model.DealId" class="btn btn-outline-success">
+                                <i class="fas fa-plus"></i> New Invoice
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Print functionality
+        function printInvoice() {
+            window.print();
+        }
+    </script>
+}

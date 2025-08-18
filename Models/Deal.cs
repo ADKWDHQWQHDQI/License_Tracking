@@ -8,18 +8,18 @@ namespace License_Tracking.Models
         [Key]
         public int DealId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Company is required")]
         public int CompanyId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "OEM is required")]
         public int OemId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Product is required")]
         public int ProductId { get; set; }
 
         public int? ContactId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Deal Name is required")]
         [StringLength(200)]
         [Display(Name = "Deal Name")]
         public string DealName { get; set; } = string.Empty; // Deal/Project Name
@@ -36,7 +36,7 @@ namespace License_Tracking.Models
         [Display(Name = "Deal Type")]
         public string? DealType { get; set; } // "New", "Renewal", "Upgrade"
 
-        [Required]
+        [Required(ErrorMessage = "Quantity is required")]
         [Display(Name = "Quantity")]
         public int Quantity { get; set; }
 

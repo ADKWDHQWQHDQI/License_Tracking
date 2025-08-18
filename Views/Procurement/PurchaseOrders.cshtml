@@ -1,147 +1,597 @@
-@{
+a@{
     ViewData["Title"] = "All Purchase Orders";
 }
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <h2 class="text-primary mb-4">
-                <i class="fas fa-list"></i> All Purchase Orders
-            </h2>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a asp-action="Index">Procurement</a></li>
-                    <li class="breadcrumb-item active">Purchase Orders</li>
-                </ol>
-            </nav>
+<style>
+    :root {
+        --primary-color: #3B82F6;
+        --secondary-color: #1E40AF;
+        --success-color: #059669;
+        --warning-color: #D97706;
+        --danger-color: #DC2626;
+        --info-color: #0EA5E9;
+        --dark-color: #1F2937;
+        --light-color: #F8FAFC;
+        --border-color: #E5E7EB;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    .bigin-container {
+        padding: 1.5rem;
+        background: #F8FAFC;
+        min-height: 100vh;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+
+    .page-header h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .breadcrumb-custom {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        margin: 0;
+    }
+
+    .breadcrumb-custom .breadcrumb-item {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .breadcrumb-custom .breadcrumb-item.active {
+        color: white;
+        font-weight: 600;
+    }
+
+    .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .breadcrumb-custom a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .breadcrumb-custom a:hover {
+        color: white;
+        text-decoration: underline;
+    }
+
+    .filter-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .filter-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+    }
+
+    .metric-card {
+        text-align: center;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--border-color);
+        position: relative;
+        overflow: hidden;
+        height: 140px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+    }
+
+    .metric-card.primary {
+        --gradient-start: #3B82F6;
+        --gradient-end: #1E40AF;
+    }
+
+    .metric-card.success {
+        --gradient-start: #059669;
+        --gradient-end: #047857;
+    }
+
+    .metric-card.warning {
+        --gradient-start: #D97706;
+        --gradient-end: #B45309;
+    }
+
+    .metric-card.info {
+        --gradient-start: #0EA5E9;
+        --gradient-end: #0284C7;
+    }
+
+    .metric-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    .metric-info h5 {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .metric-info h3 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .metric-icon {
+        font-size: 2rem;
+        opacity: 0.3;
+        color: var(--gradient-start);
+    }
+
+    .data-table {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+
+    .table-header {
+        background: var(--light-color);
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+
+    .table-header h5 {
+        margin: 0;
+        color: var(--text-primary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+    }
+
+    .results-badge {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .table-content {
+        padding: 0;
+    }
+
+    .custom-table {
+        margin: 0;
+        border: none;
+    }
+
+    .custom-table th {
+        background: var(--light-color);
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-primary);
+        font-weight: 600;
+        padding: 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .custom-table td {
+        border: none;
+        border-bottom: 1px solid #F3F4F6;
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .custom-table tbody tr:hover {
+        background: #F9FAFB;
+    }
+
+    .sort-link {
+        color: var(--text-primary);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: color 0.3s ease;
+    }
+
+    .sort-link:hover {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .sort-icon {
+        font-size: 0.8rem;
+        color: var(--primary-color);
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .status-badge.paid {
+        background: #DCFCE7;
+        color: #166534;
+    }
+
+    .status-badge.partial {
+        background: #FEF3C7;
+        color: #92400E;
+    }
+
+    .status-badge.pending {
+        background: #F3F4F6;
+        color: #374151;
+    }
+
+    .status-badge.overdue {
+        background: #FEE2E2;
+        color: #991B1B;
+    }
+
+    .bigin-btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bigin-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .bigin-btn:hover::before {
+        left: 100%;
+    }
+
+    .bigin-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        color: white;
+        text-decoration: none;
+    }
+
+    .bigin-btn.success {
+        background: linear-gradient(135deg, var(--success-color), #047857);
+    }
+
+    .bigin-btn.outline {
+        background: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+
+    .bigin-btn.outline:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .bigin-btn.sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+
+    .empty-state-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--info-color), #0284C7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+    }
+
+    .empty-state h5 {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+
+    .pagination-custom {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1.5rem;
+        background: var(--light-color);
+        border-top: 1px solid var(--border-color);
+    }
+
+    .page-link-custom {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .page-link-custom:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .page-link-custom.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .fade-in-up:nth-child(1) { animation-delay: 0.1s; }
+    .fade-in-up:nth-child(2) { animation-delay: 0.2s; }
+    .fade-in-up:nth-child(3) { animation-delay: 0.3s; }
+    .fade-in-up:nth-child(4) { animation-delay: 0.4s; }
+</style>
+
+<div class="bigin-container">
+    <!-- Page Header -->
+    <div class="page-header fade-in-up">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1><i class="fas fa-list me-3"></i>Purchase Orders</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-custom">
+                        <li class="breadcrumb-item">
+                            <a asp-action="Index">Procurement</a>
+                        </li>
+                        <li class="breadcrumb-item active">Purchase Orders</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-none d-md-block">
+                <i class="fas fa-file-invoice" style="font-size: 3rem; opacity: 0.3;"></i>
+            </div>
         </div>
     </div>
 
-    <!-- Filters and Actions -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-filter"></i> Filters & Actions
-                    </h5>
+    <!-- Filters & Actions -->
+    <div class="filter-card fade-in-up">
+        <div class="filter-header">
+            <i class="fas fa-filter"></i>
+            <span>Filters & Actions</span>
+        </div>
+        <form method="get" asp-action="PurchaseOrders">
+            <div class="row g-3">
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label">Search</label>
+                    <input type="text" class="form-control" name="search" 
+                           placeholder="PO Number, Product, OEM..." 
+                           value="@ViewBag.CurrentSearch" />
                 </div>
-                <div class="card-body">
-                    <form method="get" asp-action="PurchaseOrders">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label class="form-label">Search</label>
-                                <input type="text" class="form-control" name="search" placeholder="PO Number, Product, OEM..." value="@ViewBag.CurrentSearch" />
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Payment Status</label>
-                                <select class="form-select" name="paymentStatus">
-                                    <option value="">All Statuses</option>
-                                    <option value="Paid" selected="@(ViewBag.CurrentPaymentStatus == "Paid")">Paid</option>
-                                    <option value="Pending" selected="@(ViewBag.CurrentPaymentStatus == "Pending")">Pending</option>
-                                    <option value="Partial" selected="@(ViewBag.CurrentPaymentStatus == "Partial")">Partial</option>
-                                    <option value="Overdue" selected="@(ViewBag.CurrentPaymentStatus == "Overdue")">Overdue</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">OEM Partner</label>
-                                <select class="form-select" name="oemFilter">
-                                    <option value="">All OEMs</option>
-                                    @if (ViewBag.AvailableOems != null)
-                                    {
-                                        @foreach (var oem in (List<string>)ViewBag.AvailableOems)
-                                        {
-                                            <option value="@oem" selected="@(ViewBag.CurrentOem == oem)">@oem</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Date Range</label>
-                                <select class="form-select" name="dateRange">
-                                    <option value="">All Dates</option>
-                                    <option value="30days" selected="@(ViewBag.CurrentDateRange == "30days")">Last 30 Days</option>
-                                    <option value="90days" selected="@(ViewBag.CurrentDateRange == "90days")">Last 90 Days</option>
-                                    <option value="12months" selected="@(ViewBag.CurrentDateRange == "12months")">Last 12 Months</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">&nbsp;</label>
-                                <button type="submit" class="btn btn-primary d-block w-100">
-                                    <i class="fas fa-search"></i> Filter
-                                </button>
-                            </div>
-                            <div class="col-md-1">
-                                <label class="form-label">&nbsp;</label>
-                                <a asp-action="TrackPayment" class="btn btn-success d-block w-100" title="Add New Purchase Order">
-                                    <i class="fas fa-plus"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label">Payment Status</label>
+                    <select class="form-select" name="paymentStatus">
+                        <option value="">All Statuses</option>
+                        <option value="Paid" selected="@(ViewBag.CurrentPaymentStatus == "Paid")">Paid</option>
+                        <option value="Pending" selected="@(ViewBag.CurrentPaymentStatus == "Pending")">Pending</option>
+                        <option value="Partial" selected="@(ViewBag.CurrentPaymentStatus == "Partial")">Partial</option>
+                        <option value="Overdue" selected="@(ViewBag.CurrentPaymentStatus == "Overdue")">Overdue</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label">OEM Partner</label>
+                    <select class="form-select" name="oemFilter">
+                        <option value="">All OEMs</option>
+                        @if (ViewBag.AvailableOems != null)
+                        {
+                            @foreach (var oem in (List<string>)ViewBag.AvailableOems)
+                            {
+                                <option value="@oem" selected="@(ViewBag.CurrentOem == oem)">@oem</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label">Date Range</label>
+                    <select class="form-select" name="dateRange">
+                        <option value="">All Dates</option>
+                        <option value="30days" selected="@(ViewBag.CurrentDateRange == "30days")">Last 30 Days</option>
+                        <option value="90days" selected="@(ViewBag.CurrentDateRange == "90days")">Last 90 Days</option>
+                        <option value="12months" selected="@(ViewBag.CurrentDateRange == "12months")">Last 12 Months</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="bigin-btn d-block w-100">
+                        <i class="fas fa-search"></i>
+                        Filter
+                    </button>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                    <label class="form-label">&nbsp;</label>
+                    <a asp-action="TrackPayment" class="bigin-btn success d-block w-100" title="Add New Purchase Order">
+                        <i class="fas fa-plus"></i>
+                    </a>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 
-    <!-- Purchase Orders Summary -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title">Total POs</h5>
-                            <h3 class="mb-0">@ViewBag.Summary.TotalPOs</h3>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-file-invoice fa-2x"></i>
-                        </div>
+    <!-- Summary Metrics -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card primary fade-in-up">
+                <div class="metric-content">
+                    <div class="metric-info">
+                        <h5>Total POs</h5>
+                        <h3>@ViewBag.Summary.TotalPOs</h3>
+                    </div>
+                    <div class="metric-icon">
+                        <i class="fas fa-file-invoice"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title">Total Amount</h5>
-                            <h3 class="mb-0">@ViewBag.Summary.TotalAmount.ToString("C")</h3>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-dollar-sign fa-2x"></i>
-                        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card success fade-in-up">
+                <div class="metric-content">
+                    <div class="metric-info">
+                        <h5>Total Amount</h5>
+                        <h3>@ViewBag.Summary.TotalAmount.ToString("C0")</h3>
+                    </div>
+                    <div class="metric-icon">
+                        <i class="fas fa-dollar-sign"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title">Pending Amount</h5>
-                            <h3 class="mb-0">@ViewBag.Summary.PendingAmount.ToString("C")</h3>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-clock fa-2x"></i>
-                        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card warning fade-in-up">
+                <div class="metric-content">
+                    <div class="metric-info">
+                        <h5>Pending Amount</h5>
+                        <h3>@ViewBag.Summary.PendingAmount.ToString("C0")</h3>
+                    </div>
+                    <div class="metric-icon">
+                        <i class="fas fa-clock"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title">Avg PO Size</h5>
-                            <h3 class="mb-0">@ViewBag.Summary.AverageAmount.ToString("C")</h3>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-chart-bar fa-2x"></i>
-                        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card info fade-in-up">
+                <div class="metric-content">
+                    <div class="metric-info">
+                        <h5>Avg PO Size</h5>
+                        <h3>@ViewBag.Summary.AverageAmount.ToString("C0")</h3>
+                    </div>
+                    <div class="metric-icon">
+                        <i class="fas fa-chart-bar"></i>
                     </div>
                 </div>
             </div>
@@ -149,180 +599,366 @@
     </div>
 
     <!-- Purchase Orders Table -->
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-table"></i> Purchase Orders
-                        @if (ViewBag.TotalCount != null)
-                        {
-                            <span class="badge bg-primary ms-2">@ViewBag.TotalCount results</span>
-                        }
-                    </h5>
+    <div class="data-table fade-in-up">
+        <div class="table-header">
+            <h5><i class="fas fa-table me-2"></i>Purchase Orders</h5>
+            @if (ViewBag.TotalCount != null)
+            {
+                <span class="results-badge">@ViewBag.TotalCount results</span>
+            }
+        </div>
+        <div class="table-content">
+            @if (ViewBag.PurchaseOrders != null && ((List<License_Tracking.Models.PurchaseOrder>)ViewBag.PurchaseOrders).Any())
+            {
+                <div class="table-responsive">
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a asp-action="PurchaseOrders" 
+                                       asp-route-sortBy="OemPoNumber" 
+                                       asp-route-sortOrder="@(ViewBag.SortBy == "OemPoNumber" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" 
+                                       class="sort-link">
+                                        PO Number
+                                        @if (ViewBag.SortBy == "OemPoNumber")
+                                        {
+                                            <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down") sort-icon"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th>
+                                    <a asp-action="PurchaseOrders" 
+                                       asp-route-sortBy="OemName" 
+                                       asp-route-sortOrder="@(ViewBag.SortBy == "OemName" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" 
+                                       class="sort-link">
+                                        OEM Partner
+                                        @if (ViewBag.SortBy == "OemName")
+                                        {
+                                            <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down") sort-icon"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th>Product</th>
+                                <th>
+                                    <a asp-action="PurchaseOrders" 
+                                       asp-route-sortBy="OemPoAmount" 
+                                       asp-route-sortOrder="@(ViewBag.SortBy == "OemPoAmount" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" 
+                                       class="sort-link">
+                                        Amount
+                                        @if (ViewBag.SortBy == "OemPoAmount")
+                                        {
+                                            <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down") sort-icon"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th>Status</th>
+                                <th>Payment Terms</th>
+                                <th>
+                                    <a asp-action="PurchaseOrders" 
+                                       asp-route-sortBy="CreatedDate" 
+                                       asp-route-sortOrder="@(ViewBag.SortBy == "CreatedDate" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" 
+                                       class="sort-link">
+                                        Created
+                                        @if (ViewBag.SortBy == "CreatedDate")
+                                        {
+                                            <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down") sort-icon"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var po in (List<License_Tracking.Models.PurchaseOrder>)ViewBag.PurchaseOrders)
+                            {
+                                <tr>
+                                    <td><strong>@po.OemPoNumber</strong></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-2">
+                                                <i class="fas fa-building text-muted"></i>
+                                            </div>
+                                            <span>@(po.Deal?.Oem?.OemName ?? "N/A")</span>
+                                        </div>
+                                    </td>
+                                    <td>@(po.Deal?.Product?.ProductName ?? "N/A")</td>
+                                    <td><strong>@po.OemPoAmount.ToString("C")</strong></td>
+                                    <td>
+                                        <span class="status-badge @(po.PaymentStatus.ToLower())">
+                                            @po.PaymentStatus
+                                        </span>
+                                    </td>
+                                    <td>@(po.PaymentTerms ?? "N/A")</td>
+                                    <td>@po.CreatedDate.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        <a asp-action="TrackPayment" asp-route-id="@po.PurchaseOrderId" 
+                                           class="bigin-btn outline sm">
+                                            <i class="fas fa-edit"></i>
+                                            Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-                <div class="card-body">
-                    @if (ViewBag.PurchaseOrders != null && ((List<License_Tracking.Models.PurchaseOrder>)ViewBag.PurchaseOrders).Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>
-                                            <a asp-action="PurchaseOrders" asp-route-sortBy="OemPoNumber" asp-route-sortOrder="@(ViewBag.SortBy == "OemPoNumber" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" class="text-decoration-none">
-                                                PO Number
-                                                @if (ViewBag.SortBy == "OemPoNumber")
-                                                {
-                                                    <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down")"></i>
-                                                }
-                                            </a>
-                                        </th>
-                                        <th>
-                                            <a asp-action="PurchaseOrders" asp-route-sortBy="OemName" asp-route-sortOrder="@(ViewBag.SortBy == "OemName" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" class="text-decoration-none">
-                                                OEM Partner
-                                                @if (ViewBag.SortBy == "OemName")
-                                                {
-                                                    <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down")"></i>
-                                                }
-                                            </a>
-                                        </th>
-                                        <th>Product</th>
-                                        <th>
-                                            <a asp-action="PurchaseOrders" asp-route-sortBy="OemPoAmount" asp-route-sortOrder="@(ViewBag.SortBy == "OemPoAmount" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" class="text-decoration-none">
-                                                Amount
-                                                @if (ViewBag.SortBy == "OemPoAmount")
-                                                {
-                                                    <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down")"></i>
-                                                }
-                                            </a>
-                                        </th>
-                                        <th>Status</th>
-                                        <th>Payment Terms</th>
-                                        <th>
-                                            <a asp-action="PurchaseOrders" asp-route-sortBy="CreatedDate" asp-route-sortOrder="@(ViewBag.SortBy == "CreatedDate" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" class="text-decoration-none">
-                                                Date Created
-                                                @if (ViewBag.SortBy == "CreatedDate")
-                                                {
-                                                    <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down")"></i>
-                                                }
-                                            </a>
-                                        </th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var po in (List<License_Tracking.Models.PurchaseOrder>)ViewBag.PurchaseOrders)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <strong>@po.OemPoNumber</strong>
-                                                @if (!string.IsNullOrEmpty(po.OemInvoiceNumber))
-                                                {
-                                                    <br><small class="text-muted">Invoice: @po.OemInvoiceNumber</small>
-                                                }
-                                            </td>
-                                            <td>@(po.Deal?.Oem?.OemName ?? "N/A")</td>
-                                            <td>
-                                                <strong>@(po.Deal?.Product?.ProductName ?? "N/A")</strong>
-                                            </td>
-                                            <td>
-                                                <strong>@po.OemPoAmount.ToString("C")</strong>
-                                                @if (po.AmountPaid > 0 && po.AmountPaid < po.OemPoAmount)
-                                                {
-                                                    <br><small class="text-success">Paid: @po.AmountPaid.ToString("C")</small>
-                                                }
-                                            </td>
-                                            <td>
-                                                <span class="badge @(po.PaymentStatus == "Paid" ? "bg-success" : po.PaymentStatus == "Partial" ? "bg-warning" : po.PaymentStatus == "Overdue" ? "bg-danger" : "bg-secondary")">
-                                                    @po.PaymentStatus
-                                                </span>
-                                                @if (po.PaymentDate.HasValue)
-                                                {
-                                                    <br><small class="text-muted">@po.PaymentDate.Value.ToString("MMM dd, yyyy")</small>
-                                                }
-                                            </td>
-                                            <td>
-                                                @if (!string.IsNullOrEmpty(po.PaymentTerms))
-                                                {
-                                                    <span class="badge @(po.PaymentTerms.Contains("30") ? "bg-success" : po.PaymentTerms.Contains("60") ? "bg-warning" : "bg-info")">
-                                                        @po.PaymentTerms
-                                                    </span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-muted">-</span>
-                                                }
-                                            </td>
-                                            <td>@po.CreatedDate.ToString("MMM dd, yyyy")</td>
-                                            <td>
-                                                <div class="btn-group" role="group">
-                                                    <a asp-action="TrackPayment" asp-route-id="@po.PurchaseOrderId" class="btn btn-sm btn-outline-primary" title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#detailModal-@po.PurchaseOrderId" title="View Details">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Pagination would go here if needed -->
-                        @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+                
+                @if (ViewBag.HasPaging != null && (bool)ViewBag.HasPaging)
+                {
+                    <div class="pagination-custom">
+                        @if (ViewBag.CurrentPage > 1)
                         {
-                            <nav class="mt-4">
-                                <ul class="pagination justify-content-center">
-                                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                                    {
-                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                            <a class="page-link" asp-action="PurchaseOrders" asp-route-page="@i">@i</a>
-                                        </li>
-                                    }
-                                </ul>
-                            </nav>
-                        }
-                    }
-                    else
-                    {
-                        <div class="alert alert-info text-center">
-                            <h5><i class="fas fa-info-circle"></i> No Purchase Orders Found</h5>
-                            <p>@(ViewBag.CurrentSearch != null ? "No purchase orders match your search criteria." : "Start by tracking your first OEM purchase order.")</p>
-                            <a asp-action="TrackPayment" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Track New Purchase Order
+                            <a asp-action="PurchaseOrders" asp-route-page="@(ViewBag.CurrentPage - 1)" class="page-link-custom">
+                                <i class="fas fa-chevron-left"></i>
+                                Previous
                             </a>
-                        </div>
-                    }
+                        }
+                        
+                        @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                        {
+                            <a asp-action="PurchaseOrders" asp-route-page="@i" 
+                               class="page-link-custom @(i == ViewBag.CurrentPage ? "active" : "")">
+                                @i
+                            </a>
+                        }
+                        
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <a asp-action="PurchaseOrders" asp-route-page="@(ViewBag.CurrentPage + 1)" class="page-link-custom">
+                                Next
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <h5>No Purchase Orders Found</h5>
+                    <p>No purchase orders match your current filters. Try adjusting your search criteria or add a new purchase order.</p>
+                    <a asp-action="TrackPayment" class="bigin-btn">
+                        <i class="fas fa-plus"></i>
+                        Add Purchase Order
+                    </a>
                 </div>
-            </div>
+            }
         </div>
     </div>
 </div>
 
-<style>
-    .card {
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border: none;
-        border-radius: 8px;
-        transition: all 0.3s ease;
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate metric values
+    const metricValues = document.querySelectorAll('.metric-info h3');
+    metricValues.forEach(value => {
+        const text = value.textContent;
+        const number = parseFloat(text.replace(/[^0-9.-]/g, ''));
+        if (!isNaN(number) && number > 0) {
+            value.textContent = '0';
+            let current = 0;
+            const increment = number / 30;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= number) {
+                    current = number;
+                    clearInterval(timer);
+                }
+                value.textContent = text.replace(number.toString(), Math.floor(current).toString());
+            }, 50);
+        }
+    });
+
+    // Add search functionality
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                this.closest('form').submit();
+            }
+        });
     }
-    
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-    
-    .table th a {
-        color: inherit;
-    }
-    
-    .table th a:hover {
-        color: #0d6efd;
-    }
-    
-    .btn-group .btn {
-        border-radius: 6px;
-    }
-</style>
+
+    // Add tooltips to status badges
+    const statusBadges = document.querySelectorAll('.status-badge');
+    statusBadges.forEach(badge => {
+        const status = badge.textContent.trim().toLowerCase();
+        let tooltip = '';
+        switch (status) {
+            case 'paid':
+                tooltip = 'Payment completed successfully';
+                break;
+            case 'partial':
+                tooltip = 'Partial payment received';
+                break;
+            case 'pending':
+                tooltip = 'Payment pending from OEM';
+                break;
+            case 'overdue':
+                tooltip = 'Payment is overdue';
+                break;
+        }
+        if (tooltip) {
+            badge.setAttribute('title', tooltip);
+        }
+    });
+});
+</script>
+                </div>
+            </div>
+        </div>
+
+    <!-- Purchase Orders Table -->
+    <div class="data-table fade-in-up">
+        <div class="table-header">
+            <h5><i class="fas fa-table me-2"></i>Purchase Orders</h5>
+            @if (ViewBag.TotalCount != null)
+            {
+                <span class="results-badge">@ViewBag.TotalCount results</span>
+            }
+        </div>
+        <div class="table-content">
+            @if (ViewBag.PurchaseOrders != null && ((List<License_Tracking.Models.PurchaseOrder>)ViewBag.PurchaseOrders).Any())
+            {
+                <div class="table-responsive">
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a asp-action="PurchaseOrders" 
+                                       asp-route-sortBy="OemPoNumber" 
+                                       asp-route-sortOrder="@(ViewBag.SortBy == "OemPoNumber" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" 
+                                       class="sort-link">
+                                        PO Number
+                                        @if (ViewBag.SortBy == "OemPoNumber")
+                                        {
+                                            <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down") sort-icon"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th>
+                                    <a asp-action="PurchaseOrders" 
+                                       asp-route-sortBy="OemName" 
+                                       asp-route-sortOrder="@(ViewBag.SortBy == "OemName" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" 
+                                       class="sort-link">
+                                        OEM Partner
+                                        @if (ViewBag.SortBy == "OemName")
+                                        {
+                                            <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down") sort-icon"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th>Product</th>
+                                <th>
+                                    <a asp-action="PurchaseOrders" 
+                                       asp-route-sortBy="OemPoAmount" 
+                                       asp-route-sortOrder="@(ViewBag.SortBy == "OemPoAmount" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" 
+                                       class="sort-link">
+                                        Amount
+                                        @if (ViewBag.SortBy == "OemPoAmount")
+                                        {
+                                            <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down") sort-icon"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th>Status</th>
+                                <th>Payment Terms</th>
+                                <th>
+                                    <a asp-action="PurchaseOrders" 
+                                       asp-route-sortBy="CreatedDate" 
+                                       asp-route-sortOrder="@(ViewBag.SortBy == "CreatedDate" && ViewBag.SortOrder == "asc" ? "desc" : "asc")" 
+                                       class="sort-link">
+                                        Created
+                                        @if (ViewBag.SortBy == "CreatedDate")
+                                        {
+                                            <i class="fas fa-sort-@(ViewBag.SortOrder == "asc" ? "up" : "down") sort-icon"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var po in (List<License_Tracking.Models.PurchaseOrder>)ViewBag.PurchaseOrders)
+                            {
+                                <tr>
+                                    <td><strong>@po.OemPoNumber</strong></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-2">
+                                                <i class="fas fa-building text-muted"></i>
+                                            </div>
+                                            <span>@(po.Deal?.Oem?.OemName ?? "N/A")</span>
+                                        </div>
+                                    </td>
+                                    <td>@(po.Deal?.Product?.ProductName ?? "N/A")</td>
+                                    <td><strong>@po.OemPoAmount.ToString("C")</strong></td>
+                                    <td>
+                                        <span class="status-badge @(po.PaymentStatus.ToLower())">
+                                            @po.PaymentStatus
+                                        </span>
+                                    </td>
+                                    <td>@(po.PaymentTerms ?? "N/A")</td>
+                                    <td>@po.CreatedDate.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        <a asp-action="TrackPayment" asp-route-id="@po.PurchaseOrderId" 
+                                           class="bigin-btn outline sm">
+                                            <i class="fas fa-edit"></i>
+                                            Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                
+                @if (ViewBag.HasPaging != null && (bool)ViewBag.HasPaging)
+                {
+                    <div class="pagination-custom">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <a asp-action="PurchaseOrders" asp-route-page="@(ViewBag.CurrentPage - 1)" class="page-link-custom">
+                                <i class="fas fa-chevron-left"></i>
+                                Previous
+                            </a>
+                        }
+                        
+                        @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                        {
+                            <a asp-action="PurchaseOrders" asp-route-page="@i" 
+                               class="page-link-custom @(i == ViewBag.CurrentPage ? "active" : "")">
+                                @i
+                            </a>
+                        }
+                        
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <a asp-action="PurchaseOrders" asp-route-page="@(ViewBag.CurrentPage + 1)" class="page-link-custom">
+                                Next
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <h5>No Purchase Orders Found</h5>
+                    <p>No purchase orders match your current filters. Try adjusting your search criteria or add a new purchase order.</p>
+                    <a asp-action="TrackPayment" class="bigin-btn">
+                        <i class="fas fa-plus"></i>
+                        Add Purchase Order
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,38 +1,838 @@
+@using System.Linq
 @{
     ViewData["Title"] = "Track Payment";
     var licenses = ViewBag.Licenses as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>;
+    bool isEdit = ViewBag.IsEdit ?? false;
+    var purchaseOrder = ViewBag.PurchaseOrder as License_Tracking.Models.PurchaseOrder;
 }
-<h2>Track Payment</h2>
-<form asp-action="TrackPayment" method="post">
-    <div class="mb-3">
-        <label>License</label>
-        <select name="licenseId" class="form-control" required>
-            <option value="">Select a License</option>
-            @if (licenses != null)
+
+<style>
+    :root {
+        --primary-color: #3B82F6;
+        --secondary-color: #1E40AF;
+        --success-color: #059669;
+        --warning-color: #D97706;
+        --danger-color: #DC2626;
+        --info-color: #0EA5E9;
+        --dark-color: #1F2937;
+        --light-color: #F8FAFC;
+        --border-color: #E5E7EB;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    .bigin-container {
+        padding: 1.5rem;
+        background: #F8FAFC;
+        min-height: 100vh;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+
+    .page-header h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .breadcrumb-custom {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        margin: 0;
+    }
+
+    .breadcrumb-custom .breadcrumb-item {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .breadcrumb-custom .breadcrumb-item.active {
+        color: white;
+        font-weight: 600;
+    }
+
+    .breadcrumb-custom .breadcrumb-item+.breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .breadcrumb-custom a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .breadcrumb-custom a:hover {
+        color: white;
+        text-decoration: underline;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+
+    .form-header {
+        background: var(--light-color);
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .form-header h5 {
+        margin: 0;
+        color: var(--text-primary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-content {
+        padding: 2rem;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-label.required::after {
+        content: '*';
+        color: var(--danger-color);
+        margin-left: 0.25rem;
+    }
+
+    .form-control,
+    .form-select {
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+        background: white;
+        font-size: 1rem;
+        width: 100%;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+        outline: none;
+    }
+
+    .form-control.error,
+    .form-select.error {
+        border-color: var(--danger-color);
+    }
+
+    .form-text {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .error-message {
+        color: var(--danger-color);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+    /* Alert Styles */
+    .alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        font-size: 0.875rem;
+    }
+
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+
+    .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+
+    .alert ul {
+        padding-left: 1.25rem;
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        z-index: 5;
+    }
+
+    .input-icon+.form-control {
+        padding-left: 2.5rem;
+    }
+
+    .bigin-btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .bigin-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .bigin-btn:hover::before {
+        left: 100%;
+    }
+
+    .bigin-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        color: white;
+        text-decoration: none;
+    }
+
+    .bigin-btn.secondary {
+        background: var(--text-secondary);
+        color: white;
+    }
+
+    .bigin-btn.secondary:hover {
+        background: var(--dark-color);
+        color: white;
+    }
+
+    .bigin-btn.outline {
+        background: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+
+    .bigin-btn.outline:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        margin-top: 2rem;
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        position: relative;
+    }
+
+    .step::after {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        width: 100%;
+        height: 2px;
+        background: var(--border-color);
+        z-index: 1;
+    }
+
+    .step:last-child::after {
+        display: none;
+    }
+
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--border-color);
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+
+    .step.active .step-icon {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .step.completed .step-icon {
+        background: var(--success-color);
+        color: white;
+    }
+
+    .step-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        text-align: center;
+    }
+
+    .step.active .step-label {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .info-card {
+        background: #EFF6FF;
+        border: 1px solid #BFDBFE;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--info-color);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-card-content {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .fade-in-up:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .fade-in-up:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .fade-in-up:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    @@media (max-width: 768px) {
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .form-actions .bigin-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="bigin-container">
+    <!-- Page Header -->
+    <div class="page-header fade-in-up">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1>
+                    <i class="fas fa-@(isEdit ? "edit" : "plus") me-3"></i>
+                    @(isEdit ? "Edit Payment Tracking" : "Track New Payment")
+                </h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-custom">
+                        <li class="breadcrumb-item">
+                            <a asp-action="Index">Procurement</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-action="PurchaseOrders">Purchase Orders</a>
+                        </li>
+                        <li class="breadcrumb-item active">@(isEdit ? "Edit" : "Track") Payment</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-none d-md-block">
+                <i class="fas fa-money-check-alt" style="font-size: 3rem; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Steps -->
+    @if (!isEdit)
+    {
+        <div class="progress-steps fade-in-up">
+            <div class="step active">
+                <div class="step-icon">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <div class="step-label">Purchase Order</div>
+            </div>
+            <div class="step">
+                <div class="step-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="step-label">Payment Details</div>
+            </div>
+            <div class="step">
+                <div class="step-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="step-label">Confirmation</div>
+            </div>
+        </div>
+    }
+
+    <!-- Info Card -->
+    <div class="info-card fade-in-up">
+        <div class="info-card-header">
+            <i class="fas fa-info-circle"></i>
+            <span>@(isEdit ? "Update Payment Information" : "Track OEM Payment")</span>
+        </div>
+        <div class="info-card-content">
+            @if (isEdit)
             {
-                @foreach (var l in licenses)
+                <p>Update the payment tracking details for this purchase order. Changes will be saved immediately.</p>
+            }
+            else
+            {
+                <p>Enter the purchase order and payment details to track OEM payments in your procurement workflow. This
+                    helps maintain accurate financial records and payment status.</p>
+            }
+        </div>
+    </div>
+
+    <!-- Payment Form -->
+    <div class="form-card fade-in-up">
+        <div class="form-header">
+            <h5>
+                <i class="fas fa-clipboard-list"></i>
+                @(isEdit ? "Update Payment Details" : "Payment Tracking Form")
+            </h5>
+        </div>
+
+        <!-- Server-side Error Display -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger" role="alert">
+                <h5><i class="fas fa-exclamation-triangle"></i> Please correct the following errors:</h5>
+                <ul class="mb-0">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <div class="form-content">
+            <form asp-action="TrackPayment" method="post" id="paymentForm">
+                @if (isEdit && purchaseOrder != null)
                 {
-                    <option value="@l.Value">@l.Text</option>
+                    <input type="hidden" name="purchaseOrderId" value="@purchaseOrder.PurchaseOrderId" />
+                }
+
+                <!-- Deal/License Selection -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-handshake"></i>
+                        <span>Deal Information</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Select Deal/License</label>
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-file-contract"></i>
+                            </div>
+                            <select name="dealId" class="form-select" required>
+                                <option value="">Choose a deal to track payment for...</option>
+                                @if (licenses != null)
+                                {
+                                    @foreach (var l in licenses)
+                                    {
+                                        <option value="@l.Value"
+                                            selected="@(isEdit && purchaseOrder?.DealId.ToString() == l.Value)">
+                                            @l.Text
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="form-text">Select the deal/license associated with this purchase order</div>
+                        <div class="error-message">Please select a deal/license</div>
+                    </div>
+                </div>
+
+                <!-- Purchase Order Details -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-file-invoice"></i>
+                        <span>Purchase Order Details</span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label required">OEM PO Number</label>
+                                <div class="input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-hashtag"></i>
+                                    </div>
+                                    <input name="oemPoNumber" class="form-control"
+                                        value="@(isEdit? purchaseOrder?.OemPoNumber : "")"
+                                        placeholder="Enter purchase order number" required />
+                                </div>
+                                <div class="form-text">The purchase order number from the OEM</div>
+                                <div class="error-message">PO Number is required</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label required">OEM PO Amount</label>
+                                <div class="input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </div>
+                                    <input name="oemPoAmount" class="form-control" type="number" step="0.01"
+                                        value="@(isEdit? purchaseOrder?.OemPoAmount.ToString() : "")" placeholder="0.00"
+                                        required />
+                                </div>
+                                <div class="form-text">Total amount of the purchase order</div>
+                                <div class="error-message">Valid amount is required</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">OEM Invoice Number</label>
+                                <div class="input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-receipt"></i>
+                                    </div>
+                                    <input name="oemInvoiceNumber" class="form-control"
+                                        value="@(isEdit? purchaseOrder?.OemInvoiceNumber : "")"
+                                        placeholder="Enter invoice number (optional)" />
+                                </div>
+                                <div class="form-text">Invoice number if available</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Payment Terms</label>
+                                <div class="input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <select name="paymentTerms" class="form-select">
+                                        <option value="">Select payment terms...</option>
+                                        <option value="Net 30"
+                                            selected="@(isEdit && purchaseOrder?.PaymentTerms == "Net 30")">Net 30
+                                        </option>
+                                        <option value="Net 60"
+                                            selected="@(isEdit && purchaseOrder?.PaymentTerms == "Net 60")">Net 60
+                                        </option>
+                                        <option value="Net 90"
+                                            selected="@(isEdit && purchaseOrder?.PaymentTerms == "Net 90")">Net 90
+                                        </option>
+                                        <option value="Immediate"
+                                            selected="@(isEdit && purchaseOrder?.PaymentTerms == "Immediate")">Immediate
+                                        </option>
+                                        <option value="COD"
+                                            selected="@(isEdit && purchaseOrder?.PaymentTerms == "COD")">Cash on
+                                            Delivery</option>
+                                    </select>
+                                </div>
+                                <div class="form-text">Payment terms agreed with OEM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Information -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Payment Information</span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label required">Amount Paid</label>
+                                <div class="input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                    <input name="amountPaid" class="form-control" type="number" step="0.01"
+                                        value="@(isEdit? purchaseOrder?.AmountPaid.ToString() : "")" placeholder="0.00"
+                                        required />
+                                </div>
+                                <div class="form-text">Amount that has been paid</div>
+                                <div class="error-message">Valid payment amount is required</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Payment Status</label>
+                                <div class="input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                    </div>
+                                    <select name="paymentStatus" class="form-select">
+                                        <option value="Pending"
+                                            selected="@(isEdit && purchaseOrder?.PaymentStatus == "Pending")">Pending
+                                        </option>
+                                        <option value="Partial"
+                                            selected="@(isEdit && purchaseOrder?.PaymentStatus == "Partial")">Partial
+                                        </option>
+                                        <option value="Paid"
+                                            selected="@(isEdit && purchaseOrder?.PaymentStatus == "Paid")">Paid</option>
+                                        <option value="Overdue"
+                                            selected="@(isEdit && purchaseOrder?.PaymentStatus == "Overdue")">Overdue
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-text">Current status of the payment</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Payment Notes</label>
+                        <textarea name="notes" class="form-control" rows="3"
+                            placeholder="Add any additional notes about this payment...">@(isEdit? purchaseOrder?.Notes : "")</textarea>
+                        <div class="form-text">Optional notes about payment terms, conditions, or status</div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="bigin-btn">
+                        <i class="fas fa-@(isEdit ? "save" : "plus")"></i>
+                        @(isEdit ? "Update Payment" : "Save Payment Tracking")
+                    </button>
+                    <a asp-action="@(isEdit ? "PurchaseOrders" : "Index")" class="bigin-btn outline">
+                        <i class="fas fa-arrow-left"></i>
+                        @(isEdit ? "Back to Purchase Orders" : "Back to Dashboard")
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('paymentForm');
+        const inputs = form.querySelectorAll('input[required], select[required]');
+
+        // Form validation
+        function validateInput(input) {
+            const errorMessage = input.parentNode.parentNode.querySelector('.error-message');
+            let isValid = true;
+
+            if (input.hasAttribute('required') && !input.value.trim()) {
+                isValid = false;
+            }
+
+            if (input.type === 'number' && input.value && parseFloat(input.value) < 0) {
+                isValid = false;
+            }
+
+            if (isValid) {
+                input.classList.remove('error');
+                if (errorMessage) errorMessage.style.display = 'none';
+            } else {
+                input.classList.add('error');
+                if (errorMessage) errorMessage.style.display = 'block';
+            }
+
+            return isValid;
+        }
+
+        // Add real-time validation
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => validateInput(input));
+            input.addEventListener('input', () => {
+                if (input.classList.contains('error')) {
+                    validateInput(input);
+                }
+            });
+        });
+
+        // Form submission validation
+        form.addEventListener('submit', function (e) {
+            let allValid = true;
+
+            inputs.forEach(input => {
+                if (!validateInput(input)) {
+                    allValid = false;
+                }
+            });
+
+            // Validate amount paid vs PO amount
+            const poAmount = parseFloat(document.querySelector('input[name="oemPoAmount"]').value) || 0;
+            const amountPaid = parseFloat(document.querySelector('input[name="amountPaid"]').value) || 0;
+
+            if (amountPaid > poAmount) {
+                alert('Amount paid cannot be greater than the PO amount.');
+                allValid = false;
+            }
+
+            if (!allValid) {
+                e.preventDefault();
+                // Scroll to first error
+                const firstError = form.querySelector('.error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
-        </select>
-    </div>
-    <div class="mb-3">
-        <label>OEM PO Number</label>
-        <input name="oemPoNumber" class="form-control" required />
-    </div>
-    <div class="mb-3">
-        <label>OEM PO Amount</label>
-        <input name="oemPoAmount" class="form-control" type="number" step="0.01" required />
-    </div>
-    <div class="mb-3">
-        <label>OEM Invoice Number</label>
-        <input name="oemInvoiceNumber" class="form-control" required />
-    </div>
-    <div class="mb-3">
-        <label>Amount Paid</label>
-        <input name="amountPaid" class="form-control" type="number" step="0.01" required />
-    </div>
-    <button type="submit" class="btn btn-primary">Save Payment</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
-</form>
+        });
+
+        // Auto-update payment status based on amounts
+        const poAmountInput = document.querySelector('input[name="oemPoAmount"]');
+        const amountPaidInput = document.querySelector('input[name="amountPaid"]');
+        const statusSelect = document.querySelector('select[name="paymentStatus"]');
+
+        function updatePaymentStatus() {
+            const poAmount = parseFloat(poAmountInput.value) || 0;
+            const amountPaid = parseFloat(amountPaidInput.value) || 0;
+
+            if (amountPaid === 0) {
+                statusSelect.value = 'Pending';
+            } else if (amountPaid >= poAmount) {
+                statusSelect.value = 'Paid';
+            } else if (amountPaid > 0 && amountPaid < poAmount) {
+                statusSelect.value = 'Partial';
+            }
+        }
+
+        poAmountInput.addEventListener('input', updatePaymentStatus);
+        amountPaidInput.addEventListener('input', updatePaymentStatus);
+
+        // Format currency inputs
+        const currencyInputs = document.querySelectorAll('input[type="number"]');
+        currencyInputs.forEach(input => {
+            input.addEventListener('blur', function () {
+                if (this.value) {
+                    this.value = parseFloat(this.value).toFixed(2);
+                }
+            });
+        });
+
+        // Progressive form enhancement
+        const sections = document.querySelectorAll('.form-section');
+        sections.forEach((section, index) => {
+            section.style.animationDelay = `${(index + 1) * 0.1}s`;
+            section.classList.add('fade-in-up');
+        });
+    });
+</script>

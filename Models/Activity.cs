@@ -9,12 +9,12 @@ namespace License_Tracking.Models
         public int ActivityId { get; set; }
 
         // CRM-style Activity Fields (Phase 3 Enhancement)
-        [Required]
+        [Required(ErrorMessage = "Activity Type is required")]
         [StringLength(50)]
         [Display(Name = "Activity Type")]
         public string Type { get; set; } = string.Empty; // "Call", "Email", "Meeting", "Task", "Demo", "Follow-up", "Quote", "Negotiation", "Contract", "Other"
 
-        [Required]
+        [Required(ErrorMessage = "Subject is required")]
         [StringLength(200)]
         [Display(Name = "Subject")]
         public string Subject { get; set; } = string.Empty;
@@ -27,19 +27,19 @@ namespace License_Tracking.Models
         [Display(Name = "Notes")]
         public string? Notes { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Scheduled Date is required")]
         [Display(Name = "Scheduled Date")]
         public DateTime ScheduledDate { get; set; }
 
         [Display(Name = "Due Date")]
         public DateTime? DueDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Status is required")]
         [StringLength(50)]
         [Display(Name = "Status")]
         public string Status { get; set; } = "Pending"; // "Pending", "In Progress", "Completed", "Cancelled", "Deferred"
 
-        [Required]
+        [Required(ErrorMessage = "Priority is required")]
         [StringLength(20)]
         [Display(Name = "Priority")]
         public string Priority { get; set; } = "Medium"; // "Low", "Medium", "High", "Urgent"
@@ -57,7 +57,7 @@ namespace License_Tracking.Models
         public string? AssignedTo { get; set; }
 
         // Audit Fields
-        [Required]
+        [Required(ErrorMessage = "Created Date is required")]
         [Display(Name = "Created Date")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 

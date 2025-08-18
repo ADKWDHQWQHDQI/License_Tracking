@@ -9,6 +9,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace License_Tracking.Controllers
 {
+    /// <summary>
+    /// ProcurementController handles Phase 2 of the CBMS 4-phase workflow (Canarys → OEM)
+    /// 
+    /// Business Process Mapping:
+    /// - Phase 1: Customer → Canarys (handled by InvoiceManagement with BusinessPhase = 1)
+    /// - Phase 2: Canarys → OEM (handled by this controller - OEM procurement & purchase orders)
+    /// - Phase 3: License Delivery (handled by Deal management)
+    /// - Phase 4: OEM → Canarys Settlement (handled by InvoiceManagement with BusinessPhase = 4)
+    /// 
+    /// Key Relationships:
+    /// - PurchaseOrder entity is specific to Phase 2 OEM procurement
+    /// - CbmsInvoice (Invoice Management) handles multi-phase invoicing (BusinessPhase 1-4)
+    /// - TrackPayment here is for OEM purchase order payments (Phase 2)
+    /// - RecordPayment in InvoiceManagement is for comprehensive invoice payments (all phases)
+    /// </summary>
     [Authorize(Roles = "Admin,Operations,Finance")]
     public class ProcurementController : Controller
     {
@@ -25,6 +40,9 @@ namespace License_Tracking.Controllers
             var oemSummary = await GetOemSummaryAsync();
             var recentPurchaseOrders = await _context.PurchaseOrders
                 .Include(p => p.Deal)
+                    .ThenInclude(d => d.Product)
+                .Include(p => p.Deal)
+                    .ThenInclude(d => d.Oem)
                 .OrderByDescending(p => p.PurchaseOrderId)
                 .Take(10)
                 .ToListAsync();
@@ -39,14 +57,19 @@ namespace License_Tracking.Controllers
         public async Task<IActionResult> PurchaseOrders(string search = "", string paymentStatus = "",
             string oemFilter = "", string dateRange = "", string sortBy = "CreatedDate", string sortOrder = "desc")
         {
-            var query = _context.PurchaseOrders.Include(p => p.Deal).AsQueryable();
+            var query = _context.PurchaseOrders
+                .Include(p => p.Deal)
+                    .ThenInclude(d => d.Product)
+                .Include(p => p.Deal)
+                    .ThenInclude(d => d.Oem)
+                .AsQueryable();
 
             // Apply search filter
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(p => p.OemPoNumber.Contains(search) ||
-                                   p.Deal.Product.ProductName.Contains(search) ||
-                                   p.Deal.Oem.OemName.Contains(search));
+                                   (p.Deal.Product != null && p.Deal.Product.ProductName.Contains(search)) ||
+                                   (p.Deal.Oem != null && p.Deal.Oem.OemName.Contains(search)));
             }
 
             // Apply payment status filter
@@ -58,7 +81,7 @@ namespace License_Tracking.Controllers
             // Apply OEM filter
             if (!string.IsNullOrEmpty(oemFilter))
             {
-                query = query.Where(p => p.Deal.Oem.OemName == oemFilter);
+                query = query.Where(p => p.Deal.Oem != null && p.Deal.Oem.OemName == oemFilter);
             }
 
             // Apply date range filter
@@ -82,7 +105,7 @@ namespace License_Tracking.Controllers
             query = sortBy switch
             {
                 "OemPoNumber" => sortOrder == "asc" ? query.OrderBy(p => p.OemPoNumber) : query.OrderByDescending(p => p.OemPoNumber),
-                "OemName" => sortOrder == "asc" ? query.OrderBy(p => p.Deal.Oem.OemName) : query.OrderByDescending(p => p.Deal.Oem.OemName),
+                "OemName" => sortOrder == "asc" ? query.OrderBy(p => p.Deal.Oem != null ? p.Deal.Oem.OemName : "") : query.OrderByDescending(p => p.Deal.Oem != null ? p.Deal.Oem.OemName : ""),
                 "OemPoAmount" => sortOrder == "asc" ? query.OrderBy(p => p.OemPoAmount) : query.OrderByDescending(p => p.OemPoAmount),
                 "CreatedDate" => sortOrder == "asc" ? query.OrderBy(p => p.CreatedDate) : query.OrderByDescending(p => p.CreatedDate),
                 _ => query.OrderByDescending(p => p.CreatedDate)
@@ -102,6 +125,7 @@ namespace License_Tracking.Controllers
             // Get available OEMs for filter
             var availableOems = await _context.Deals
                 .Include(l => l.Oem)
+                .Where(l => l.Oem != null)
                 .Select(l => l.Oem.OemName)
                 .Distinct()
                 .ToListAsync();
@@ -157,13 +181,90 @@ namespace License_Tracking.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> TrackPayment(int? purchaseOrderId, int licenseId, string oemPoNumber,
+        public async Task<IActionResult> TrackPayment(int? purchaseOrderId, int dealId, string oemPoNumber,
             decimal oemPoAmount, string oemInvoiceNumber, decimal amountPaid, string paymentStatus,
-            DateTime? paymentDate, string paymentTerms, string notes)
+            DateTime? paymentDate, string? paymentTerms, string? notes)
         {
             try
             {
-                PurchaseOrder purchaseOrder;
+                // Clear any automatic validation errors for optional fields
+                if (ModelState.ContainsKey("notes"))
+                {
+                    ModelState.Remove("notes");
+                }
+                if (ModelState.ContainsKey("paymentTerms"))
+                {
+                    ModelState.Remove("paymentTerms");
+                }
+                if (ModelState.ContainsKey("paymentDate"))
+                {
+                    ModelState.Remove("paymentDate");
+                }
+
+                // Validate required fields manually
+                if (dealId <= 0)
+                {
+                    ModelState.AddModelError("dealId", "Please select a valid deal/license");
+                }
+
+                if (string.IsNullOrWhiteSpace(oemPoNumber))
+                {
+                    ModelState.AddModelError("oemPoNumber", "OEM PO Number is required");
+                }
+
+                if (oemPoAmount <= 0)
+                {
+                    ModelState.AddModelError("oemPoAmount", "OEM PO Amount must be greater than zero");
+                }
+
+                if (string.IsNullOrWhiteSpace(oemInvoiceNumber))
+                {
+                    ModelState.AddModelError("oemInvoiceNumber", "OEM Invoice Number is required");
+                }
+
+                if (amountPaid < 0)
+                {
+                    ModelState.AddModelError("amountPaid", "Amount Paid cannot be negative");
+                }
+
+                if (amountPaid > oemPoAmount)
+                {
+                    ModelState.AddModelError("amountPaid", "Amount Paid cannot exceed PO Amount");
+                }
+
+                // Debug: Log ModelState errors
+                if (!ModelState.IsValid)
+                {
+                    foreach (var error in ModelState.Where(x => x.Value?.Errors.Count > 0))
+                    {
+                        System.Diagnostics.Debug.WriteLine($"ModelState Error - Key: {error.Key}, Errors: {string.Join(", ", error.Value?.Errors.Select(e => e.ErrorMessage) ?? Array.Empty<string>())}");
+                    }
+                }
+
+                // If validation fails, reload the form
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.Licenses = await _context.Deals
+                        .Include(l => l.Product)
+                        .Include(l => l.Company)
+                        .Include(l => l.Oem)
+                        .Select(l => new SelectListItem
+                        {
+                            Value = l.DealId.ToString(),
+                            Text = $"{(l.Product != null ? l.Product.ProductName : "Unknown")} - {(l.Company != null ? l.Company.CompanyName : "Unknown")} ({(l.Oem != null ? l.Oem.OemName : "Unknown")})"
+                        }).ToListAsync();
+
+                    if (purchaseOrderId.HasValue)
+                    {
+                        var existingPO = await _context.PurchaseOrders.Include(p => p.Deal).FirstOrDefaultAsync(p => p.PurchaseOrderId == purchaseOrderId.Value);
+                        ViewBag.IsEdit = true;
+                        ViewBag.PurchaseOrder = existingPO;
+                    }
+
+                    return View();
+                }
+
+                PurchaseOrder? purchaseOrder;
 
                 if (purchaseOrderId.HasValue)
                 {
@@ -180,7 +281,7 @@ namespace License_Tracking.Controllers
                     // Create new PO
                     purchaseOrder = new PurchaseOrder
                     {
-                        DealId = licenseId,
+                        DealId = dealId,
                         CreatedDate = DateTime.Now
                     };
                     _context.PurchaseOrders.Add(purchaseOrder);
@@ -195,8 +296,9 @@ namespace License_Tracking.Controllers
                 purchaseOrder.PaymentDate = paymentDate;
                 purchaseOrder.PaymentTerms = paymentTerms;
                 purchaseOrder.Notes = notes;
+                purchaseOrder.UpdatedDate = DateTime.Now;
 
-                // Update payment status based on amount paid
+                // Automatically determine payment status based on amount paid
                 if (amountPaid >= oemPoAmount)
                 {
                     purchaseOrder.PaymentStatus = "Paid";
@@ -206,17 +308,23 @@ namespace License_Tracking.Controllers
                 {
                     purchaseOrder.PaymentStatus = "Partial";
                 }
+                else
+                {
+                    purchaseOrder.PaymentStatus = "Pending";
+                }
 
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = purchaseOrderId.HasValue ?
-                    "Payment tracking updated successfully!" :
-                    "Payment tracking created successfully!";
+                    $"Payment tracking updated successfully! Status: {purchaseOrder.PaymentStatus}" :
+                    $"Payment tracking created successfully! Status: {purchaseOrder.PaymentStatus}";
 
                 return RedirectToAction(nameof(PurchaseOrders));
             }
             catch (Exception ex)
             {
+                TempData["ErrorMessage"] = "Error tracking payment: " + ex.Message;
+
                 ViewBag.Licenses = await _context.Deals
                     .Include(l => l.Product)
                     .Include(l => l.Company)
@@ -227,7 +335,13 @@ namespace License_Tracking.Controllers
                         Text = $"{(l.Product != null ? l.Product.ProductName : "Unknown")} - {(l.Company != null ? l.Company.CompanyName : "Unknown")} ({(l.Oem != null ? l.Oem.OemName : "Unknown")})"
                     }).ToListAsync();
 
-                ModelState.AddModelError("", "Error tracking payment: " + ex.Message);
+                if (purchaseOrderId.HasValue)
+                {
+                    var existingPO = await _context.PurchaseOrders.Include(p => p.Deal).FirstOrDefaultAsync(p => p.PurchaseOrderId == purchaseOrderId.Value);
+                    ViewBag.IsEdit = true;
+                    ViewBag.PurchaseOrder = existingPO;
+                }
+
                 return View();
             }
         }
@@ -239,7 +353,12 @@ namespace License_Tracking.Controllers
             var pendingPayments = await _context.PurchaseOrders
                 .Where(p => p.PaymentStatus != "Paid")
                 .SumAsync(p => p.OemPoAmount - p.AmountPaid);
-            var uniqueOems = await _context.Deals.Select(l => l.OemName).Distinct().CountAsync();
+            var uniqueOems = await _context.Deals
+                .Include(l => l.Oem)
+                .Where(l => l.Oem != null)
+                .Select(l => l.Oem.OemName)
+                .Distinct()
+                .CountAsync();
 
             return new
             {

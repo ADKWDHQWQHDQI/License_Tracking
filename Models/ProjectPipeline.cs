@@ -8,15 +8,15 @@ namespace License_Tracking.Models
     {
         public int ProjectPipelineId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Product Name is required")]
         [StringLength(100)]
         public required string ProductName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "OEM Name is required")]
         [StringLength(100)]
         public required string OemName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Client Name is required")]
         [StringLength(100)]
         public required string ClientName { get; set; }
 
@@ -26,10 +26,10 @@ namespace License_Tracking.Models
         [StringLength(50)]
         public string? ClientContactPhone { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Expected License Date is required")]
         public DateTime ExpectedLicenseDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Expected Expiry Date is required")]
         public DateTime ExpectedExpiryDate { get; set; }
 
         // Pipeline Stage Management (Week 10 Enhancement)

@@ -29,23 +29,23 @@ namespace License_Tracking.Models
         public int? DealId { get; set; }
         public int? ProjectPipelineId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Alert Type is required")]
         public AlertType AlertType { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Priority is required")]
         public AlertPriority Priority { get; set; } = AlertPriority.Medium;
 
-        [Required]
+        [Required(ErrorMessage = "Alert Title is required")]
         [StringLength(200)]
         public required string Title { get; set; }
 
         [StringLength(1000)]
         public string? AlertMessage { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Alert Date is required")]
         public DateTime AlertDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Created Date is required")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         public DateTime? SentDate { get; set; }

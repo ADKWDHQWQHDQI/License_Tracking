@@ -15,6 +15,290 @@
             color: white;
         }
 
+        /* Bigin.com Metric Cards */
+        .bigin-metrics-header {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid #e8ecff;
+        }
+
+        .bigin-metric-badge {
+            animation: pulse 2s infinite;
+        }
+
+        .bigin-metric-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f3f7;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bigin-metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            border-color: #e0e6ff;
+        }
+
+        .bigin-metric-card.bigin-metric-danger:hover {
+            border-color: #ffe0e0;
+        }
+
+        .bigin-metric-body {
+            padding: 1.5rem;
+        }
+
+        .bigin-metric-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .bigin-metric-content {
+            flex: 1;
+        }
+
+        .bigin-metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.25rem;
+        }
+
+        .bigin-metric-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .bigin-metric-description {
+            font-size: 0.8125rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .bigin-metric-footer {
+            background: #f8f9ff;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #f1f3f7;
+        }
+
+        .bigin-metric-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.8125rem;
+            transition: all 0.2s ease;
+        }
+
+        .bigin-metric-link:hover {
+            color: #5a6fd8;
+            text-decoration: none;
+        }
+
+        .bigin-metric-link.text-danger {
+            color: #dc3545;
+        }
+
+        .bigin-metric-link.text-danger:hover {
+            color: #c82333;
+        }
+
+        /* Bigin.com Admin Panel */
+        .bigin-admin-panel {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            border: 1px solid #f1f3f7;
+            overflow: hidden;
+        }
+
+        .bigin-admin-header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            padding: 1.5rem;
+        }
+
+        .bigin-admin-body {
+            padding: 2rem;
+        }
+
+        .bigin-admin-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f3f7;
+            transition: all 0.3s ease;
+        }
+
+        .bigin-admin-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .bigin-admin-card-body {
+            padding: 1.5rem;
+        }
+
+        .bigin-admin-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.125rem;
+        }
+
+        .bigin-admin-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.25rem;
+        }
+
+        .bigin-admin-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .bigin-admin-description {
+            font-size: 0.8125rem;
+        }
+
+        .bigin-admin-actions {
+            border-top: 1px solid #f1f3f7;
+            padding-top: 1rem;
+        }
+
+        .bigin-admin-tools {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .bigin-admin-quick-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .bigin-quick-action-btn {
+            background: white;
+            border: 1px solid #e8ecff;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 500;
+            font-size: 0.8125rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .bigin-quick-action-btn:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        /* Soft Background Colors */
+        .bg-primary-soft {
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+
+        .bg-success-soft {
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+
+        .bg-warning-soft {
+            background-color: rgba(255, 193, 7, 0.1);
+        }
+
+        .bg-info-soft {
+            background-color: rgba(23, 162, 184, 0.1);
+        }
+
+        .bg-danger-soft {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        /* Pipeline Insights */
+        .bigin-pipeline-insights {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f3f7;
+        }
+
+        .bigin-insight-card {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #e8ecff;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bigin-insight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .bigin-insight-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.125rem;
+            flex-shrink: 0;
+        }
+
+        .bigin-insight-content {
+            flex: 1;
+        }
+
+        .bigin-insight-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Animations */
+        @@keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
         .metric-card {
             background: white;
             border-radius: 12px;
@@ -170,6 +454,26 @@
             margin-bottom: 2rem;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
+
+        /* Animations */
+        @@keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        @@keyframes ripple {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
     </style>
 }
 
@@ -191,142 +495,80 @@
     </div>
 </div>
 
-<!-- Key Metrics Row -->
+<!-- 4-Phase B2B2B Workflow Overview -->
 <div class="row mb-4">
     <div class="col-12">
-        <h5 class="fw-semibold mb-3">Business Overview</h5>
-    </div>
-    
-    <!-- Total Companies -->
-    <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
-        <div class="metric-card">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="metric-icon bg-primary bg-opacity-10">
-                        <i class="fas fa-building text-primary"></i>
-                    </div>
-                    <h3 class="fw-bold text-dark mb-1">@(Model.TotalCompanies)</h3>
-                    <p class="text-muted mb-0 small">Total Companies</p>
-                </div>
-                <div class="text-end">
-                    <a asp-controller="Companies" asp-action="Index" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-gradient-primary text-white border-bottom-0">
+                <h5 class="mb-0 text-white">
+                    <i class="fas fa-sitemap"></i> 4-Phase B2B2B Workflow Status
+                </h5>
+                <small class="text-white-50">Track your deals through each phase of the workflow</small>
             </div>
-        </div>
-    </div>
+            <div class="card-body p-0">
+                <div class="row g-0">
+                    <div class="col-md-3">
+                        <div class="text-center p-4 border-end">
+                            <div class="mb-3">
+                                <i class="fas fa-search fa-3x text-primary mb-2"></i>
+                                <h6 class="fw-bold text-primary">Phase 1: Customer PO</h6>
+                            </div>
+                            <div class="h3 text-primary mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Lead") ==
+                                                                true ? Model.DealsByStage["Lead"] : 0)</div>
+                            <small class="text-muted d-block mb-3">Customer → Canarys Invoice</small>
+                            <a asp-controller="Deals" asp-action="Index" asp-route-stage="Lead"
+                                class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i> View Deals
+                            </a>
+                        </div>
+                    </div>
 
-    <!-- Active Deals -->
-    <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
-        <div class="metric-card">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="metric-icon bg-success bg-opacity-10">
-                        <i class="fas fa-handshake text-success"></i>
+                    <div class="col-md-3">
+                        <div class="text-center p-4 border-end">
+                            <div class="mb-3">
+                                <i class="fas fa-shopping-cart fa-3x text-warning mb-2"></i>
+                                <h6 class="fw-bold text-warning">Phase 2: OEM Procurement</h6>
+                            </div>
+                            <div class="h3 text-warning mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Quoted") ==
+                                                                true ? Model.DealsByStage["Quoted"] : 0)</div>
+                            <small class="text-muted d-block mb-3">Canarys → OEM Purchase</small>
+                            <a asp-controller="Deals" asp-action="Index" asp-route-stage="Quoted"
+                                class="btn btn-sm btn-outline-warning">
+                                <i class="fas fa-eye"></i> View Deals
+                            </a>
+                        </div>
                     </div>
-                    <h3 class="fw-bold text-dark mb-1">@(Model.TotalDeals)</h3>
-                    <p class="text-muted mb-0 small">Active Deals</p>
-                </div>
-                <div class="text-end">
-                    <a asp-controller="Deals" asp-action="Index" class="btn btn-sm btn-outline-success">
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Pipeline Projects -->
-    <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
-        <div class="metric-card">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="metric-icon bg-info bg-opacity-10">
-                        <i class="fas fa-project-diagram text-info"></i>
+                    <div class="col-md-3">
+                        <div class="text-center p-4 border-end">
+                            <div class="mb-3">
+                                <i class="fas fa-key fa-3x text-info mb-2"></i>
+                                <h6 class="fw-bold text-info">Phase 3: License Delivery</h6>
+                            </div>
+                            <div class="h3 text-info mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Negotiation")
+                                                                == true ? Model.DealsByStage["Negotiation"] : 0)</div>
+                            <small class="text-muted d-block mb-3">OEM → Customer Delivery</small>
+                            <a asp-controller="Deals" asp-action="Index" asp-route-stage="Negotiation"
+                                class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-eye"></i> View Deals
+                            </a>
+                        </div>
                     </div>
-                    <h3 class="fw-bold text-dark mb-1">@(Model.TotalPipelineProjects)</h3>
-                    <p class="text-muted mb-0 small">Pipeline Projects</p>
-                </div>
-                <div class="text-end">
-                    <a asp-controller="ProjectPipeline" asp-action="Index" class="btn btn-sm btn-outline-info">
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Revenue Metric -->
-    <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
-        <div class="metric-card">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="metric-icon bg-warning bg-opacity-10">
-                        <i class="fas fa-chart-line text-warning"></i>
-                    </div>
-                    <h3 class="fw-bold text-dark mb-1">₹@(((Model.TotalRevenue) / 100000m).ToString("N1"))L</h3>
-                    <p class="text-muted mb-0 small">Total Revenue</p>
-                </div>
-                <div class="text-end">
-                    <a asp-controller="InvoiceManagement" asp-action="BillingDashboard" class="btn btn-sm btn-outline-warning">
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 4-Phase Workflow Status -->
-<div class="row mb-4">
-    <div class="col-12">
-        <h5 class="fw-semibold mb-3">4-Phase Workflow Progress</h5>
-    </div>
-    <div class="col-12">
-        <div class="workflow-progress">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="workflow-step active">
-                    <div class="step-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-1">Phase 1</h6>
-                    <p class="small text-muted mb-0">Customer PO</p>
-                    <div class="mt-2">
-                        <span class="badge bg-primary">@(Model.DealsByStage?.ContainsKey("Lead") == true ? Model.DealsByStage["Lead"] : 0) deals</span>
-                    </div>
-                </div>
-                
-                <div class="workflow-step">
-                    <div class="step-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-1">Phase 2</h6>
-                    <p class="small text-muted mb-0">OEM Procurement</p>
-                    <div class="mt-2">
-                        <span class="badge bg-warning">@(Model.DealsByStage?.ContainsKey("Quoted") == true ? Model.DealsByStage["Quoted"] : 0) deals</span>
-                    </div>
-                </div>
-                
-                <div class="workflow-step">
-                    <div class="step-icon">
-                        <i class="fas fa-key"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-1">Phase 3</h6>
-                    <p class="small text-muted mb-0">License Delivery</p>
-                    <div class="mt-2">
-                        <span class="badge bg-info">@(Model.DealsByStage?.ContainsKey("Negotiation") == true ? Model.DealsByStage["Negotiation"] : 0) deals</span>
-                    </div>
-                </div>
-                
-                <div class="workflow-step">
-                    <div class="step-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-1">Phase 4</h6>
-                    <p class="small text-muted mb-0">OEM Settlement</p>
-                    <div class="mt-2">
-                        <span class="badge bg-success">@(Model.DealsByStage?.ContainsKey("Won") == true ? Model.DealsByStage["Won"] : 0) deals</span>
+                    <div class="col-md-3">
+                        <div class="text-center p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-credit-card fa-3x text-success mb-2"></i>
+                                <h6 class="fw-bold text-success">Phase 4: OEM Settlement</h6>
+                            </div>
+                            <div class="h3 text-success mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Won") ==
+                                                                true ? Model.DealsByStage["Won"] : 0)</div>
+                            <small class="text-muted d-block mb-3">Settlement & Completion</small>
+                            <a asp-controller="Deals" asp-action="Index" asp-route-stage="Won"
+                                class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-eye"></i> View Deals
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -339,7 +581,7 @@
     <div class="col-12">
         <h5 class="fw-semibold mb-3">Quick Actions</h5>
     </div>
-    
+
     @if (User?.IsInRole("Admin") == true || User?.IsInRole("Sales") == true)
     {
         <div class="col-lg-2 col-md-4 col-6 mb-3">
@@ -349,7 +591,7 @@
                 <small class="text-muted">Create new customer</small>
             </a>
         </div>
-        
+
         <div class="col-lg-2 col-md-4 col-6 mb-3">
             <a asp-controller="Deals" asp-action="Create" class="quick-action-btn">
                 <i class="fas fa-handshake fa-lg text-success mb-2"></i>
@@ -398,172 +640,396 @@
     </div>
 </div>
 
-<!-- Recent Activity & Performance Section -->
-<div class="row">
-    <!-- Recent Activity -->
-    <div class="col-lg-8 mb-4">
-        <div class="recent-activity">
-            <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
-                <h6 class="fw-semibold mb-0">Recent Activity</h6>
-                <a href="#" class="text-decoration-none small">View all</a>
-            </div>
-            
-            @if (Model.RecentActivities?.Any() == true)
-            {
-                @foreach (var activity in Model.RecentActivities.Take(6))
-                {
-                    <div class="activity-item">
-                        <div class="activity-icon bg-primary bg-opacity-10">
-                            <i class="fas fa-@(activity.ActivityType == "Deal" ? "handshake" : activity.ActivityType == "Company" ? "building" : "bell") text-primary"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <p class="mb-1 fw-medium">@activity.Description</p>
-                            <small class="text-muted">@activity.CreatedDate.ToString("MMM dd, yyyy • hh:mm tt")</small>
-                        </div>
-                        <div class="text-end">
-                            <span class="badge bg-light text-muted">@activity.ActivityType</span>
-                        </div>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="text-center py-5">
-                    <i class="fas fa-history fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">No recent activity to display</p>
+<!-- Key Business Metrics - Bigin.com Style -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="bigin-metrics-header mb-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h4 class="mb-2 text-dark fw-bold">
+                        <i class="fas fa-chart-bar text-primary me-2"></i>
+                        Key Business Metrics
+                    </h4>
+                    <p class="text-muted mb-0">Real-time insights into your B2B2B CRM performance</p>
                 </div>
-            }
+                <div class="bigin-metric-badge">
+                    <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-2">
+                        <i class="fas fa-sync-alt me-1"></i>
+                        Live Data
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Performance Summary -->
-    <div class="col-lg-4 mb-4">
-        <div class="recent-activity">
-            <div class="p-3 border-bottom">
-                <h6 class="fw-semibold mb-0">Performance Summary</h6>
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+        <div class="bigin-metric-card h-100">
+            <div class="bigin-metric-body">
+                <div class="bigin-metric-icon bg-primary-soft">
+                    <i class="fas fa-building text-primary"></i>
+                </div>
+                <div class="bigin-metric-content">
+                    <div class="bigin-metric-value text-dark">@Model.TotalCompanies</div>
+                    <div class="bigin-metric-label text-muted">Total Companies</div>
+                    <div class="bigin-metric-description">
+                        <span class="text-success me-2">
+                            <i class="fas fa-users"></i> Active
+                        </span>
+                        Customers & prospects
+                    </div>
+                </div>
             </div>
-            <div class="p-3">
-                <!-- Deals Won This Month -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <p class="mb-1 fw-medium">Deals Won</p>
-                        <small class="text-muted">This month</small>
-                    </div>
-                    <div class="text-end">
-                        <h5 class="fw-bold text-success mb-0">@(Model.DealsByStage?.ContainsKey("Won") == true ? Model.DealsByStage["Won"] : 0)</h5>
-                    </div>
-                </div>
+            <div class="bigin-metric-footer">
+                <a href="/Companies" class="bigin-metric-link">
+                    View companies <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 
-                <!-- Pending Invoices -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <p class="mb-1 fw-medium">Pending Invoices</p>
-                        <small class="text-muted">Awaiting payment</small>
-                    </div>
-                    <div class="text-end">
-                        <h5 class="fw-bold text-warning mb-0">@(Model.PendingInvoices)</h5>
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+        <div class="bigin-metric-card h-100">
+            <div class="bigin-metric-body">
+                <div class="bigin-metric-icon bg-success-soft">
+                    <i class="fas fa-handshake text-success"></i>
+                </div>
+                <div class="bigin-metric-content">
+                    <div class="bigin-metric-value text-dark">@Model.TotalDeals</div>
+                    <div class="bigin-metric-label text-muted">Total Deals</div>
+                    <div class="bigin-metric-description">
+                        <span class="text-success me-2">
+                            <i class="fas fa-arrow-up"></i> +12%
+                        </span>
+                        Active B2B2B workflows
                     </div>
                 </div>
+            </div>
+            <div class="bigin-metric-footer">
+                <a href="/Deals" class="bigin-metric-link">
+                    View all deals <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 
-                <!-- Active Customers -->
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="mb-1 fw-medium">Active Customers</p>
-                        <small class="text-muted">With ongoing deals</small>
-                    </div>
-                    <div class="text-end">
-                        <h5 class="fw-bold text-info mb-0">@(Model.ActiveCustomers)</h5>
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+        <div class="bigin-metric-card h-100">
+            <div class="bigin-metric-body">
+                <div class="bigin-metric-icon bg-warning-soft">
+                    <i class="fas fa-key text-warning"></i>
+                </div>
+                <div class="bigin-metric-content">
+                    <div class="bigin-metric-value text-dark">@Model.ActiveLicenses</div>
+                    <div class="bigin-metric-label text-muted">Active Licenses</div>
+                    <div class="bigin-metric-description">
+                        <span class="text-success me-2">
+                            <i class="fas fa-check-circle"></i> Active
+                        </span>
+                        Currently deployed
                     </div>
                 </div>
+            </div>
+            <div class="bigin-metric-footer">
+                <a href="/License" class="bigin-metric-link">
+                    Manage licenses <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 
-                <!-- Progress to Monthly Target -->
-                <div class="mt-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <small class="fw-medium">Monthly Target Progress</small>
-                        <small class="text-muted">75%</small>
-                    </div>
-                    <div class="progress" style="height: 6px;">
-                        <div class="progress-bar bigin-gradient" role="progressbar" style="width: 75%"></div>
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+        <div class="bigin-metric-card h-100">
+            <div class="bigin-metric-body">
+                <div class="bigin-metric-icon bg-info-soft">
+                    <i class="fas fa-dollar-sign text-info"></i>
+                </div>
+                <div class="bigin-metric-content">
+                    <div class="bigin-metric-value text-dark">@Model.TotalRevenue.ToString("C0")</div>
+                    <div class="bigin-metric-label text-muted">Total Revenue</div>
+                    <div class="bigin-metric-description">
+                        <span class="text-success me-2">
+                            <i class="fas fa-trophy"></i> YTD
+                        </span>
+                        Year to date
                     </div>
                 </div>
+            </div>
+            <div class="bigin-metric-footer">
+                <a href="/InvoiceManagement" class="bigin-metric-link">
+                    View invoices <i class="fas fa-arrow-right ms-1"></i>
+                </a>
             </div>
         </div>
     </div>
 </div>
 
-    <!-- 4-Phase Workflow Overview -->
-    <div class="row mb-4">
+<!-- Additional Performance Metrics -->
+<div class="row mb-5">
+    <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+        <div class="bigin-metric-card bigin-metric-danger h-100">
+            <div class="bigin-metric-body">
+                <div class="bigin-metric-icon bg-danger-soft">
+                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                </div>
+                <div class="bigin-metric-content">
+                    <div class="bigin-metric-value text-dark">@Model.ExpiringLicenses</div>
+                    <div class="bigin-metric-label text-muted">Expiring Soon</div>
+                    <div class="bigin-metric-description">
+                        <span class="text-danger me-2">
+                            <i class="fas fa-clock"></i> Urgent
+                        </span>
+                        Requires attention
+                    </div>
+                </div>
+            </div>
+            <div class="bigin-metric-footer">
+                <a href="/Renewal" class="bigin-metric-link text-danger">
+                    Manage renewals <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+        <div class="bigin-metric-card h-100">
+            <div class="bigin-metric-body">
+                <div class="bigin-metric-icon bg-success-soft">
+                    <i class="fas fa-chart-line text-success"></i>
+                </div>
+                <div class="bigin-metric-content">
+                    <div class="bigin-metric-value text-dark">@Model.MonthlyRevenue.ToString("C0")</div>
+                    <div class="bigin-metric-label text-muted">Monthly Revenue</div>
+                    <div class="bigin-metric-description">
+                        <span class="text-success me-2">
+                            <i class="fas fa-trending-up"></i> +8.5%
+                        </span>
+                        vs last month
+                    </div>
+                </div>
+            </div>
+            <div class="bigin-metric-footer">
+                <a href="/Report/FinancialReport" class="bigin-metric-link">
+                    View reports <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+        <div class="bigin-metric-card h-100">
+            <div class="bigin-metric-body">
+                <div class="bigin-metric-icon bg-primary-soft">
+                    <i class="fas fa-chart-bar text-primary"></i>
+                </div>
+                <div class="bigin-metric-content">
+                    <div class="bigin-metric-value text-dark">@((Model.MonthlyRevenue / Model.TotalRevenue *
+                                                100).ToString("F1"))%</div>
+                    <div class="bigin-metric-label text-muted">Monthly Growth</div>
+                    <div class="bigin-metric-description">
+                        <span class="text-primary me-2">
+                            <i class="fas fa-trending-up"></i> Growth
+                        </span>
+                        Performance indicator
+                    </div>
+                </div>
+            </div>
+            <div class="bigin-metric-footer">
+                <a href="/Analytics" class="bigin-metric-link">
+                    View analytics <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Project Pipeline Metrics - Bigin.com Style (for Sales, Admin, Management) -->
+@if (User?.IsInRole("Admin") == true || User?.IsInRole("Sales") == true || User?.IsInRole("Management") == true)
+{
+    <div class="row mb-5">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-gradient-primary text-white border-bottom-0">
-                    <h5 class="mb-0 text-white">
-                        <i class="fas fa-sitemap"></i> 4-Phase B2B2B Workflow Status
+            <div class="bigin-metrics-header mb-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h4 class="mb-2 text-dark fw-bold">
+                            <i class="fas fa-project-diagram text-primary me-2"></i>
+                            Project Pipeline Overview
+                        </h4>
+                        <p class="text-muted mb-0">Track your sales pipeline performance and projected outcomes</p>
+                    </div>
+                    <div class="bigin-metric-badge">
+                        <span class="badge bg-success-soft text-success rounded-pill px-3 py-2">
+                            <i class="fas fa-chart-line me-1"></i>
+                            Pipeline Active
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="bigin-metric-card bigin-pipeline-card h-100">
+                <div class="bigin-metric-body">
+                    <div class="bigin-metric-icon bg-info-soft">
+                        <i class="fas fa-project-diagram text-info"></i>
+                    </div>
+                    <div class="bigin-metric-content">
+                        <div class="bigin-metric-value text-dark">@Model.TotalPipelineProjects</div>
+                        <div class="bigin-metric-label text-muted">Total Pipeline Projects</div>
+                        <div class="bigin-metric-description">
+                            <span class="text-info me-2">
+                                <i class="fas fa-layer-group"></i> All stages
+                            </span>
+                            Complete pipeline view
+                        </div>
+                    </div>
+                </div>
+                <div class="bigin-metric-footer">
+                    <a href="/ProjectPipeline" class="bigin-metric-link">
+                        View pipeline <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="bigin-metric-card bigin-pipeline-card h-100">
+                <div class="bigin-metric-body">
+                    <div class="bigin-metric-icon bg-primary-soft">
+                        <i class="fas fa-tasks text-primary"></i>
+                    </div>
+                    <div class="bigin-metric-content">
+                        <div class="bigin-metric-value text-dark">@Model.ActivePipelineProjects</div>
+                        <div class="bigin-metric-label text-muted">Active Projects</div>
+                        <div class="bigin-metric-description">
+                            <span class="text-primary me-2">
+                                <i class="fas fa-play-circle"></i> In progress
+                            </span>
+                            Currently being worked
+                        </div>
+                    </div>
+                </div>
+                <div class="bigin-metric-footer">
+                    <a href="/ProjectPipeline?filter=active" class="bigin-metric-link">
+                        Manage active <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="bigin-metric-card bigin-pipeline-card h-100">
+                <div class="bigin-metric-body">
+                    <div class="bigin-metric-icon bg-success-soft">
+                        <i class="fas fa-chart-line text-success"></i>
+                    </div>
+                    <div class="bigin-metric-content">
+                        <div class="bigin-metric-value text-dark">@Model.ProjectedPipelineRevenue.ToString("C0")</div>
+                        <div class="bigin-metric-label text-muted">Projected Revenue</div>
+                        <div class="bigin-metric-description">
+                            <span class="text-success me-2">
+                                <i class="fas fa-trending-up"></i> Forecast
+                            </span>
+                            Expected earnings
+                        </div>
+                    </div>
+                </div>
+                <div class="bigin-metric-footer">
+                    <a href="/ProjectPipeline/PipelineAnalytics" class="bigin-metric-link">
+                        View analytics <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="bigin-metric-card bigin-pipeline-card h-100">
+                <div class="bigin-metric-body">
+                    <div class="bigin-metric-icon bg-warning-soft">
+                        <i class="fas fa-percentage text-warning"></i>
+                    </div>
+                    <div class="bigin-metric-content">
+                        <div class="bigin-metric-value text-dark">@Model.ProjectedPipelineMargin.ToString("C0")</div>
+                        <div class="bigin-metric-label text-muted">Projected Margin</div>
+                        <div class="bigin-metric-description">
+                            <span class="text-warning me-2">
+                                <i class="fas fa-coins"></i> Profit
+                            </span>
+                            Expected margin
+                        </div>
+                    </div>
+                </div>
+                <div class="bigin-metric-footer">
+                    <a href="/Report/MarginBreakup" class="bigin-metric-link">
+                        Margin analysis <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pipeline Performance Insights -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="bigin-pipeline-insights">
+                <div class="bigin-insights-header">
+                    <h5 class="text-dark fw-bold mb-3">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        Pipeline Performance Insights
                     </h5>
-                    <small class="text-white-50">Track your deals through each phase of the workflow</small>
                 </div>
-                <div class="card-body p-0">
-                    <div class="row g-0">
-                        <div class="col-md-3">
-                            <div class="text-center p-4 border-end">
-                                <div class="mb-3">
-                                    <i class="fas fa-search fa-3x text-primary mb-2"></i>
-                                    <h6 class="fw-bold text-primary">Phase 1: Customer PO</h6>
+                <div class="row">
+                    <div class="col-lg-4 mb-3">
+                        <div class="bigin-insight-card">
+                            <div class="bigin-insight-icon bg-primary-soft">
+                                <i class="fas fa-bullseye text-primary"></i>
+                            </div>
+                            <div class="bigin-insight-content">
+                                <h6 class="text-dark mb-1">Conversion Rate</h6>
+                                <div class="bigin-insight-value text-primary">
+                                    @{
+                                        var conversionRate = Model.TotalPipelineProjects > 0 ?
+                                        (Model.ActivePipelineProjects * 100.0 / Model.TotalPipelineProjects) : 0;
+                                    }
+                                    @conversionRate.ToString("F1")%
                                 </div>
-                                <div class="h3 text-primary mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Lead") ==
-                                                                        true ? Model.DealsByStage["Lead"] : 0)</div>
-                                <small class="text-muted d-block mb-3">Customer → Canarys Invoice</small>
-                                <a asp-controller="Deals" asp-action="Index" asp-route-stage="Lead"
-                                    class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-eye"></i> View Deals
-                                </a>
+                                <small class="text-muted">Active to total ratio</small>
                             </div>
                         </div>
-
-                        <div class="col-md-3">
-                            <div class="text-center p-4 border-end">
-                                <div class="mb-3">
-                                    <i class="fas fa-shopping-cart fa-3x text-warning mb-2"></i>
-                                    <h6 class="fw-bold text-warning">Phase 2: OEM Procurement</h6>
+                    </div>
+                    <div class="col-lg-4 mb-3">
+                        <div class="bigin-insight-card">
+                            <div class="bigin-insight-icon bg-success-soft">
+                                <i class="fas fa-calculator text-success"></i>
+                            </div>
+                            <div class="bigin-insight-content">
+                                <h6 class="text-dark mb-1">Avg. Deal Size</h6>
+                                <div class="bigin-insight-value text-success">
+                                    @{
+                                        var avgDealSize = Model.TotalPipelineProjects > 0 ?
+                                        (Model.ProjectedPipelineRevenue / Model.TotalPipelineProjects) : 0;
+                                    }
+                                    @avgDealSize.ToString("C0")
                                 </div>
-                                <div class="h3 text-warning mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Quoted") ==
-                                                                        true ? Model.DealsByStage["Quoted"] : 0)</div>
-                                <small class="text-muted d-block mb-3">Canarys → OEM Purchase</small>
-                                <a asp-controller="Deals" asp-action="Index" asp-route-stage="Quoted"
-                                    class="btn btn-sm btn-outline-warning">
-                                    <i class="fas fa-eye"></i> View Deals
-                                </a>
+                                <small class="text-muted">Revenue per project</small>
                             </div>
                         </div>
-
-                        <div class="col-md-3">
-                            <div class="text-center p-4 border-end">
-                                <div class="mb-3">
-                                    <i class="fas fa-key fa-3x text-info mb-2"></i>
-                                    <h6 class="fw-bold text-info">Phase 3: License Delivery</h6>
-                                </div>
-                                <div class="h3 text-info mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Negotiation")
-                                                                        == true ? Model.DealsByStage["Negotiation"] : 0)</div>
-                                <small class="text-muted d-block mb-3">OEM → Customer Delivery</small>
-                                <a asp-controller="Deals" asp-action="Index" asp-route-stage="Negotiation"
-                                    class="btn btn-sm btn-outline-info">
-                                    <i class="fas fa-eye"></i> View Deals
-                                </a>
+                    </div>
+                    <div class="col-lg-4 mb-3">
+                        <div class="bigin-insight-card">
+                            <div class="bigin-insight-icon bg-info-soft">
+                                <i class="fas fa-chart-pie text-info"></i>
                             </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="text-center p-4">
-                                <div class="mb-3">
-                                    <i class="fas fa-credit-card fa-3x text-success mb-2"></i>
-                                    <h6 class="fw-bold text-success">Phase 4: OEM Settlement</h6>
+                            <div class="bigin-insight-content">
+                                <h6 class="text-dark mb-1">Margin Ratio</h6>
+                                <div class="bigin-insight-value text-info">
+                                    @{
+                                        var marginRatio = Model.ProjectedPipelineRevenue > 0 ?
+                                        ((double)Model.ProjectedPipelineMargin * 100.0 / (double)Model.ProjectedPipelineRevenue)
+                                        : 0;
+                                    }
+                                    @marginRatio.ToString("F1")%
                                 </div>
-                                <div class="h3 text-success mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Won") ==
-                                                                        true ? Model.DealsByStage["Won"] : 0)</div>
-                                <small class="text-muted d-block mb-3">Settlement & Completion</small>
-                                <a asp-controller="Deals" asp-action="Index" asp-route-stage="Won"
-                                    class="btn btn-sm btn-outline-success">
-                                    <i class="fas fa-eye"></i> View Deals
-                                </a>
+                                <small class="text-muted">Margin percentage</small>
                             </div>
                         </div>
                     </div>
@@ -571,350 +1037,226 @@
             </div>
         </div>
     </div>
-
-    <!-- Key Business Metrics -->
+}
+<!-- Admin Panel (for Admins only) -->
+@if (User?.IsInRole("Admin") == true)
+{
     <div class="row mb-4">
         <div class="col-12">
-            <h5 class="text-primary mb-3">
-                <i class="fas fa-chart-bar"></i> Key Business Metrics
-            </h5>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card border-start border-primary border-4">
-                <div class="stats-card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <div class="stats-label text-primary">Total Deals</div>
-                            <div class="stats-value">@Model.TotalLicenses</div>
-                            <div class="stats-description">Active B2B2B workflows</div>
+            <div class="bigin-admin-panel">
+                <div class="bigin-admin-header">
+                    <h5 class="mb-0 text-white">
+                        <i class="fas fa-shield-alt me-2"></i> Admin Control Panel
+                    </h5>
+                    <p class="mb-0 text-white-50">System administration and management tools</p>
+                </div>
+                <div class="bigin-admin-body">
+                    <div class="row">
+                        <div class="col-lg-6 mb-4">
+                            <div class="bigin-admin-card border-start border-danger border-4">
+                                <div class="bigin-admin-card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bigin-admin-icon bg-danger-soft">
+                                            <i class="fas fa-users text-danger"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="bigin-admin-value text-dark">@Model.TotalUsers</div>
+                                            <div class="bigin-admin-label text-muted">Total System Users</div>
+                                            <div class="bigin-admin-description">
+                                                <span class="text-muted">
+                                                    <i class="fas fa-user-check me-1"></i>
+                                                    Active user accounts
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bigin-admin-actions mt-3">
+                                        <a asp-controller="UserManagement" asp-action="Index" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-cog me-1"></i> Manage Users
+                                        </a>
+                                        <a asp-controller="Auth" asp-action="Register"
+                                            class="btn btn-outline-danger btn-sm ms-2">
+                                            <i class="fas fa-user-plus me-1"></i> Add User
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="stats-icon text-primary">
-                            <i class="fas fa-handshake"></i>
+
+                        <div class="col-lg-6 mb-4">
+                            <div class="bigin-admin-card border-start border-warning border-4">
+                                <div class="bigin-admin-card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bigin-admin-icon bg-warning-soft">
+                                            <i class="fas fa-credit-card text-warning"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="bigin-admin-value text-dark">@Model.PendingPayments</div>
+                                            <div class="bigin-admin-label text-muted">Pending Payments</div>
+                                            <div class="bigin-admin-description">
+                                                <span class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    Awaiting payment processing
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bigin-admin-actions mt-3">
+                                        <a asp-controller="InvoiceManagement" asp-action="Index" asp-route-status="pending"
+                                            class="btn btn-warning btn-sm">
+                                            <i class="fas fa-eye me-1"></i> View Pending
+                                        </a>
+                                        <a asp-controller="InvoiceManagement" asp-action="BillingDashboard"
+                                            class="btn btn-outline-warning btn-sm ms-2">
+                                            <i class="fas fa-chart-pie me-1"></i> Billing Dashboard
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card border-start border-success border-4">
-                <div class="stats-card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <div class="stats-label text-success">Active Licenses</div>
-                            <div class="stats-value">@Model.ActiveLicenses</div>
-                            <div class="stats-description">Currently deployed</div>
-                        </div>
-                        <div class="stats-icon text-success">
-                            <i class="fas fa-key"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card border-start border-warning border-4">
-                <div class="stats-card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <div class="stats-label text-warning">Companies</div>
-                            <div class="stats-value">@Model.TotalLicenses</div>
-                            <div class="stats-description">Customers & prospects</div>
-                        </div>
-                        <div class="stats-icon text-warning">
-                            <i class="fas fa-building"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card border-start border-info border-4">
-                <div class="stats-card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <div class="stats-label text-info">This Month Revenue</div>
-                            <div class="stats-value">@Model.MonthlyRevenue.ToString("C")</div>
-                            <div class="stats-description">Invoiced amount</div>
-                        </div>
-                        <div class="stats-icon text-info">
-                            <i class="fas fa-dollar-sign"></i>
+                    <!-- Additional Admin Tools -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="bigin-admin-tools">
+                                <h6 class="text-muted mb-3">
+                                    <i class="fas fa-tools me-2"></i>Quick Admin Tools
+                                </h6>
+                                <div class="bigin-admin-quick-actions">
+                                    <a asp-controller="Report" asp-action="Index" class="bigin-quick-action-btn">
+                                        <i class="fas fa-chart-area"></i>
+                                        <span>System Reports</span>
+                                    </a>
+                                    <a asp-controller="Analytics" asp-action="Index" class="bigin-quick-action-btn">
+                                        <i class="fas fa-analytics"></i>
+                                        <span>Analytics</span>
+                                    </a>
+                                    <a asp-controller="Notification" asp-action="Dashboard" class="bigin-quick-action-btn">
+                                        <i class="fas fa-bell"></i>
+                                        <span>Notifications</span>
+                                    </a>
+                                    <a asp-controller="Activity" asp-action="WeeklyReport" class="bigin-quick-action-btn">
+                                        <i class="fas fa-calendar-week"></i>
+                                        <span>Activity Reports</span>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Additional Metrics Row -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card border-start border-danger border-4">
-                <div class="stats-card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <div class="stats-label text-danger">Expiring Soon</div>
-                            <div class="stats-value">@Model.ExpiringLicenses</div>
-                            <div class="stats-description">Licenses expiring soon</div>
-                        </div>
-                        <div class="stats-icon text-danger">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card border-start border-success border-4">
-                <div class="stats-card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <div class="stats-label text-success">Total Revenue</div>
-                            <div class="stats-value">@Model.TotalRevenue.ToString("C")</div>
-                            <div class="stats-description">All-time revenue</div>
-                        </div>
-                        <div class="stats-icon text-success">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Project Pipeline Metrics Row (for Sales, Admin, Management) -->
-    @if (User?.IsInRole("Admin") == true || User?.IsInRole("Sales") == true || User?.IsInRole("Management") == true)
-    {
-        <div class="row mb-4">
-            <div class="col-12">
-                <h5 class="text-primary mb-3">
-                    <i class="fas fa-project-diagram"></i> Project Pipeline Overview
-                </h5>
-            </div>
-
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="stats-card border-start border-info border-4">
-                    <div class="stats-card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-grow-1">
-                                <div class="stats-label text-info">Total Pipeline Projects</div>
-                                <div class="stats-value">@Model.TotalPipelineProjects</div>
-                                <div class="stats-description">All pipeline projects</div>
-                            </div>
-                            <div class="stats-icon text-info">
-                                <i class="fas fa-project-diagram"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="stats-card border-start border-primary border-4">
-                    <div class="stats-card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-grow-1">
-                                <div class="stats-label text-primary">Active Projects</div>
-                                <div class="stats-value">@Model.ActivePipelineProjects</div>
-                                <div class="stats-description">Currently active</div>
-                            </div>
-                            <div class="stats-icon text-primary">
-                                <i class="fas fa-tasks"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="stats-card border-start border-success border-4">
-                    <div class="stats-card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-grow-1">
-                                <div class="stats-label text-success">Projected Revenue</div>
-                                <div class="stats-value">@Model.ProjectedPipelineRevenue.ToString("C")</div>
-                                <div class="stats-description">Expected revenue</div>
-                            </div>
-                            <div class="stats-icon text-success">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="stats-card border-start border-warning border-4">
-                    <div class="stats-card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-grow-1">
-                                <div class="stats-label text-warning">Projected Margin</div>
-                                <div class="stats-value">@Model.ProjectedPipelineMargin.ToString("C")</div>
-                                <div class="stats-description">Expected margin</div>
-                            </div>
-                            <div class="stats-icon text-warning">
-                                <i class="fas fa-percentage"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-
-    <!-- Admin Panel (for Admins only) -->
-    @if (User?.IsInRole("Admin") == true)
-    {
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0 text-white">
-                            <i class="fas fa-shield-alt"></i> Admin Panel
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="stats-card border-start border-danger border-4">
-                                    <div class="stats-card-body">
-                                        <div class="d-flex align-items-center">
-                                            <div class="flex-grow-1">
-                                                <div class="stats-label text-danger">Total Users</div>
-                                                <div class="stats-value">@Model.TotalUsers</div>
-                                                <div class="stats-description">System users</div>
-                                            </div>
-                                            <div class="stats-icon text-danger">
-                                                <i class="fas fa-users"></i>
-                                            </div>
-                                        </div>
-                                        <div class="mt-3">
-                                            <a asp-action="Users" class="btn btn-sm btn-danger">
-                                                <i class="fas fa-cog"></i> Manage Users
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="stats-card border-start border-warning border-4">
-                                    <div class="stats-card-body">
-                                        <div class="d-flex align-items-center">
-                                            <div class="flex-grow-1">
-                                                <div class="stats-label text-warning">Pending Payments</div>
-                                                <div class="stats-value">@Model.PendingPayments</div>
-                                                <div class="stats-description">Awaiting payment</div>
-                                            </div>
-                                            <div class="stats-icon text-warning">
-                                                <i class="fas fa-clock"></i>
-                                            </div>
-                                        </div>
-                                        <div class="mt-3">
-                                            <a asp-controller="License" asp-action="Index" class="btn btn-sm btn-warning">
-                                                <i class="fas fa-eye"></i> View Details
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="stats-card border-start border-success border-4">
-                                    <div class="stats-card-body">
-                                        <div class="d-flex align-items-center">
-                                            <div class="flex-grow-1">
-                                                <div class="stats-label text-success">Current Projects Analytics</div>
-                                                <div class="stats-value" id="currentProjectsMargin">Loading...</div>
-                                                <div class="stats-description">Pipeline margin & revenue</div>
-                                            </div>
-                                            <div class="stats-icon text-success">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </div>
-                                        </div>
-                                        <div class="mt-3">
-                                            <a asp-controller="Report" asp-action="Index" class="btn btn-sm btn-success">
-                                                <i class="fas fa-chart-area"></i> View Analytics
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-</div>
+}
 
 @section Scripts {
     <script>
-        // Dashboard initialization
+        // Bigin.com-style Dashboard initialization
         document.addEventListener('DOMContentLoaded', function () {
-            // Add subtle animations for Bigin.com feel
-            initializeAnimations();
-            
-            // Load current projects analytics for dashboard
-            loadCurrentProjectsAnalytics();
+            // Initialize smooth animations for metric cards
+            initializeBiginAnimations();
+
+            // Add interactive hover effects
+            initializeInteractiveEffects();
         });
 
-        function initializeAnimations() {
-            // Add animation classes if animate.css is available
-            if (typeof window.anime !== 'undefined' || $('.animate__animated').length > 0) {
-                $('.metric-card, .phase-card, .quick-action-btn').addClass('animate__animated animate__fadeInUp');
-                
-                // Stagger animations
-                $('.metric-card').each(function(index) {
-                    $(this).css('animation-delay', (index * 0.1) + 's');
+        function initializeBiginAnimations() {
+            // Animate metric cards on load
+            const metricCards = document.querySelectorAll('.bigin-metric-card');
+            metricCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Animate admin panel if present
+            const adminPanel = document.querySelector('.bigin-admin-panel');
+            if (adminPanel) {
+                setTimeout(() => {
+                    adminPanel.style.opacity = '0';
+                    adminPanel.style.transform = 'translateY(30px)';
+                    adminPanel.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+
+                    setTimeout(() => {
+                        adminPanel.style.opacity = '1';
+                        adminPanel.style.transform = 'translateY(0)';
+                    }, 50);
+                }, 800);
+            }
+        }
+
+        function initializeInteractiveEffects() {
+            // Add ripple effect to metric cards
+            const metricCards = document.querySelectorAll('.bigin-metric-card');
+            metricCards.forEach(card => {
+                card.addEventListener('click', function (e) {
+                    const ripple = document.createElement('div');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    ripple.style.cssText = `
+                                            position: absolute;
+                                            width: ${size}px;
+                                            height: ${size}px;
+                                            left: ${x}px;
+                                            top: ${y}px;
+                                            background: rgba(102, 126, 234, 0.1);
+                                            border-radius: 50%;
+                                            transform: scale(0);
+                                            animation: ripple 0.6s ease-out;
+                                            pointer-events: none;
+                                            z-index: 1;
+                                        `;
+
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    this.appendChild(ripple);
+
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
                 });
+            });
+
+            // Add pulse animation to live data badge
+            const liveBadge = document.querySelector('.bigin-metric-badge .badge');
+            if (liveBadge) {
+                setInterval(() => {
+                    liveBadge.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        liveBadge.style.transform = 'scale(1)';
+                    }, 150);
+                }, 3000);
             }
         }
 
-        async function loadCurrentProjectsAnalytics() {
-            try {
-                const response = await fetch('@Url.Action("GetPipelineAnalyticsSummary", "ProjectPipeline")');
-                if (!response.ok) throw new Error('Failed to load analytics');
-
-                const data = await response.json();
-                updateCurrentProjectsDisplay(data);
-            } catch (error) {
-                console.error('Error loading current projects analytics:', error);
-                const marginElement = document.getElementById('currentProjectsMargin');
-                if (marginElement) {
-                    marginElement.textContent = 'Error loading';
-                }
-            }
-        }
-
-        function updateCurrentProjectsDisplay(data) {
-            const marginElement = document.getElementById('currentProjectsMargin');
-            if (marginElement && data && typeof data.TotalEstimatedMargin !== 'undefined') {
-                // Show margin and project count
-                const marginText = formatCurrency(data.TotalEstimatedMargin) +
-                    ' (' + data.ActiveProjectsCount + ' projects)';
-                marginElement.textContent = marginText;
-                marginElement.title =
-                    'Estimated Revenue: ' + formatCurrency(data.TotalEstimatedRevenue) + '\n' +
-                    'Weighted Revenue: ' + formatCurrency(data.TotalWeightedRevenue) + '\n' +
-                    'Estimated Margin: ' + formatCurrency(data.TotalEstimatedMargin) + '\n' +
-                    'Active Projects: ' + data.ActiveProjectsCount;
-            } else if (marginElement) {
-                marginElement.textContent = 'No data';
-            }
-        }
-
+        // Format currency for display
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US', {
+            return new Intl.NumberFormat('en-IN', {
                 style: 'currency',
-                currency: 'USD',
+                currency: 'INR',
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             }).format(amount || 0);
+        }
+
+        // Utility function for smooth scrolling to sections
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
         }
     </script>
 }
