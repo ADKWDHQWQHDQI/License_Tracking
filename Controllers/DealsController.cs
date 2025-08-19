@@ -18,7 +18,7 @@ namespace License_Tracking.Controllers
         }
 
         // GET: Deals
-        public async Task<IActionResult> Index(string searchString, string stage, string assignedTo)
+        public async Task<IActionResult> Index(string searchString, string stage, string assignedTo, string licenseStatus)
         {
             var deals = _context.Deals
                 .Include(d => d.Company)
@@ -45,9 +45,23 @@ namespace License_Tracking.Controllers
                 deals = deals.Where(d => d.AssignedTo == assignedTo);
             }
 
+            if (!string.IsNullOrEmpty(licenseStatus))
+            {
+                if (licenseStatus == "Active")
+                {
+                    // "Active" means both Delivered and Activated
+                    deals = deals.Where(d => d.LicenseDeliveryStatus == "Delivered" || d.LicenseDeliveryStatus == "Activated");
+                }
+                else
+                {
+                    deals = deals.Where(d => d.LicenseDeliveryStatus == licenseStatus);
+                }
+            }
+
             ViewData["CurrentFilter"] = searchString;
             ViewData["CurrentStage"] = stage;
             ViewData["CurrentAssignedTo"] = assignedTo;
+            ViewData["CurrentLicenseStatus"] = licenseStatus;
 
             // Get unique assigned users for filter dropdown
             ViewBag.AssignedUsers = await _context.Deals

@@ -74,6 +74,31 @@ namespace License_Tracking.Controllers
                 .GroupBy(d => d.DealStage ?? "Unknown")
                 .ToDictionary(g => g.Key, g => g.Count());
 
+            // Calculate current month revenue (based on actual payments received this month)
+            var currentMonth = DateTime.Now.Month;
+            var currentYear = DateTime.Now.Year;
+
+            // Calculate monthly revenue from deals with customer invoice amounts (including pending payments)
+            var currentMonthRevenue = allDeals
+                .Where(d => d.CustomerInvoiceAmount.HasValue && d.CustomerInvoiceAmount.Value > 0 &&
+                           (d.CustomerPaymentDate.HasValue && d.CustomerPaymentDate.Value.Month == currentMonth && d.CustomerPaymentDate.Value.Year == currentYear) ||
+                           (d.ActualCloseDate.HasValue && d.ActualCloseDate.Value.Month == currentMonth && d.ActualCloseDate.Value.Year == currentYear) ||
+                           (d.CustomerPoDate.HasValue && d.CustomerPoDate.Value.Month == currentMonth && d.CustomerPoDate.Value.Year == currentYear))
+                .Sum(d => d.CustomerInvoiceAmount ?? 0);
+
+            // Calculate last month revenue for comparison
+            var lastMonthDate = DateTime.Now.AddMonths(-1);
+            var lastMonthRevenue = allDeals
+                .Where(d => d.CustomerInvoiceAmount.HasValue && d.CustomerInvoiceAmount.Value > 0 &&
+                           (d.CustomerPaymentDate.HasValue && d.CustomerPaymentDate.Value.Month == lastMonthDate.Month && d.CustomerPaymentDate.Value.Year == lastMonthDate.Year) ||
+                           (d.ActualCloseDate.HasValue && d.ActualCloseDate.Value.Month == lastMonthDate.Month && d.ActualCloseDate.Value.Year == lastMonthDate.Year) ||
+                           (d.CustomerPoDate.HasValue && d.CustomerPoDate.Value.Month == lastMonthDate.Month && d.CustomerPoDate.Value.Year == lastMonthDate.Year))
+                .Sum(d => d.CustomerInvoiceAmount ?? 0);
+
+            // Calculate month-over-month growth percentage
+            var monthlyGrowthPercentage = lastMonthRevenue > 0 ?
+                ((currentMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100 : 0;
+
             var dashboardData = new DashboardViewModel
             {
                 UserEmail = currentUser.Email ?? "Unknown",
@@ -86,10 +111,14 @@ namespace License_Tracking.Controllers
                 ActiveCustomers = activeCustomers,
                 PendingInvoices = pendingInvoices,
 
+                // Monthly Revenue with accurate calculation
+                MonthlyRevenue = currentMonthRevenue,
+                MonthlyGrowthPercentage = monthlyGrowthPercentage,
+
                 // Legacy metrics for backward compatibility
                 TotalLicenses = allDeals.Count,
-                ActiveLicenses = allDeals.Count(d => d.LicenseDeliveryStatus == "Active"),
-                ExpiringLicenses = allDeals.Count(d => d.LicenseEndDate <= DateTime.Now.AddDays(30) && d.LicenseDeliveryStatus == "Active"),
+                ActiveLicenses = allDeals.Count(d => d.LicenseDeliveryStatus == "Delivered" || d.LicenseDeliveryStatus == "Activated"),
+                ExpiringLicenses = allDeals.Count(d => d.LicenseEndDate <= DateTime.Now.AddDays(30) && (d.LicenseDeliveryStatus == "Delivered" || d.LicenseDeliveryStatus == "Activated")),
                 TotalRevenue = allDeals.Sum(d => d.AmountReceived ?? 0),
                 TotalMargin = allDeals.Sum(d => d.Margin),
 
@@ -161,7 +190,7 @@ namespace License_Tracking.Controllers
             var operationsData = new OperationsViewModel
             {
                 TotalLicenses = await _context.Deals.CountAsync(),
-                ActiveLicenses = await _context.Deals.CountAsync(l => l.LicenseDeliveryStatus == "Active"),
+                ActiveLicenses = await _context.Deals.CountAsync(l => l.LicenseDeliveryStatus == "Delivered" || l.LicenseDeliveryStatus == "Activated"),
                 ExpiredLicenses = await _context.Deals.CountAsync(l => l.LicenseEndDate < today),
                 ExpiringIn30Days = await _context.Deals.CountAsync(l => l.LicenseEndDate <= today.AddDays(30) && l.LicenseEndDate > today && l.LicenseDeliveryStatus == "Active"),
                 ExpiringIn60Days = await _context.Deals.CountAsync(l => l.LicenseEndDate <= today.AddDays(60) && l.LicenseEndDate > today.AddDays(30) && l.LicenseDeliveryStatus == "Active"),

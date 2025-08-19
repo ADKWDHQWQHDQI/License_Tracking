@@ -23,8 +23,8 @@
                             class="btn btn-light">
                             <i class="fas fa-users"></i> Collaborate
                         </a>
-                        <a asp-controller="InvoiceManagement" asp-action="GenerateCustomerInvoice" asp-route-dealId="@Model.DealId"
-                            class="btn btn-light">
+                        <a asp-controller="InvoiceManagement" asp-action="CreateCustomerInvoice"
+                            asp-route-dealId="@Model.DealId" class="btn btn-light">
                             <i class="fas fa-file-invoice"></i> Invoices
                         </a>
                     </div>
@@ -373,13 +373,13 @@
                                     <ul class="dropdown-menu w-100">
                                         <li>
                                             <a class="dropdown-item" asp-controller="InvoiceManagement"
-                                                asp-action="GenerateCustomerInvoice" asp-route-dealId="@Model.DealId">
+                                                asp-action="CreateCustomerInvoice" asp-route-dealId="@Model.DealId">
                                                 <i class="fas fa-user"></i> Generate Customer Invoice
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item" asp-controller="InvoiceManagement"
-                                                asp-action="GenerateOemInvoice" asp-route-dealId="@Model.DealId">
+                                                asp-action="CreateOemInvoice" asp-route-dealId="@Model.DealId">
                                                 <i class="fas fa-industry"></i> Generate OEM Invoice
                                             </a>
                                         </li>

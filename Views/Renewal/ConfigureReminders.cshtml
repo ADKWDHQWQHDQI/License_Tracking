@@ -1,47 +1,152 @@
 @{
-    ViewData["Title"] = "Configure Reminders";
+    ViewData["Title"] = "Configure Renewal Reminders";
 }
-<div class="container">
-    <h2><i class="fas fa-cog"></i> Configure Renewal Reminders</h2>
 
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <div class="alert alert-danger">
-            <div asp-validation-summary="All"></div>
-        </div>
-    }
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-cog"></i> Configure Renewal Reminders</h4>
+                    <small>Set up automatic renewal reminders for delivered licenses</small>
+                </div>
+                <div class="card-body">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <h6><i class="fas fa-exclamation-triangle"></i> Please fix the following errors:</h6>
+                            <div asp-validation-summary="All"></div>
+                        </div>
+                    }
 
-    <form asp-action="ConfigureReminders" method="post">
-        @Html.AntiForgeryToken()
-        <div class="mb-3">
-            <label class="form-label">Deal</label>
-            <select asp-items="ViewBag.Deals" name="dealId" class="form-control">
-                <option value="">Select a Deal</option>
-            </select>
-            <span class="text-danger"></span>
+                    <form asp-action="ConfigureReminders" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-handshake text-primary"></i> Select Deal to Configure Renewal
+                            </label>
+                            <select asp-items="ViewBag.Deals" name="dealId" class="form-select form-select-lg"
+                                id="dealSelect" required>
+                                <option value="">-- Select a Deal with Active License --</option>
+                            </select>
+                            <div class="form-text">Only deals with delivered or activated licenses are shown</div>
+                            <span class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-calendar-alt text-warning"></i> Renewal Date
+                                    </label>
+                                    <input name="renewalDate" class="form-control" type="date" required
+                                        min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                    <div class="form-text">When should the renewal reminder be triggered?</div>
+                                    <span class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-dollar-sign text-success"></i> Expected Renewal Amount
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₹</span>
+                                        <input name="renewalAmount" class="form-control" type="number" step="0.01"
+                                            min="0" required placeholder="0.00" />
+                                    </div>
+                                    <div class="form-text">Expected amount for the renewal</div>
+                                    <span class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-sticky-note text-info"></i> Remarks / Notes
+                            </label>
+                            <textarea name="remarks" class="form-control" rows="3"
+                                placeholder="Add any additional notes about this renewal reminder..."></textarea>
+                            <div class="form-text">Optional notes for the renewal reminder</div>
+                            <span class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Configure Renewal Reminder
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left"></i> Back to Renewals
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Renewal Date</label>
-            <input name="renewalDate" class="form-control" type="date" />
-            <span class="text-danger"></span>
+
+        <div class="col-lg-4">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Configuration Tips</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6><i class="fas fa-calendar-check text-primary"></i> Renewal Date</h6>
+                        <small class="text-muted">
+                            Set this to when you want to be reminded about the renewal.
+                            Typically 30-90 days before the license expires.
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6><i class="fas fa-money-bill-wave text-success"></i> Renewal Amount</h6>
+                        <small class="text-muted">
+                            Enter the expected renewal amount. This can be the same as the original
+                            license amount or adjusted based on new pricing.
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6><i class="fas fa-bell text-warning"></i> Automatic Alerts</h6>
+                        <small class="text-muted">
+                            Once configured, the system will automatically send email alerts
+                            and dashboard notifications approaching the renewal date.
+                        </small>
+                    </div>
+
+                    <div class="alert alert-light">
+                        <small>
+                            <i class="fas fa-info-circle text-info"></i>
+                            <strong>Note:</strong> Only deals with "Delivered" or "Activated"
+                            license status can have renewal reminders configured.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Renewals Summary -->
+            <div class="card border-secondary mt-3">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0"><i class="fas fa-list"></i> Quick Stats</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h4 class="text-primary mb-0">@(ViewBag.TotalActiveDeals ?? 0)</h4>
+                                <small class="text-muted">Active Licenses</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-warning mb-0">@(ViewBag.ConfiguredRenewals ?? 0)</h4>
+                            <small class="text-muted">Configured Renewals</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Renewal Amount</label>
-            <input name="renewalAmount" class="form-control" type="number" step="0.01" />
-            <span class="text-danger"></span>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Remarks</label>
-            <input name="remarks" class="form-control" />
-            <span class="text-danger"></span>
-        </div>
-        <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> Save Reminder
-        </button>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Pipeline
-        </a>
-    </form>
+    </div>
 </div>
 
 @section Scripts {

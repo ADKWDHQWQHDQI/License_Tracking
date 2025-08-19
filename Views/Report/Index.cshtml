@@ -128,6 +128,10 @@
                 </div>
                 <div class="card-body">
                     <div class="list-group list-group-flush">
+                        <a href="@Url.Action("MonthlyRevenueAnalytics")" class="list-group-item list-group-item-action">
+                            <i class="fas fa-chart-line"></i> Monthly Revenue Analytics
+                            <small class="text-muted d-block">Comprehensive monthly revenue trends and analytics</small>
+                        </a>
                         <a href="@Url.Action("MarginBreakup")" class="list-group-item list-group-item-action">
                             <i class="fas fa-percentage"></i> Margin Breakup Analysis
                             <small class="text-muted d-block">Detailed margin analysis by OEM and client</small>
@@ -258,6 +262,9 @@
                 </div>
                 <div class="card-body">
                     <div class="btn-group" role="group">
+                        <a href="@Url.Action("ExportRevenueAnalytics")" class="btn btn-success" target="_blank">
+                            <i class="fas fa-file-excel"></i> Export Revenue Analytics (Excel)
+                        </a>
                         <a href="@Url.Action("ExportMarginBreakupExcel")" class="btn btn-success" target="_blank">
                             <i class="fas fa-file-excel"></i> Export Margin Breakup (Excel)
                         </a>

@@ -1,0 +1,575 @@
+@model License_Tracking.ViewModels.MonthlyRevenueAnalyticsViewModel
+
+@{
+    ViewData["Title"] = "Monthly Revenue Analytics - CBMS";
+    var isPipelineAnalytics = ViewData["IsPipelineAnalytics"] as bool? ?? false;
+}
+
+@section Styles {
+    <style>
+        /* Bigin.com-inspired Revenue Analytics Styles */
+        .bigin-analytics-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .bigin-analytics-controls {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f3f7;
+        }
+
+        .bigin-summary-cards {
+            margin-bottom: 2rem;
+        }
+
+        .bigin-summary-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f3f7;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .bigin-summary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .bigin-summary-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .bigin-summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.25rem;
+        }
+
+        .bigin-summary-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .bigin-chart-container {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f3f7;
+        }
+
+        .bigin-table-container {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f3f7;
+        }
+
+        .bigin-data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bigin-data-table th {
+            background: #f8f9ff;
+            padding: 1rem;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .bigin-data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .bigin-data-table tbody tr:hover {
+            background: #f8f9ff;
+        }
+
+        .bigin-growth-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+        }
+
+        .bigin-growth-positive {
+            background: rgba(34, 197, 94, 0.1);
+            color: #059669;
+        }
+
+        .bigin-growth-negative {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .bigin-control-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .bigin-select {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4a5568;
+            transition: all 0.2s ease;
+            min-width: 160px;
+        }
+
+        .bigin-select:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .bigin-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .bigin-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .bigin-chart-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .bigin-analytics-header {
+                padding: 1.5rem;
+            }
+            
+            .bigin-control-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .bigin-select {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+
+        /* Animation for loading states */
+        .bigin-loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .bigin-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+}
+
+<!-- Analytics Header -->
+<div class="bigin-analytics-header">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            @if (isPipelineAnalytics)
+            {
+                <h1 class="mb-2" style="font-size: 2.25rem; font-weight: 700;">
+                    <i class="fas fa-project-diagram me-3"></i>Pipeline Revenue Analytics
+                </h1>
+                <p class="mb-0 opacity-90" style="font-size: 1.125rem;">
+                    Estimated revenue projections from pipeline projects with @Model.PeriodDisplayName analysis
+                </p>
+            }
+            else
+            {
+                <h1 class="mb-2" style="font-size: 2.25rem; font-weight: 700;">
+                    <i class="fas fa-chart-line me-3"></i>Monthly Revenue Analytics
+                </h1>
+                <p class="mb-0 opacity-90" style="font-size: 1.125rem;">
+                    Comprehensive revenue insights with @Model.PeriodDisplayName analysis
+                </p>
+            }
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <div class="text-white">
+                <div style="font-size: 2rem; font-weight: 700;">@Model.TotalRevenue.ToString("C0")</div>
+                @if (isPipelineAnalytics)
+                {
+                    <div style="font-size: 0.875rem; opacity: 0.9;">Total Estimated Revenue</div>
+                }
+                else
+                {
+                    <div style="font-size: 0.875rem; opacity: 0.9;">Total Revenue</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Controls -->
+<div class="bigin-analytics-controls">
+    <form method="get" id="analyticsForm">
+        <div class="bigin-control-group">
+            <div>
+                <label for="period" class="form-label fw-semibold">Time Period:</label>
+                <select name="period" id="period" class="bigin-select" onchange="updateAnalytics()">
+                    @foreach (var period in Model.AvailablePeriods)
+                    {
+                        <option value="@period.Key" selected="@(period.Key == Model.SelectedPeriod)">
+                            @period.Value
+                        </option>
+                    }
+                </select>
+            </div>
+            
+            <div>
+                <label for="viewType" class="form-label fw-semibold">View Type:</label>
+                <select name="viewType" id="viewType" class="bigin-select" onchange="updateAnalytics()">
+                    @foreach (var viewType in Model.AvailableViewTypes)
+                    {
+                        <option value="@viewType.Key" selected="@(viewType.Key == Model.SelectedViewType)">
+                            @viewType.Value
+                        </option>
+                    }
+                </select>
+            </div>
+            
+            <button type="submit" class="bigin-btn">
+                <i class="fas fa-sync-alt me-2"></i>Update Analytics
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Summary Statistics Cards -->
+<div class="bigin-summary-cards">
+    <div class="row">
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="bigin-summary-card">
+                <div class="bigin-summary-icon bg-primary" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="bigin-summary-value text-primary">@Model.TotalRevenue.ToString("C0")</div>
+                @if (isPipelineAnalytics)
+                {
+                    <div class="bigin-summary-label">Total Estimated Revenue</div>
+                }
+                else
+                {
+                    <div class="bigin-summary-label">Total Revenue</div>
+                }
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="bigin-summary-card">
+                <div class="bigin-summary-icon bg-success" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="bigin-summary-value text-success">@Model.AverageRevenue.ToString("C0")</div>
+                @if (isPipelineAnalytics)
+                {
+                    <div class="bigin-summary-label">Average Estimated Revenue</div>
+                }
+                else
+                {
+                    <div class="bigin-summary-label">Average Revenue</div>
+                }
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="bigin-summary-card">
+                <div class="bigin-summary-icon bg-warning" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="bigin-summary-value text-warning">@Model.MaxRevenue.ToString("C0")</div>
+                @if (isPipelineAnalytics)
+                {
+                    <div class="bigin-summary-label">Peak Estimated Revenue</div>
+                }
+                else
+                {
+                    <div class="bigin-summary-label">Peak Revenue</div>
+                }
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="bigin-summary-card">
+                <div class="bigin-summary-icon bg-info" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                    @if (isPipelineAnalytics)
+                    {
+                        <i class="fas fa-project-diagram"></i>
+                    }
+                    else
+                    {
+                        <i class="fas fa-handshake"></i>
+                    }
+                </div>
+                <div class="bigin-summary-value text-info">@Model.TotalDeals</div>
+                @if (isPipelineAnalytics)
+                {
+                    <div class="bigin-summary-label">Total Pipeline Projects</div>
+                }
+                else
+                {
+                    <div class="bigin-summary-label">Total Deals</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart View -->
+@if (Model.SelectedViewType == "chart" || Model.SelectedViewType == "both")
+{
+    <div class="bigin-chart-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-semibold mb-0">
+                <i class="fas fa-chart-area text-primary me-2"></i>Revenue Trend - @Model.PeriodDisplayName
+            </h4>
+            <div class="text-muted small">
+                <i class="fas fa-calendar-alt me-1"></i>Last updated: @DateTime.Now.ToString("MMM dd, yyyy HH:mm")
+            </div>
+        </div>
+        
+        <div class="bigin-chart-wrapper">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+}
+
+<!-- Table View -->
+@if (Model.SelectedViewType == "table" || Model.SelectedViewType == "both")
+{
+    <div class="bigin-table-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-semibold mb-0">
+                <i class="fas fa-table text-primary me-2"></i>Revenue Data - @Model.PeriodDisplayName
+            </h4>
+            <div>
+                <button class="btn btn-outline-primary btn-sm" onclick="exportToExcel()">
+                    <i class="fas fa-download me-2"></i>Export Excel
+                </button>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="bigin-data-table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-calendar me-2"></i>Period</th>
+                        <th><i class="fas fa-dollar-sign me-2"></i>Revenue</th>
+                        <th><i class="fas fa-handshake me-2"></i>Deals</th>
+                        <th><i class="fas fa-chart-line me-2"></i>Growth</th>
+                        <th><i class="fas fa-calculator me-2"></i>Avg per Deal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var dataPoint in Model.RevenueData)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@dataPoint.Period</td>
+                            <td class="fw-semibold text-primary">@dataPoint.FormattedRevenue</td>
+                            <td>
+                                <span class="badge bg-light text-dark">@dataPoint.DealCount</span>
+                            </td>
+                            <td>
+                                <span class="bigin-growth-badge @(dataPoint.IsPositiveGrowth ? "bigin-growth-positive" : "bigin-growth-negative")">
+                                    <i class="fas @dataPoint.GrowthIcon"></i>
+                                    @dataPoint.FormattedGrowthPercentage
+                                </span>
+                            </td>
+                            <td class="text-muted">
+                                @((dataPoint.DealCount > 0 ? dataPoint.Revenue / dataPoint.DealCount : 0).ToString("C0"))
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Revenue Chart Configuration
+        const revenueData = @Html.Raw(Json.Serialize(Model.RevenueData.Select(r => new { 
+            period = r.Period, 
+            revenue = r.Revenue, 
+            dealCount = r.DealCount,
+            growthPercentage = r.GrowthPercentage
+        })));
+
+        let revenueChart = null;
+
+        function initializeChart() {
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+
+            const ctx = document.getElementById('revenueChart');
+            if (!ctx) return;
+
+            const chartCtx = ctx.getContext('2d');
+            
+            revenueChart = new Chart(chartCtx, {
+                type: 'line',
+                data: {
+                    labels: revenueData.map(d => d.period),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: revenueData.map(d => d.revenue),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 3,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: '#667eea',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    const dataPoint = revenueData[context.dataIndex];
+                                    return [
+                                        `Revenue: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y)}`,
+                                        `Deals: ${dataPoint.dealCount}`,
+                                        `Growth: ${dataPoint.growthPercentage.toFixed(1)}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('en-US', { 
+                                        style: 'currency', 
+                                        currency: 'USD',
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0
+                                    }).format(value);
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            hoverRadius: 8
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAnalytics() {
+            document.getElementById('analyticsForm').submit();
+        }
+
+        function exportToExcel() {
+            // This would typically call a server-side action to generate Excel
+            window.location.href = '/Report/ExportRevenueAnalytics?period=@Model.SelectedPeriod';
+        }
+
+        // Initialize chart when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (Model.SelectedViewType == "chart" || Model.SelectedViewType == "both")
+            {
+                <text>initializeChart();</text>
+            }
+        });
+
+        // Add smooth transitions for form updates
+        document.getElementById('analyticsForm').addEventListener('submit', function() {
+            const container = document.querySelector('.container-fluid');
+            container.classList.add('bigin-loading');
+        });
+    </script>
+}

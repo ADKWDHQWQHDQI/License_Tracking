@@ -16,6 +16,7 @@ namespace License_Tracking.ViewModels
         public int TotalOEMs { get; set; }
         public decimal TotalPipelineValue { get; set; }
         public decimal MonthlyRevenue { get; set; }
+        public decimal MonthlyGrowthPercentage { get; set; } // Added for month-over-month growth
 
         // Legacy License Tracking (for backward compatibility)
         public int TotalLicenses { get; set; }

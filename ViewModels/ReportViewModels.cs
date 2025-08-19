@@ -240,4 +240,47 @@ namespace License_Tracking.ViewModels
         public decimal AvgCostPerLicense => AvgCostPerDeal;
         public decimal AvgMarginPerLicense => AvgMarginPerDeal;
     }
+
+    // Monthly Revenue Analytics ViewModels
+    public class MonthlyRevenueAnalyticsViewModel
+    {
+        public List<MonthlyRevenueDataPoint> RevenueData { get; set; } = new();
+        public string SelectedPeriod { get; set; } = "last24months";
+        public string SelectedViewType { get; set; } = "chart";
+
+        // Summary Statistics
+        public decimal TotalRevenue { get; set; }
+        public decimal AverageRevenue { get; set; }
+        public decimal MaxRevenue { get; set; }
+        public int TotalDeals { get; set; }
+
+        // Dropdown Options
+        public Dictionary<string, string> AvailablePeriods { get; set; } = new();
+        public Dictionary<string, string> AvailableViewTypes { get; set; } = new();
+
+        // Helper Properties
+        public string PeriodDisplayName => AvailablePeriods.ContainsKey(SelectedPeriod) ? AvailablePeriods[SelectedPeriod] : "Unknown";
+        public string ViewTypeDisplayName => AvailableViewTypes.ContainsKey(SelectedViewType) ? AvailableViewTypes[SelectedViewType] : "Unknown";
+    }
+
+    public class MonthlyRevenueDataPoint
+    {
+        public string Period { get; set; } = string.Empty;
+        public decimal Revenue { get; set; }
+        public int DealCount { get; set; }
+        public decimal GrowthPercentage { get; set; }
+        public int Month { get; set; }
+        public int Year { get; set; }
+
+        // Pipeline-specific properties for future analytics
+        public decimal WeightedRevenue { get; set; }
+        public decimal AverageSuccessProbability { get; set; }
+
+        // Helper Properties
+        public string FormattedRevenue => Revenue.ToString("C0");
+        public string FormattedGrowthPercentage => GrowthPercentage.ToString("F1") + "%";
+        public bool IsPositiveGrowth => GrowthPercentage >= 0;
+        public string GrowthIcon => IsPositiveGrowth ? "fa-trending-up" : "fa-trending-down";
+        public string GrowthColor => IsPositiveGrowth ? "text-success" : "text-danger";
+    }
 }

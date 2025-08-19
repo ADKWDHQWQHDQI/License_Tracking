@@ -45,11 +45,17 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="deals-tab" data-bs-toggle="pill"
-                        data-bs-target="#deals-analysis" type="button" role="tab">
+                    <button class="nav-link" id="deals-tab" data-bs-toggle="pill" data-bs-target="#deals-analysis"
+                        type="button" role="tab">
                         <i class="fas fa-gem"></i> High-Value Deals
                         <small class="d-block">Premium Opportunities</small>
                     </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" href="@Url.Action("PipelineRevenueAnalytics", "ProjectPipeline")" role="tab">
+                        <i class="fas fa-chart-line"></i> Revenue Analytics
+                        <small class="d-block">Monthly Projections</small>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -423,27 +429,27 @@
             try {
                 const response = await fetch('@Url.Action("GetPipelineAnalytics")');
                 if (!response.ok) throw new Error('Failed to load analytics');
-                
+
                 analyticsData = await response.json();
                 console.log('Analytics Data Loaded:', analyticsData); // Debug log
-                
+
                 // Check if we received valid data
                 if (!analyticsData || analyticsData.error) {
                     throw new Error(analyticsData?.error || 'Invalid data received');
                 }
-                
+
                 // Update all components
                 updateAnalyticsDisplay();
                 createCharts();
                 populateStageCards();
                 populateOemPerformanceTable();
                 populateHighValueDeals();
-                
+
                 console.log('All components updated successfully');
             } catch (error) {
                 console.error('Error loading analytics:', error);
                 showError('Failed to load pipeline analytics: ' + error.message);
-                
+
                 // Show fallback data
                 displayFallbackData();
             } finally {
@@ -454,20 +460,20 @@
         function displayFallbackData() {
             // Display a helpful message if no data is available
             const fallbackMessage = `
-                <div class="alert alert-warning">
-                    <h6><i class="fas fa-exclamation-triangle"></i> No Analytics Data Available</h6>
-                    <p>The pipeline analytics data could not be loaded. This might be because:</p>
-                    <ul>
-                        <li>No projects are currently in the pipeline</li>
-                        <li>The analytics service is temporarily unavailable</li>
-                        <li>You may not have permission to view this data</li>
-                    </ul>
-                    <button class="btn btn-sm btn-primary" onclick="loadPipelineAnalytics()">
-                        <i class="fas fa-retry"></i> Retry Loading Data
-                    </button>
-                </div>
-            `;
-            
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-exclamation-triangle"></i> No Analytics Data Available</h6>
+                            <p>The pipeline analytics data could not be loaded. This might be because:</p>
+                            <ul>
+                                <li>No projects are currently in the pipeline</li>
+                                <li>The analytics service is temporarily unavailable</li>
+                                <li>You may not have permission to view this data</li>
+                            </ul>
+                            <button class="btn btn-sm btn-primary" onclick="loadPipelineAnalytics()">
+                                <i class="fas fa-retry"></i> Retry Loading Data
+                            </button>
+                        </div>
+                    `;
+
             // Show fallback in main containers
             document.getElementById('stageCards').innerHTML = `<div class="col-12">${fallbackMessage}</div>`;
         }
@@ -476,44 +482,44 @@
             if (!analyticsData) return;
 
             // Update main overview cards with correct property names
-            document.getElementById('totalEstimatedRevenue').textContent = 
+            document.getElementById('totalEstimatedRevenue').textContent =
                 formatCurrency(analyticsData.totalEstimatedRevenue || 0);
-            document.getElementById('totalWeightedRevenue').textContent = 
+            document.getElementById('totalWeightedRevenue').textContent =
                 formatCurrency(analyticsData.totalWeightedRevenue || 0);
-            document.getElementById('totalEstimatedMargin').textContent = 
+            document.getElementById('totalEstimatedMargin').textContent =
                 formatCurrency(analyticsData.totalEstimatedMargin || 0);
-            document.getElementById('activeProjects').textContent = 
+            document.getElementById('activeProjects').textContent =
                 analyticsData.activeProjects || 0;
 
             // Update text elements
-            document.getElementById('totalProjectsText').textContent = 
+            document.getElementById('totalProjectsText').textContent =
                 `${analyticsData.totalProjects || 0} projects`;
-            document.getElementById('marginPercentageText').textContent = 
+            document.getElementById('marginPercentageText').textContent =
                 `${(analyticsData.averageMarginPercentage || 0).toFixed(1)}% margin`;
-            document.getElementById('avgSuccessRateText').textContent = 
+            document.getElementById('avgSuccessRateText').textContent =
                 `${(analyticsData.averageSuccessProbability || 0).toFixed(1)}% avg success`;
 
             // Update quick stats
-            document.getElementById('avgConfidence').textContent = 
+            document.getElementById('avgConfidence').textContent =
                 `${(analyticsData.averageConfidenceLevel || 0).toFixed(1)}/5`;
-            document.getElementById('highProbabilityDeals').textContent = 
+            document.getElementById('highProbabilityDeals').textContent =
                 analyticsData.pipelineHealth?.highProbabilityDeals || 0;
-            document.getElementById('lowConfidenceDeals').textContent = 
+            document.getElementById('lowConfidenceDeals').textContent =
                 analyticsData.pipelineHealth?.lowConfidenceDeals || 0;
-            document.getElementById('upcomingClosures').textContent = 
+            document.getElementById('upcomingClosures').textContent =
                 analyticsData.upcomingClosures || 0;
-            document.getElementById('projectsThisMonth').textContent = 
+            document.getElementById('projectsThisMonth').textContent =
                 analyticsData.projectsThisMonth || 0;
-            document.getElementById('staleDeals').textContent = 
+            document.getElementById('staleDeals').textContent =
                 analyticsData.pipelineHealth?.staleDeals || 0;
 
             // Update high-value deals summary
             const highValueDeals = analyticsData.highValueDeals || [];
             document.getElementById('highValueDealsCount').textContent = highValueDeals.length;
-            
+
             const highValueRevenue = highValueDeals.reduce((sum, deal) => sum + (deal.estimatedRevenue || 0), 0);
             const highValueWeighted = highValueDeals.reduce((sum, deal) => sum + (deal.weightedRevenue || 0), 0);
-            const avgSuccess = highValueDeals.length > 0 ? 
+            const avgSuccess = highValueDeals.length > 0 ?
                 highValueDeals.reduce((sum, deal) => sum + (deal.successProbability || 0), 0) / highValueDeals.length : 0;
 
             document.getElementById('highValueRevenue').textContent = formatCurrency(highValueRevenue);
@@ -648,7 +654,7 @@
                                     y: {
                                         beginAtZero: true,
                                         ticks: {
-                                            callback: function(value) {
+                                            callback: function (value) {
                                                 return formatCurrency(value);
                                             }
                                         }
@@ -725,7 +731,7 @@
                                     x: {
                                         beginAtZero: true,
                                         ticks: {
-                                            callback: function(value) {
+                                            callback: function (value) {
                                                 return formatCurrency(value);
                                             }
                                         }
@@ -737,7 +743,7 @@
                                     },
                                     tooltip: {
                                         callbacks: {
-                                            label: function(context) {
+                                            label: function (context) {
                                                 return 'Revenue: ' + formatCurrency(context.parsed.x);
                                             }
                                         }
@@ -759,7 +765,7 @@
             // Trend Chart (Enhanced with better error handling)
             const trendData = analyticsData.monthlyTrend || [];
             console.log('Trend Data:', trendData); // Debug log
-            
+
             if (trendData.length > 0) {
                 const trendCtx = document.getElementById('trendChart');
                 if (trendCtx) {
@@ -790,7 +796,7 @@
                                 y: {
                                     beginAtZero: true,
                                     ticks: {
-                                        callback: function(value) {
+                                        callback: function (value) {
                                             return formatCurrency(value);
                                         }
                                     }
@@ -799,7 +805,7 @@
                             plugins: {
                                 tooltip: {
                                     callbacks: {
-                                        label: function(context) {
+                                        label: function (context) {
                                             return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
                                         }
                                     }
@@ -828,7 +834,7 @@
 
             const stageData = analyticsData.projectsByStage || {};
             console.log('Stage Data:', stageData); // Debug log
-            
+
             if (Object.keys(stageData).length === 0) {
                 stageCardsContainer.innerHTML = '<div class="col-12"><div class="alert alert-info">No stage data available</div></div>';
                 return;
@@ -836,7 +842,7 @@
 
             const stageColors = {
                 'Lead': 'secondary',
-                'Qualified': 'info', 
+                'Qualified': 'info',
                 'Proposal': 'primary',
                 'Negotiation': 'warning',
                 'Closed Won': 'success',
@@ -844,7 +850,7 @@
             };
 
             // Sort stages by count (descending)
-            const sortedStages = Object.entries(stageData).sort(([,a], [,b]) => 
+            const sortedStages = Object.entries(stageData).sort(([, a], [, b]) =>
                 (b.count || 0) - (a.count || 0)
             );
 
@@ -854,34 +860,34 @@
                 const weightedRevenue = data.weightedRevenue || 0;
                 const averageConfidence = data.averageConfidence || 0;
                 const count = data.count || 0;
-                
+
                 const card = document.createElement('div');
                 card.className = 'col-lg-3 col-md-6 mb-3';
                 card.innerHTML = `
-                    <div class="card border-${color} border-start border-4 h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="text-${color} mb-0">${stage}</h6>
-                                <span class="badge bg-${color}">${count}</span>
+                            <div class="card border-${color} border-start border-4 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="text-${color} mb-0">${stage}</h6>
+                                        <span class="badge bg-${color}">${count}</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Revenue:</small>
+                                        <h6 class="mb-1">${formatCurrency(estimatedRevenue)}</h6>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Weighted:</small>
+                                        <h6 class="mb-1">${formatCurrency(weightedRevenue)}</h6>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">Confidence:</small>
+                                        <span class="badge bg-outline-${color}">${averageConfidence.toFixed(1)}/5</span>
+                                    </div>
+                                    <div class="progress mt-2" style="height: 6px;">
+                                        <div class="progress-bar bg-${color}" style="width: ${(averageConfidence / 5) * 100}%"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Revenue:</small>
-                                <h6 class="mb-1">${formatCurrency(estimatedRevenue)}</h6>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Weighted:</small>
-                                <h6 class="mb-1">${formatCurrency(weightedRevenue)}</h6>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">Confidence:</small>
-                                <span class="badge bg-outline-${color}">${averageConfidence.toFixed(1)}/5</span>
-                            </div>
-                            <div class="progress mt-2" style="height: 6px;">
-                                <div class="progress-bar bg-${color}" style="width: ${(averageConfidence / 5) * 100}%"></div>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                        `;
                 stageCardsContainer.appendChild(card);
             });
         }
@@ -892,7 +898,7 @@
 
             const oemData = analyticsData.projectsByOem || {};
             console.log('OEM Data:', oemData); // Debug log
-            
+
             if (Object.keys(oemData).length === 0) {
                 const row = tbody.insertRow();
                 row.innerHTML = '<td colspan="6" class="text-center text-muted">No OEM data available</td>';
@@ -900,7 +906,7 @@
             }
 
             // Sort OEMs by estimated revenue (descending)
-            const sortedOems = Object.entries(oemData).sort(([,a], [,b]) => 
+            const sortedOems = Object.entries(oemData).sort(([, a], [, b]) =>
                 (b.estimatedRevenue || 0) - (a.estimatedRevenue || 0)
             );
 
@@ -908,36 +914,36 @@
                 const row = tbody.insertRow();
                 const estimatedRevenue = data.estimatedRevenue || 0;
                 const estimatedMargin = data.estimatedMargin || 0;
-                const marginPercentage = estimatedRevenue > 0 ? 
+                const marginPercentage = estimatedRevenue > 0 ?
                     (estimatedMargin / estimatedRevenue * 100) : 0;
-                
+
                 row.innerHTML = `
-                    <td><strong>${oem}</strong></td>
-                    <td>
-                        <span class="badge bg-info">${data.count || 0}</span>
-                    </td>
-                    <td>${formatCurrency(estimatedRevenue)}</td>
-                    <td>${formatCurrency(data.weightedRevenue || 0)}</td>
-                    <td>${formatCurrency(estimatedMargin)}</td>
-                    <td>
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar bg-${marginPercentage >= 20 ? 'success' : 
-                                marginPercentage >= 10 ? 'warning' : 'danger'}" 
-                                style="width: ${Math.min(marginPercentage, 100)}%">
-                                ${marginPercentage.toFixed(1)}%
-                            </div>
-                        </div>
-                    </td>
-                `;
+                            <td><strong>${oem}</strong></td>
+                            <td>
+                                <span class="badge bg-info">${data.count || 0}</span>
+                            </td>
+                            <td>${formatCurrency(estimatedRevenue)}</td>
+                            <td>${formatCurrency(data.weightedRevenue || 0)}</td>
+                            <td>${formatCurrency(estimatedMargin)}</td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-${marginPercentage >= 20 ? 'success' :
+                        marginPercentage >= 10 ? 'warning' : 'danger'}" 
+                                        style="width: ${Math.min(marginPercentage, 100)}%">
+                                        ${marginPercentage.toFixed(1)}%
+                                    </div>
+                                </div>
+                            </td>
+                        `;
             });
         }
 
         function showDealDetails(projectId) {
             // Find the deal in the high value deals array
-            const deal = analyticsData.highValueDeals?.find(d => 
+            const deal = analyticsData.highValueDeals?.find(d =>
                 (d.projectPipelineId || d.ProjectPipelineId) === projectId
             );
-            
+
             if (!deal) {
                 alert('Deal details not found');
                 return;
@@ -951,50 +957,50 @@
             const pipelineStage = deal.pipelineStage || deal.PipelineStage || 'N/A';
 
             const modalHtml = `
-                <div class="modal fade" id="dealDetailsModal" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title"><i class="fas fa-gem text-warning"></i> Deal Details</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h6>Project Information</h6>
-                                        <p><strong>Product:</strong> ${productName}</p>
-                                        <p><strong>Client:</strong> ${clientName}</p>
-                                        <p><strong>Stage:</strong> <span class="badge bg-primary">${pipelineStage}</span></p>
+                        <div class="modal fade" id="dealDetailsModal" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"><i class="fas fa-gem text-warning"></i> Deal Details</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
-                                    <div class="col-md-6">
-                                        <h6>Financial Details</h6>
-                                        <p><strong>Estimated Revenue:</strong> ${formatCurrency(estimatedRevenue)}</p>
-                                        <p><strong>Weighted Revenue:</strong> ${formatCurrency(weightedRevenue)}</p>
-                                        <p><strong>Success Probability:</strong> ${successProbability}%</p>
-                                    </div>
-                                </div>
-                                <div class="mt-3">
-                                    <h6>Success Probability</h6>
-                                    <div class="progress mb-3" style="height: 25px;">
-                                        <div class="progress-bar bg-${successProbability >= 75 ? 'success' : 
-                                            successProbability >= 50 ? 'info' : 
-                                            successProbability >= 25 ? 'warning' : 'danger'}" 
-                                            style="width: ${successProbability}%">
-                                            ${successProbability}%
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6>Project Information</h6>
+                                                <p><strong>Product:</strong> ${productName}</p>
+                                                <p><strong>Client:</strong> ${clientName}</p>
+                                                <p><strong>Stage:</strong> <span class="badge bg-primary">${pipelineStage}</span></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>Financial Details</h6>
+                                                <p><strong>Estimated Revenue:</strong> ${formatCurrency(estimatedRevenue)}</p>
+                                                <p><strong>Weighted Revenue:</strong> ${formatCurrency(weightedRevenue)}</p>
+                                                <p><strong>Success Probability:</strong> ${successProbability}%</p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <h6>Success Probability</h6>
+                                            <div class="progress mb-3" style="height: 25px;">
+                                                <div class="progress-bar bg-${successProbability >= 75 ? 'success' :
+                    successProbability >= 50 ? 'info' :
+                        successProbability >= 25 ? 'warning' : 'danger'}" 
+                                                    style="width: ${successProbability}%">
+                                                    ${successProbability}%
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <a href="/ProjectPipeline/Details/${projectId}" class="btn btn-primary">
+                                            <i class="fas fa-external-link-alt"></i> View Full Details
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <a href="/ProjectPipeline/Details/${projectId}" class="btn btn-primary">
-                                    <i class="fas fa-external-link-alt"></i> View Full Details
-                                </a>
-                            </div>
                         </div>
-                    </div>
-                </div>
-            `;
+                    `;
 
             // Remove existing modal if any
             const existingModal = document.getElementById('dealDetailsModal');
@@ -1004,7 +1010,7 @@
 
             // Add modal to page
             document.body.insertAdjacentHTML('beforeend', modalHtml);
-            
+
             // Show modal
             const modal = new bootstrap.Modal(document.getElementById('dealDetailsModal'));
             modal.show();
@@ -1016,7 +1022,7 @@
 
             const highValueDeals = analyticsData.highValueDeals || [];
             console.log('High Value Deals:', highValueDeals); // Debug log
-            
+
             if (highValueDeals.length === 0) {
                 const row = tbody.insertRow();
                 row.innerHTML = '<td colspan="7" class="text-center text-muted">No high-value deals found</td>';
@@ -1025,7 +1031,7 @@
 
             highValueDeals.forEach((deal, index) => {
                 const row = tbody.insertRow();
-                
+
                 // Handle both camelCase and PascalCase property names
                 const productName = deal.productName || deal.ProductName || 'N/A';
                 const clientName = deal.clientName || deal.ClientName || 'N/A';
@@ -1036,38 +1042,38 @@
                 const projectId = deal.projectPipelineId || deal.ProjectPipelineId || index + 1;
 
                 row.innerHTML = `
-                    <td><strong>${productName}</strong></td>
-                    <td>${clientName}</td>
-                    <td>${formatCurrency(estimatedRevenue)}</td>
-                    <td>${formatCurrency(weightedRevenue)}</td>
-                    <td>
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar bg-${successProbability >= 75 ? 'success' : 
-                                successProbability >= 50 ? 'info' : 
-                                successProbability >= 25 ? 'warning' : 'danger'}" 
-                                style="width: ${successProbability}%">
-                                ${successProbability}%
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="badge bg-${pipelineStage === 'Closed Won' ? 'success' : 
-                            pipelineStage === 'Negotiation' ? 'warning' : 
-                            pipelineStage === 'Proposal' ? 'info' : 
-                            pipelineStage === 'Qualified' ? 'primary' : 
-                            pipelineStage === 'Lead' ? 'secondary' : 'dark'}">
-                            ${pipelineStage}
-                        </span>
-                    </td>
-                    <td>
-                        <a href="@Url.Action("Details")/${projectId}" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-eye"></i> View
-                        </a>
-                        <button class="btn btn-sm btn-outline-success ms-1" onclick="showDealDetails(${projectId})">
-                            <i class="fas fa-info-circle"></i>
-                        </button>
-                    </td>
-                `;
+                            <td><strong>${productName}</strong></td>
+                            <td>${clientName}</td>
+                            <td>${formatCurrency(estimatedRevenue)}</td>
+                            <td>${formatCurrency(weightedRevenue)}</td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-${successProbability >= 75 ? 'success' :
+                        successProbability >= 50 ? 'info' :
+                            successProbability >= 25 ? 'warning' : 'danger'}" 
+                                        style="width: ${successProbability}%">
+                                        ${successProbability}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-${pipelineStage === 'Closed Won' ? 'success' :
+                        pipelineStage === 'Negotiation' ? 'warning' :
+                            pipelineStage === 'Proposal' ? 'info' :
+                                pipelineStage === 'Qualified' ? 'primary' :
+                                    pipelineStage === 'Lead' ? 'secondary' : 'dark'}">
+                                    ${pipelineStage}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="@Url.Action("Details")/${projectId}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <button class="btn btn-sm btn-outline-success ms-1" onclick="showDealDetails(${projectId})">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </td>
+                        `;
             });
         }
 
@@ -1101,7 +1107,7 @@
 
             // Download as JSON
             const dataStr = JSON.stringify(exportData, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(dataBlob);
             const link = document.createElement('a');
             link.href = url;
@@ -1114,17 +1120,17 @@
         function verifyData() {
             console.log('=== Data Verification ===');
             console.log('Analytics Data:', analyticsData);
-            
+
             if (analyticsData) {
                 console.log('High Value Deals Count:', analyticsData.highValueDeals?.length || 0);
                 console.log('OEM Data Keys:', Object.keys(analyticsData.projectsByOem || {}));
                 console.log('Stage Data Keys:', Object.keys(analyticsData.projectsByStage || {}));
                 console.log('Monthly Trend Length:', analyticsData.monthlyTrend?.length || 0);
             }
-            
+
             console.log('=== Chart Objects ===');
             console.log('Available Charts:', Object.keys(charts));
-            
+
             console.log('=== DOM Elements ===');
             console.log('High Value Table Body:', document.querySelector('#highValueDealsTable tbody'));
             console.log('OEM Table Body:', document.querySelector('#oemPerformanceTable tbody'));
@@ -1142,9 +1148,9 @@
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-danger alert-dismissible fade show';
             alertDiv.innerHTML = `
-                <i class="fas fa-exclamation-triangle"></i> ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
+                        <i class="fas fa-exclamation-triangle"></i> ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
             document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.row'));
         }
 

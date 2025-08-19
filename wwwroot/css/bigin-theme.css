@@ -850,3 +850,281 @@ body {
         font-size: 1.5rem;
     }
 }
+
+/* ==========================================================================
+   ENTERPRISE USER PROFILE - Professional Navigation Component
+   ========================================================================== */
+
+/* Enterprise User Profile Navigation */
+.enterprise-user-profile {
+    padding: 0.5rem 1rem !important;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: transparent;
+    border: 1px solid transparent;
+}
+
+.enterprise-user-profile:hover {
+    background: var(--bigin-gray-50);
+    border-color: var(--bigin-gray-200);
+    transform: translateY(-1px);
+    box-shadow: var(--bigin-shadow-sm);
+}
+
+.enterprise-user-profile.show {
+    background: var(--bigin-primary-light);
+    border-color: var(--bigin-primary);
+}
+
+/* User Avatar */
+.enterprise-user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bigin-primary) 0%, var(--bigin-primary-hover) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--bigin-white);
+    box-shadow: var(--bigin-shadow);
+    position: relative;
+}
+
+.enterprise-avatar-text {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--bigin-white);
+    letter-spacing: 0.025em;
+}
+
+.enterprise-user-avatar::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    background: var(--bigin-success);
+    border: 2px solid var(--bigin-white);
+    border-radius: 50%;
+    box-shadow: var(--bigin-shadow-sm);
+}
+
+/* User Info */
+.enterprise-user-info {
+    line-height: 1.2;
+}
+
+.enterprise-user-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--bigin-gray-800);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.enterprise-user-role {
+    margin: 0;
+}
+
+.enterprise-user-role .badge {
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+}
+
+/* Dropdown Menu */
+.enterprise-user-dropdown {
+    min-width: 280px;
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--bigin-shadow-xl);
+    padding: 0;
+    margin-top: 0.5rem;
+    background: var(--bigin-white);
+    border: 1px solid var(--bigin-gray-200);
+}
+
+.enterprise-dropdown-header {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--bigin-gray-50) 0%, var(--bigin-gray-100) 100%);
+    border-bottom: 1px solid var(--bigin-gray-200);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-radius: 11px 11px 0 0;
+}
+
+.enterprise-user-avatar-large {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bigin-primary) 0%, var(--bigin-primary-hover) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--bigin-white);
+    box-shadow: var(--bigin-shadow-md);
+    position: relative;
+    flex-shrink: 0;
+}
+
+.enterprise-avatar-text-large {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--bigin-white);
+    letter-spacing: 0.025em;
+}
+
+.enterprise-user-avatar-large::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 14px;
+    height: 14px;
+    background: var(--bigin-success);
+    border: 3px solid var(--bigin-white);
+    border-radius: 50%;
+    box-shadow: var(--bigin-shadow-sm);
+}
+
+.enterprise-user-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.enterprise-user-name-large {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--bigin-gray-800);
+    margin: 0 0 0.25rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.enterprise-user-email {
+    font-size: 0.875rem;
+    color: var(--bigin-gray-600);
+    margin: 0 0 0.5rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.enterprise-user-role-large .badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid transparent;
+}
+
+/* Dropdown Items */
+.enterprise-dropdown-item {
+    padding: 0.875rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+    border: none;
+    background: transparent;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--bigin-gray-700);
+}
+
+.enterprise-dropdown-item:hover {
+    background: var(--bigin-gray-50);
+    color: var(--bigin-gray-900);
+    transform: translateX(4px);
+}
+
+.enterprise-dropdown-item:active {
+    background: var(--bigin-gray-100);
+}
+
+.enterprise-dropdown-item.text-danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--bigin-danger);
+}
+
+.enterprise-dropdown-item i {
+    width: 16px;
+    text-align: center;
+    font-size: 0.875rem;
+}
+
+/* Role-specific Avatar Colors */
+.enterprise-user-profile[data-role="Admin"] .enterprise-user-avatar,
+.enterprise-user-profile[data-role="Admin"] .enterprise-user-avatar-large {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+}
+
+.enterprise-user-profile[data-role="Management"] .enterprise-user-avatar,
+.enterprise-user-profile[data-role="Management"] .enterprise-user-avatar-large {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+}
+
+.enterprise-user-profile[data-role="Sales"] .enterprise-user-avatar,
+.enterprise-user-profile[data-role="Sales"] .enterprise-user-avatar-large {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.enterprise-user-profile[data-role="Finance"] .enterprise-user-avatar,
+.enterprise-user-profile[data-role="Finance"] .enterprise-user-avatar-large {
+    background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+}
+
+.enterprise-user-profile[data-role="Operations"] .enterprise-user-avatar,
+.enterprise-user-profile[data-role="Operations"] .enterprise-user-avatar-large {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+}
+
+.enterprise-user-profile[data-role="BA"] .enterprise-user-avatar,
+.enterprise-user-profile[data-role="BA"] .enterprise-user-avatar-large {
+    background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+}
+
+/* Responsive Design */
+@media (max-width: 991.98px) {
+    .enterprise-user-info {
+        display: none;
+    }
+    
+    .enterprise-user-dropdown {
+        min-width: 260px;
+    }
+    
+    .enterprise-dropdown-header {
+        padding: 1.25rem;
+    }
+    
+    .enterprise-user-name-large {
+        font-size: 0.9375rem;
+    }
+    
+    .enterprise-user-email {
+        font-size: 0.8125rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .enterprise-user-dropdown {
+        min-width: 240px;
+    }
+    
+    .enterprise-dropdown-header {
+        padding: 1rem;
+    }
+    
+    .enterprise-dropdown-item {
+        padding: 0.75rem 1rem;
+        font-size: 0.8125rem;
+    }
+}

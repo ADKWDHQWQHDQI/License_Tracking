@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using License_Tracking.Services;
 using License_Tracking.ViewModels;
+using License_Tracking.Data;
+using License_Tracking.Models;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace License_Tracking.Controllers
@@ -12,13 +15,16 @@ namespace License_Tracking.Controllers
     {
         private readonly IProjectPipelineService _projectPipelineService;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly AppDbContext _context;
 
         public ProjectPipelineController(
             IProjectPipelineService projectPipelineService,
-            UserManager<IdentityUser> userManager)
+            UserManager<IdentityUser> userManager,
+            AppDbContext context)
         {
             _projectPipelineService = projectPipelineService;
             _userManager = userManager;
+            _context = context;
         }
 
         [Authorize(Roles = "Admin,Sales,Management")]
@@ -481,7 +487,303 @@ namespace License_Tracking.Controllers
             }
         }
 
-        // Week 10 Enhancement: Autocomplete APIs for Enhanced Filtering
+        [HttpGet]
+        [Authorize(Roles = "Admin,Sales,Management")]
+        public async Task<IActionResult> PipelineRevenueAnalytics(string period = "next12months", string viewType = "chart")
+        {
+            try
+            {
+                // BIGIN.COM APPROACH: Pipeline Analytics = Future Estimations Only
+                // Filter pipeline projects for future-looking analytics based on Expected Close Dates
+                var currentDate = DateTime.Now;
+                var futureStartDate = currentDate.Date; // Today onwards
+
+                var pipelineProjects = await _context.ProjectPipelines
+                    .Where(p => p.EstimatedRevenue > 0 &&
+                               p.ProjectStatus == "Pipeline" && // Only active pipeline deals
+                               (p.ExpectedCloseDate.HasValue && p.ExpectedCloseDate.Value >= futureStartDate))
+                    .OrderBy(p => p.ExpectedCloseDate)
+                    .ToListAsync();
+
+                List<MonthlyRevenueDataPoint> revenueData = new List<MonthlyRevenueDataPoint>();
+
+                if (!pipelineProjects.Any())
+                {
+                    ViewBag.NoDataMessage = "No active pipeline projects found with future Expected Close Dates. Pipeline analytics shows estimated revenue for future periods based on deal closure projections.";
+
+                    // Create empty future periods for visualization
+                    CreateEmptyFuturePeriods(revenueData, currentDate, period);
+                }
+                else
+                {
+                    switch (period.ToLower())
+                    {
+                        case "next12months":
+                            // Future 12 months from current date
+                            for (int i = 0; i < 12; i++)
+                            {
+                                var monthDate = currentDate.AddMonths(i);
+                                var monthProjects = pipelineProjects.Where(p =>
+                                    p.ExpectedCloseDate.HasValue &&
+                                    p.ExpectedCloseDate.Value.Year == monthDate.Year &&
+                                    p.ExpectedCloseDate.Value.Month == monthDate.Month).ToList();
+
+                                var estimatedRevenue = monthProjects.Sum(p => p.EstimatedRevenue);
+                                var weightedRevenue = monthProjects.Sum(p => p.WeightedRevenue);
+
+                                revenueData.Add(new MonthlyRevenueDataPoint
+                                {
+                                    Period = monthDate.ToString("MMM yyyy"),
+                                    Revenue = estimatedRevenue,
+                                    WeightedRevenue = weightedRevenue,
+                                    DealCount = monthProjects.Count,
+                                    Month = monthDate.Month,
+                                    Year = monthDate.Year,
+                                    AverageSuccessProbability = monthProjects.Any() ? (decimal)monthProjects.Average(p => p.SuccessProbability) : 0
+                                });
+                            }
+                            break;
+
+                        case "next24months":
+                            // Future 24 months from current date
+                            for (int i = 0; i < 24; i++)
+                            {
+                                var monthDate = currentDate.AddMonths(i);
+                                var monthProjects = pipelineProjects.Where(p =>
+                                    p.ExpectedCloseDate.HasValue &&
+                                    p.ExpectedCloseDate.Value.Year == monthDate.Year &&
+                                    p.ExpectedCloseDate.Value.Month == monthDate.Month).ToList();
+
+                                var estimatedRevenue = monthProjects.Sum(p => p.EstimatedRevenue);
+                                var weightedRevenue = monthProjects.Sum(p => p.WeightedRevenue);
+
+                                revenueData.Add(new MonthlyRevenueDataPoint
+                                {
+                                    Period = monthDate.ToString("MMM yyyy"),
+                                    Revenue = estimatedRevenue,
+                                    WeightedRevenue = weightedRevenue,
+                                    DealCount = monthProjects.Count,
+                                    Month = monthDate.Month,
+                                    Year = monthDate.Year,
+                                    AverageSuccessProbability = monthProjects.Any() ? (decimal)monthProjects.Average(p => p.SuccessProbability) : 0
+                                });
+                            }
+                            break;
+
+                        case "futureqoq":
+                            // Future Quarters (QoQ) - Next 8 quarters
+                            var futureQuarters = new[]
+                            {
+                                new { Name = "Q1", Months = new[] { 1, 2, 3 } },
+                                new { Name = "Q2", Months = new[] { 4, 5, 6 } },
+                                new { Name = "Q3", Months = new[] { 7, 8, 9 } },
+                                new { Name = "Q4", Months = new[] { 10, 11, 12 } }
+                            };
+
+                            for (int yearOffset = 0; yearOffset < 2; yearOffset++) // Next 2 years
+                            {
+                                var targetYear = currentDate.Year + yearOffset;
+                                foreach (var quarter in futureQuarters)
+                                {
+                                    // Skip past quarters in current year
+                                    if (yearOffset == 0 && quarter.Months.Any(m => m < currentDate.Month))
+                                        continue;
+
+                                    var quarterProjects = pipelineProjects.Where(p =>
+                                        p.ExpectedCloseDate.HasValue &&
+                                        p.ExpectedCloseDate.Value.Year == targetYear &&
+                                        quarter.Months.Contains(p.ExpectedCloseDate.Value.Month)).ToList();
+
+                                    var estimatedRevenue = quarterProjects.Sum(p => p.EstimatedRevenue);
+                                    var weightedRevenue = quarterProjects.Sum(p => p.WeightedRevenue);
+
+                                    revenueData.Add(new MonthlyRevenueDataPoint
+                                    {
+                                        Period = $"{quarter.Name} {targetYear}",
+                                        Revenue = estimatedRevenue,
+                                        WeightedRevenue = weightedRevenue,
+                                        DealCount = quarterProjects.Count,
+                                        Month = quarter.Months[0],
+                                        Year = targetYear,
+                                        AverageSuccessProbability = quarterProjects.Any() ? (decimal)quarterProjects.Average(p => p.SuccessProbability) : 0
+                                    });
+                                }
+                            }
+                            break;
+
+                        case "futureyoy":
+                            // Future Years (YoY) - Next 3 years
+                            for (int i = 0; i < 3; i++)
+                            {
+                                var targetYear = currentDate.Year + i;
+                                var yearProjects = pipelineProjects.Where(p =>
+                                    p.ExpectedCloseDate.HasValue &&
+                                    p.ExpectedCloseDate.Value.Year == targetYear).ToList();
+
+                                var estimatedRevenue = yearProjects.Sum(p => p.EstimatedRevenue);
+                                var weightedRevenue = yearProjects.Sum(p => p.WeightedRevenue);
+
+                                revenueData.Add(new MonthlyRevenueDataPoint
+                                {
+                                    Period = targetYear.ToString(),
+                                    Revenue = estimatedRevenue,
+                                    WeightedRevenue = weightedRevenue,
+                                    DealCount = yearProjects.Count,
+                                    Month = 1,
+                                    Year = targetYear,
+                                    AverageSuccessProbability = yearProjects.Any() ? (decimal)yearProjects.Average(p => p.SuccessProbability) : 0
+                                });
+                            }
+                            break;
+                    }
+                }
+
+                // Calculate month-over-month or period-over-period growth for future projections
+                for (int i = 1; i < revenueData.Count; i++)
+                {
+                    var current = revenueData[i];
+                    var previous = revenueData[i - 1];
+
+                    if (previous.Revenue > 0)
+                    {
+                        current.GrowthPercentage = ((current.Revenue - previous.Revenue) / previous.Revenue) * 100;
+                    }
+                }
+
+                // Calculate summary statistics
+                var totalRevenue = revenueData.Sum(r => r.Revenue);
+                var averageRevenue = revenueData.Count > 0 ? revenueData.Average(r => r.Revenue) : 0;
+                var maxRevenue = revenueData.Count > 0 ? revenueData.Max(r => r.Revenue) : 0;
+                var totalDeals = revenueData.Sum(r => r.DealCount);
+
+                var viewModel = new MonthlyRevenueAnalyticsViewModel
+                {
+                    RevenueData = revenueData,
+                    SelectedPeriod = period,
+                    SelectedViewType = viewType,
+                    TotalRevenue = totalRevenue,
+                    AverageRevenue = averageRevenue,
+                    MaxRevenue = maxRevenue,
+                    TotalDeals = totalDeals,
+                    AvailablePeriods = new Dictionary<string, string>
+                    {
+                        { "next12months", "Next 12 Months" },
+                        { "next24months", "Next 24 Months" },
+                        { "futureqoq", "Future Quarters (QoQ)" },
+                        { "futureyoy", "Future Years (YoY)" }
+                    },
+                    AvailableViewTypes = new Dictionary<string, string>
+                    {
+                        { "chart", "Chart View" },
+                        { "table", "Table View" },
+                        { "both", "Chart & Table" }
+                    }
+                };
+
+                ViewData["Title"] = "Pipeline Revenue Analytics - CBMS";
+                ViewData["IsPipelineAnalytics"] = true;
+
+                return View("~/Views/Report/MonthlyRevenueAnalytics.cshtml", viewModel);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Error loading pipeline revenue analytics: {ex.Message}";
+                return View("~/Views/Report/MonthlyRevenueAnalytics.cshtml", new MonthlyRevenueAnalyticsViewModel());
+            }
+        }
+
+        // Helper method to create empty future periods for visualization
+        private void CreateEmptyFuturePeriods(List<MonthlyRevenueDataPoint> revenueData, DateTime currentDate, string period)
+        {
+            switch (period.ToLower())
+            {
+                case "next12months":
+                    for (int i = 0; i < 12; i++)
+                    {
+                        var monthDate = currentDate.AddMonths(i);
+                        revenueData.Add(new MonthlyRevenueDataPoint
+                        {
+                            Period = monthDate.ToString("MMM yyyy"),
+                            Revenue = 0,
+                            WeightedRevenue = 0,
+                            DealCount = 0,
+                            Month = monthDate.Month,
+                            Year = monthDate.Year,
+                            GrowthPercentage = 0,
+                            AverageSuccessProbability = 0
+                        });
+                    }
+                    break;
+
+                case "next24months":
+                    for (int i = 0; i < 24; i++)
+                    {
+                        var monthDate = currentDate.AddMonths(i);
+                        revenueData.Add(new MonthlyRevenueDataPoint
+                        {
+                            Period = monthDate.ToString("MMM yyyy"),
+                            Revenue = 0,
+                            WeightedRevenue = 0,
+                            DealCount = 0,
+                            Month = monthDate.Month,
+                            Year = monthDate.Year,
+                            GrowthPercentage = 0,
+                            AverageSuccessProbability = 0
+                        });
+                    }
+                    break;
+
+                case "futureqoq":
+                    var futureQuarters = new[]
+                    {
+                        new { Name = "Q1", Months = new[] { 1, 2, 3 } },
+                        new { Name = "Q2", Months = new[] { 4, 5, 6 } },
+                        new { Name = "Q3", Months = new[] { 7, 8, 9 } },
+                        new { Name = "Q4", Months = new[] { 10, 11, 12 } }
+                    };
+
+                    for (int yearOffset = 0; yearOffset < 2; yearOffset++)
+                    {
+                        var targetYear = currentDate.Year + yearOffset;
+                        foreach (var quarter in futureQuarters)
+                        {
+                            if (yearOffset == 0 && quarter.Months.Any(m => m < currentDate.Month))
+                                continue;
+
+                            revenueData.Add(new MonthlyRevenueDataPoint
+                            {
+                                Period = $"{quarter.Name} {targetYear}",
+                                Revenue = 0,
+                                WeightedRevenue = 0,
+                                DealCount = 0,
+                                Month = quarter.Months[0],
+                                Year = targetYear,
+                                GrowthPercentage = 0,
+                                AverageSuccessProbability = 0
+                            });
+                        }
+                    }
+                    break;
+
+                case "futureyoy":
+                    for (int i = 0; i < 3; i++)
+                    {
+                        var targetYear = currentDate.Year + i;
+                        revenueData.Add(new MonthlyRevenueDataPoint
+                        {
+                            Period = targetYear.ToString(),
+                            Revenue = 0,
+                            WeightedRevenue = 0,
+                            DealCount = 0,
+                            Month = 1,
+                            Year = targetYear,
+                            GrowthPercentage = 0,
+                            AverageSuccessProbability = 0
+                        });
+                    }
+                    break;
+            }
+        }        // Week 10 Enhancement: Autocomplete APIs for Enhanced Filtering
         [HttpGet]
         [Authorize(Roles = "Admin,Sales,Management")]
         public async Task<IActionResult> GetOemSuggestions()

@@ -526,6 +526,285 @@ namespace License_Tracking.Controllers
             return RedirectToAction("CustomerProfitability", new { startDate, endDate });
         }
 
+        [Authorize(Roles = "Admin,Management,Finance,Sales")]
+        public async Task<IActionResult> MonthlyRevenueAnalytics(string period = "last24months", string viewType = "chart")
+        {
+            var deals = await _context.Deals
+                .Include(d => d.Company)
+                .Include(d => d.Product)
+                .Include(d => d.Oem)
+                .Where(d => d.CustomerInvoiceAmount.HasValue && d.CustomerInvoiceAmount.Value > 0 &&
+                           (d.DealStage == "Won" || d.CustomerPaymentStatus == "Paid" || d.CustomerPaymentStatus == "Pending") &&
+                           (d.CustomerPaymentDate.HasValue || d.ActualCloseDate.HasValue || d.CustomerPoDate.HasValue))
+                .ToListAsync();
+
+            var currentDate = DateTime.Now;
+            List<MonthlyRevenueDataPoint> revenueData = new List<MonthlyRevenueDataPoint>();
+
+            // Helper function to get the appropriate revenue date for a deal
+            Func<Deal, DateTime?> getRevenueDate = (deal) =>
+            {
+                if (deal.CustomerPaymentDate.HasValue)
+                    return deal.CustomerPaymentDate.Value;
+                if (deal.ActualCloseDate.HasValue)
+                    return deal.ActualCloseDate.Value;
+                if (deal.CustomerPoDate.HasValue)
+                    return deal.CustomerPoDate.Value;
+                return deal.CreatedDate; // Fallback to creation date
+            };
+
+            switch (period.ToLower())
+            {
+                case "last24months":
+                    // Generate last 24 months of data
+                    for (int i = 23; i >= 0; i--)
+                    {
+                        var monthDate = currentDate.AddMonths(-i);
+                        var monthDeals = deals.Where(d =>
+                        {
+                            var revenueDate = getRevenueDate(d);
+                            return revenueDate.HasValue &&
+                                   revenueDate.Value.Year == monthDate.Year &&
+                                   revenueDate.Value.Month == monthDate.Month;
+                        }).ToList();
+
+                        var monthRevenue = monthDeals.Sum(d => d.CustomerInvoiceAmount ?? 0);
+
+                        revenueData.Add(new MonthlyRevenueDataPoint
+                        {
+                            Period = monthDate.ToString("MMM yyyy"),
+                            Revenue = monthRevenue,
+                            DealCount = monthDeals.Count,
+                            Month = monthDate.Month,
+                            Year = monthDate.Year
+                        });
+                    }
+                    break;
+
+                case "qoq": // Quarter over Quarter
+                    var quarters = new[]
+                    {
+                        new { Name = "Q1", StartMonth = 1, Months = new[] { 1, 2, 3 } },
+                        new { Name = "Q2", StartMonth = 4, Months = new[] { 4, 5, 6 } },
+                        new { Name = "Q3", StartMonth = 7, Months = new[] { 7, 8, 9 } },
+                        new { Name = "Q4", StartMonth = 10, Months = new[] { 10, 11, 12 } }
+                    };
+
+                    for (int yearOffset = 1; yearOffset >= 0; yearOffset--)
+                    {
+                        var targetYear = currentDate.Year - yearOffset;
+                        foreach (var quarter in quarters)
+                        {
+                            var quarterDeals = deals.Where(d =>
+                            {
+                                var revenueDate = getRevenueDate(d);
+                                return revenueDate.HasValue &&
+                                       revenueDate.Value.Year == targetYear &&
+                                       quarter.Months.Contains(revenueDate.Value.Month);
+                            }).ToList();
+
+                            var quarterRevenue = quarterDeals.Sum(d => d.CustomerInvoiceAmount ?? 0);
+
+                            revenueData.Add(new MonthlyRevenueDataPoint
+                            {
+                                Period = $"{quarter.Name} {targetYear}",
+                                Revenue = quarterRevenue,
+                                DealCount = quarterDeals.Count,
+                                Month = quarter.StartMonth,
+                                Year = targetYear
+                            });
+                        }
+                    }
+                    break;
+
+                case "yoy": // Year over Year
+                    for (int i = 4; i >= 0; i--)
+                    {
+                        var targetYear = currentDate.Year - i;
+                        var yearDeals = deals.Where(d =>
+                        {
+                            var revenueDate = getRevenueDate(d);
+                            return revenueDate.HasValue && revenueDate.Value.Year == targetYear;
+                        }).ToList();
+
+                        var yearRevenue = yearDeals.Sum(d => d.CustomerInvoiceAmount ?? 0);
+
+                        revenueData.Add(new MonthlyRevenueDataPoint
+                        {
+                            Period = targetYear.ToString(),
+                            Revenue = yearRevenue,
+                            DealCount = yearDeals.Count,
+                            Month = 1,
+                            Year = targetYear
+                        });
+                    }
+                    break;
+            }
+
+            // Calculate growth percentages
+            for (int i = 1; i < revenueData.Count; i++)
+            {
+                var current = revenueData[i];
+                var previous = revenueData[i - 1];
+
+                if (previous.Revenue > 0)
+                {
+                    current.GrowthPercentage = ((current.Revenue - previous.Revenue) / previous.Revenue) * 100;
+                }
+            }
+
+            // Calculate summary statistics
+            var totalRevenue = revenueData.Sum(r => r.Revenue);
+            var averageRevenue = revenueData.Count > 0 ? revenueData.Average(r => r.Revenue) : 0;
+            var maxRevenue = revenueData.Count > 0 ? revenueData.Max(r => r.Revenue) : 0;
+            var totalDeals = revenueData.Sum(r => r.DealCount);
+
+            var viewModel = new MonthlyRevenueAnalyticsViewModel
+            {
+                RevenueData = revenueData,
+                SelectedPeriod = period,
+                SelectedViewType = viewType,
+                TotalRevenue = totalRevenue,
+                AverageRevenue = averageRevenue,
+                MaxRevenue = maxRevenue,
+                TotalDeals = totalDeals,
+                AvailablePeriods = new Dictionary<string, string>
+                {
+                    { "last24months", "Last 24 Months" },
+                    { "qoq", "Quarter over Quarter" },
+                    { "yoy", "Year over Year" }
+                },
+                AvailableViewTypes = new Dictionary<string, string>
+                {
+                    { "chart", "Chart View" },
+                    { "table", "Table View" },
+                    { "both", "Chart & Table" }
+                }
+            };
+
+            return View(viewModel);
+        }
+
+        [Authorize(Roles = "Admin,Management,Finance,Sales")]
+        public async Task<IActionResult> ExportRevenueAnalytics(string period = "last24months")
+        {
+            try
+            {
+                var deals = await _context.Deals
+                    .Include(d => d.Company)
+                    .Include(d => d.Product)
+                    .Include(d => d.Oem)
+                    .Where(d => d.CustomerInvoiceAmount.HasValue && d.CustomerInvoiceAmount.Value > 0 &&
+                               (d.DealStage == "Won" || d.CustomerPaymentStatus == "Paid" || d.CustomerPaymentStatus == "Pending") &&
+                               (d.CustomerPaymentDate.HasValue || d.ActualCloseDate.HasValue || d.CustomerPoDate.HasValue))
+                    .ToListAsync();
+
+                var currentDate = DateTime.Now;
+                List<MonthlyRevenueDataPoint> revenueData = new List<MonthlyRevenueDataPoint>();
+
+                // Helper function to get the appropriate revenue date for a deal
+                Func<Deal, DateTime?> getRevenueDate = (deal) =>
+                {
+                    if (deal.CustomerPaymentDate.HasValue)
+                        return deal.CustomerPaymentDate.Value;
+                    if (deal.ActualCloseDate.HasValue)
+                        return deal.ActualCloseDate.Value;
+                    if (deal.CustomerPoDate.HasValue)
+                        return deal.CustomerPoDate.Value;
+                    return deal.CreatedDate; // Fallback to creation date
+                };
+
+                // Generate revenue data based on period (reuse logic from MonthlyRevenueAnalytics)
+                switch (period.ToLower())
+                {
+                    case "last24months":
+                        for (int i = 23; i >= 0; i--)
+                        {
+                            var monthDate = currentDate.AddMonths(-i);
+                            var monthDeals = deals.Where(d =>
+                            {
+                                var revenueDate = getRevenueDate(d);
+                                return revenueDate.HasValue &&
+                                       revenueDate.Value.Year == monthDate.Year &&
+                                       revenueDate.Value.Month == monthDate.Month;
+                            }).ToList();
+
+                            var monthRevenue = monthDeals.Sum(d => d.CustomerInvoiceAmount ?? 0);
+
+                            revenueData.Add(new MonthlyRevenueDataPoint
+                            {
+                                Period = monthDate.ToString("MMM yyyy"),
+                                Revenue = monthRevenue,
+                                DealCount = monthDeals.Count,
+                                Month = monthDate.Month,
+                                Year = monthDate.Year
+                            });
+                        }
+                        break;
+                }
+
+                // Calculate growth percentages
+                for (int i = 1; i < revenueData.Count; i++)
+                {
+                    var current = revenueData[i];
+                    var previous = revenueData[i - 1];
+
+                    if (previous.Revenue > 0)
+                    {
+                        current.GrowthPercentage = ((current.Revenue - previous.Revenue) / previous.Revenue) * 100;
+                    }
+                }
+
+                // Generate Excel file
+                using (var package = new ExcelPackage())
+                {
+                    var worksheet = package.Workbook.Worksheets.Add("Monthly Revenue Analytics");
+
+                    // Headers
+                    worksheet.Cells[1, 1].Value = "Period";
+                    worksheet.Cells[1, 2].Value = "Revenue";
+                    worksheet.Cells[1, 3].Value = "Deal Count";
+                    worksheet.Cells[1, 4].Value = "Growth %";
+                    worksheet.Cells[1, 5].Value = "Avg per Deal";
+
+                    // Header styling
+                    var headerRange = worksheet.Cells[1, 1, 1, 5];
+                    headerRange.Style.Font.Bold = true;
+
+                    // Data
+                    for (int i = 0; i < revenueData.Count; i++)
+                    {
+                        var row = i + 2;
+                        var data = revenueData[i];
+
+                        worksheet.Cells[row, 1].Value = data.Period;
+                        worksheet.Cells[row, 2].Value = data.Revenue;
+                        worksheet.Cells[row, 3].Value = data.DealCount;
+                        worksheet.Cells[row, 4].Value = data.GrowthPercentage;
+                        worksheet.Cells[row, 5].Value = data.DealCount > 0 ? data.Revenue / data.DealCount : 0;
+                    }
+
+                    // Format currency columns
+                    worksheet.Cells[2, 2, revenueData.Count + 1, 2].Style.Numberformat.Format = "$#,##0";
+                    worksheet.Cells[2, 5, revenueData.Count + 1, 5].Style.Numberformat.Format = "$#,##0";
+                    worksheet.Cells[2, 4, revenueData.Count + 1, 4].Style.Numberformat.Format = "0.0%";
+
+                    // Auto-fit columns
+                    worksheet.Cells.AutoFitColumns();
+
+                    var fileName = $"MonthlyRevenueAnalytics_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+                    var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+                    return File(package.GetAsByteArray(), contentType, fileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error generating export: {ex.Message}";
+                return RedirectToAction("MonthlyRevenueAnalytics", new { period });
+            }
+        }
+
         // Financial Report Action  
         [Authorize(Roles = "Admin,Management,Finance")]
         public IActionResult FinancialReport(DateTime? startDate = null, DateTime? endDate = null)
