@@ -1,0 +1,468 @@
+/* ==========================================================================
+   CBMS Authentication Pages - Professional Enterprise Design
+   Login & Registration Forms
+   ========================================================================== */
+
+/* ==========================================================================
+   1. ROOT VARIABLES - Authentication Theme
+   ========================================================================== */
+:root {
+    /* Colors */
+    --auth-primary: #2563EB;
+    --auth-primary-hover: #1D4ED8;
+    --auth-primary-light: #EFF6FF;
+    --auth-success: #059669;
+    --auth-warning: #D97706;
+    --auth-danger: #DC2626;
+    
+    /* Neutral Colors */
+    --auth-white: #FFFFFF;
+    --auth-gray-50: #F8FAFC;
+    --auth-gray-100: #F1F5F9;
+    --auth-gray-200: #E2E8F0;
+    --auth-gray-300: #CBD5E1;
+    --auth-gray-400: #94A3B8;
+    --auth-gray-500: #64748B;
+    --auth-gray-600: #475569;
+    --auth-gray-700: #334155;
+    --auth-gray-800: #1E293B;
+    --auth-gray-900: #0F172A;
+    
+    /* Typography */
+    --auth-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    
+    /* Shadows */
+    --auth-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --auth-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --auth-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --auth-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --auth-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    
+    /* Border Radius */
+    --auth-radius: 0.5rem;
+    --auth-radius-md: 0.75rem;
+    --auth-radius-lg: 1rem;
+    --auth-radius-xl: 1.5rem;
+    
+    /* Transitions */
+    --auth-transition: all 0.15s ease-in-out;
+}
+
+/* ==========================================================================
+   2. AUTHENTICATION LAYOUT
+   ========================================================================== */
+.auth-layout {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--auth-gray-50) 0%, var(--auth-primary-light) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    font-family: var(--auth-font-family);
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 420px;
+    background: var(--auth-white);
+    border-radius: var(--auth-radius-xl);
+    box-shadow: var(--auth-shadow-xl);
+    border: 1px solid var(--auth-gray-200);
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   3. AUTHENTICATION FORM
+   ========================================================================== */
+.auth-form {
+    padding: 2.5rem;
+}
+
+.auth-form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-form-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--auth-gray-900);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.auth-form-subtitle {
+    color: var(--auth-gray-600);
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.auth-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.auth-form-label {
+    display: block;
+    font-weight: 500;
+    color: var(--auth-gray-700);
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.auth-form-control {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--auth-gray-200);
+    border-radius: var(--auth-radius-md);
+    font-size: 1rem;
+    color: var(--auth-gray-900);
+    background: var(--auth-white);
+    transition: var(--auth-transition);
+    box-sizing: border-box;
+}
+
+.auth-form-control:focus {
+    outline: none;
+    border-color: var(--auth-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.auth-form-control:hover {
+    border-color: var(--auth-gray-300);
+}
+
+.auth-form-control::placeholder {
+    color: var(--auth-gray-400);
+}
+
+.auth-form-control.input-validation-error {
+    border-color: var(--auth-danger);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* ==========================================================================
+   4. BUTTONS
+   ========================================================================== */
+.auth-btn {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    border-radius: var(--auth-radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--auth-transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-sizing: border-box;
+}
+
+.auth-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.auth-btn-primary {
+    background: var(--auth-primary);
+    color: var(--auth-white);
+}
+
+.auth-btn-primary:hover {
+    background: var(--auth-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--auth-shadow-md);
+    color: var(--auth-white);
+}
+
+.auth-btn-outline {
+    background: transparent;
+    color: var(--auth-primary);
+    border: 2px solid var(--auth-primary);
+}
+
+.auth-btn-outline:hover {
+    background: var(--auth-primary);
+    color: var(--auth-white);
+    transform: translateY(-1px);
+    box-shadow: var(--auth-shadow-md);
+}
+
+/* ==========================================================================
+   5. FORM VALIDATION
+   ========================================================================== */
+.field-validation-error {
+    display: block;
+    color: var(--auth-danger);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.validation-summary-errors {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: var(--auth-radius);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.validation-summary-errors strong {
+    color: var(--auth-danger);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.validation-summary-errors ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    list-style: disc;
+}
+
+.validation-summary-errors li {
+    color: var(--auth-danger);
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+/* ==========================================================================
+   6. SPECIAL ELEMENTS
+   ========================================================================== */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+    color: var(--auth-gray-500);
+    font-size: 0.875rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--auth-gray-200);
+}
+
+.auth-divider span {
+    padding: 0 1rem;
+}
+
+.auth-link {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.auth-link p {
+    color: var(--auth-gray-600);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.auth-link a {
+    color: var(--auth-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
+
+/* Password Requirements */
+.password-requirements {
+    margin-top: 0.5rem;
+}
+
+.password-requirements small {
+    font-size: 0.75rem;
+    color: var(--auth-gray-500);
+    transition: var(--auth-transition);
+}
+
+/* Demo Alert */
+.demo-alert {
+    background: var(--auth-primary-light);
+    border: 1px solid var(--auth-primary);
+    border-radius: var(--auth-radius);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.demo-alert strong {
+    color: var(--auth-primary);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.demo-alert small {
+    color: var(--auth-gray-600);
+    font-size: 0.875rem;
+}
+
+/* Remember Me */
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.form-check-input {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid var(--auth-gray-300);
+    border-radius: 0.25rem;
+    background: var(--auth-white);
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background: var(--auth-primary);
+    border-color: var(--auth-primary);
+}
+
+.form-check-label {
+    font-size: 0.875rem;
+    color: var(--auth-gray-700);
+    cursor: pointer;
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   7. BRAND HEADER
+   ========================================================================== */
+.auth-brand {
+    text-align: center;
+    padding: 2rem;
+    background: var(--auth-gray-50);
+    border-bottom: 1px solid var(--auth-gray-200);
+}
+
+.auth-brand-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.auth-brand-icon {
+    font-size: 2rem;
+    color: var(--auth-primary);
+}
+
+.auth-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}
+
+.auth-brand-primary {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--auth-gray-900);
+}
+
+.auth-brand-secondary {
+    font-size: 0.75rem;
+    color: var(--auth-gray-500);
+    margin-top: -2px;
+}
+
+.auth-brand-tagline {
+    color: var(--auth-gray-600);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* ==========================================================================
+   8. RESPONSIVE DESIGN
+   ========================================================================== */
+@media (max-width: 640px) {
+    .auth-layout {
+        padding: 1rem;
+    }
+    
+    .auth-container {
+        max-width: 100%;
+    }
+    
+    .auth-form {
+        padding: 2rem 1.5rem;
+    }
+    
+    .auth-brand {
+        padding: 1.5rem;
+    }
+    
+    .auth-form-title {
+        font-size: 1.5rem;
+    }
+    
+    .auth-brand-primary {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-form {
+        padding: 1.5rem 1rem;
+    }
+    
+    .auth-brand {
+        padding: 1rem;
+    }
+    
+    .auth-form-group {
+        margin-bottom: 1.25rem;
+    }
+}
+
+/* ==========================================================================
+   9. UTILITIES
+   ========================================================================== */
+.text-danger { color: var(--auth-danger) !important; }
+.text-success { color: var(--auth-success) !important; }
+.text-warning { color: var(--auth-warning) !important; }
+.text-muted { color: var(--auth-gray-500) !important; }
+.text-primary { color: var(--auth-primary) !important; }
+
+.bg-danger { background-color: var(--auth-danger) !important; }
+.bg-success { background-color: var(--auth-success) !important; }
+.bg-warning { background-color: var(--auth-warning) !important; }
+
+/* ==========================================================================
+   10. ACCESSIBILITY
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus visible for keyboard navigation */
+.auth-btn:focus-visible,
+.auth-form-control:focus-visible,
+.form-check-input:focus-visible {
+    outline: 2px solid var(--auth-primary);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .auth-form-control {
+        border-width: 2px;
+    }
+    
+    .auth-btn {
+        border-width: 2px;
+    }
+}

@@ -5,22 +5,31 @@
 }
 
 @section Styles {
+    <link rel="stylesheet" href="~/css/analytics.css" /> @* Removed compact, assuming a non-compact version *@
     <style>
-        /* Bigin.com-inspired Dashboard Styles */
+        /* Enhanced Bigin.com-inspired Dashboard Styles for Enterprise Application */
+        /* Focus on clean, professional layout with subtle interactivity, larger cards for better readability, and enterprise-grade polish */
+
         .dashboard-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            border-radius: 16px;
+            /* Slightly larger radius for modern feel */
+            padding: 2.5rem;
+            /* Increased padding for spaciousness */
+            margin-bottom: 2.5rem;
             color: white;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+            /* Softer shadow for depth */
         }
 
-        /* Bigin.com Metric Cards */
+        /* Enhanced Metric Cards - Larger, more interactive */
         .bigin-metrics-header {
             background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
             border-radius: 16px;
-            padding: 1.5rem;
+            padding: 2rem;
+            /* Increased padding */
             border: 1px solid #e8ecff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .bigin-metric-badge {
@@ -30,80 +39,131 @@
         .bigin-metric-card {
             background: white;
             border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            /* Larger radius */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            /* Enhanced shadow */
             border: 1px solid #f1f3f7;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
             position: relative;
+            min-height: 250px;
+            /* Increased height for enterprise readability, removed fixed height for flexibility */
+            cursor: pointer;
+            /* Indicate interactivity */
         }
 
         .bigin-metric-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-            border-color: #e0e6ff;
+            /* Stronger hover lift */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            border-color: #d8e0ff;
         }
 
         .bigin-metric-card.bigin-metric-danger:hover {
-            border-color: #ffe0e0;
+            border-color: #ffd4d4;
         }
 
         .bigin-metric-body {
             padding: 1.5rem;
+            /* Increased padding */
+            display: flex;
+            align-items: center;
+            height: calc(100% - 50px);
+            /* Adjusted for larger footer */
         }
 
         .bigin-metric-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
+            width: 48px;
+            /* Larger icon */
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1rem;
+            margin-right: 1rem;
             font-size: 1.25rem;
+            /* Larger font */
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            /* Add animation */
+        }
+
+        .bigin-metric-card:hover .bigin-metric-icon {
+            transform: scale(1.1);
+            /* Interactive scale on hover */
         }
 
         .bigin-metric-content {
             flex: 1;
+            min-width: 0;
         }
 
         .bigin-metric-value {
             font-size: 2rem;
+            /* Larger value for impact */
             font-weight: 700;
             line-height: 1.2;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .bigin-metric-label {
             font-size: 0.875rem;
+            /* Slightly larger */
             font-weight: 500;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            color: #6c757d;
         }
 
         .bigin-metric-description {
-            font-size: 0.8125rem;
+            font-size: 0.875rem;
+            /* Larger description */
             display: flex;
             align-items: center;
+            color: #6c757d;
         }
 
         .bigin-metric-footer {
             background: #f8f9ff;
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1.5rem;
+            /* Adjusted padding */
             border-top: 1px solid #f1f3f7;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            /* Larger footer */
+            display: flex;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .bigin-metric-card:hover .bigin-metric-footer {
+            background: #e8ecff;
+            /* Subtle color change on hover */
         }
 
         .bigin-metric-link {
             color: #667eea;
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.8125rem;
+            font-size: 0.875rem;
+            /* Larger link text */
             transition: all 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .bigin-metric-link:hover {
             color: #5a6fd8;
-            text-decoration: none;
+            text-decoration: underline;
+            /* Add underline for interactivity */
         }
 
         .bigin-metric-link.text-danger {
@@ -114,11 +174,11 @@
             color: #c82333;
         }
 
-        /* Bigin.com Admin Panel */
+        /* Enhanced Admin Panel - More professional */
         .bigin-admin-panel {
             background: white;
             border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
             border: 1px solid #f1f3f7;
             overflow: hidden;
         }
@@ -130,38 +190,46 @@
 
         .bigin-admin-body {
             padding: 2rem;
+            /* Increased padding */
         }
 
         .bigin-admin-card {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             border: 1px solid #f1f3f7;
             transition: all 0.3s ease;
+            min-height: 160px;
+            /* Adjusted for flexibility */
         }
 
         .bigin-admin-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         }
 
         .bigin-admin-card-body {
-            padding: 1.5rem;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            height: 100%;
         }
 
         .bigin-admin-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 1rem;
             font-size: 1.125rem;
+            flex-shrink: 0;
         }
 
         .bigin-admin-value {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
+            /* Larger value */
             font-weight: 700;
             line-height: 1.2;
             margin-bottom: 0.25rem;
@@ -170,28 +238,30 @@
         .bigin-admin-label {
             font-size: 0.875rem;
             font-weight: 500;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
+            color: #6c757d;
         }
 
         .bigin-admin-description {
-            font-size: 0.8125rem;
+            font-size: 0.8rem;
+            color: #6c757d;
         }
 
         .bigin-admin-actions {
             border-top: 1px solid #f1f3f7;
-            padding-top: 1rem;
+            padding-top: 1.25rem;
         }
 
         .bigin-admin-tools {
             background: #f8f9ff;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 1rem;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 1.5rem;
         }
 
         .bigin-admin-quick-actions {
             display: flex;
-            gap: 1rem;
+            gap: 1.25rem;
             flex-wrap: wrap;
         }
 
@@ -203,7 +273,7 @@
             text-decoration: none;
             color: #667eea;
             font-weight: 500;
-            font-size: 0.8125rem;
+            font-size: 0.875rem;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
@@ -215,10 +285,12 @@
             background: #667eea;
             color: white;
             text-decoration: none;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            /* Added shadow for depth */
         }
 
-        /* Soft Background Colors */
+        /* Soft Background Colors - Kept for consistency */
         .bg-primary-soft {
             background-color: rgba(102, 126, 234, 0.1);
         }
@@ -247,39 +319,40 @@
             color: #6f42c1 !important;
         }
 
-        /* Pipeline Insights */
+        /* Pipeline Insights - Enhanced with larger icons */
         .bigin-pipeline-insights {
             background: white;
             border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
             border: 1px solid #f1f3f7;
         }
 
         .bigin-insight-card {
             background: #f8f9ff;
-            border-radius: 12px;
-            padding: 1.25rem;
+            border-radius: 16px;
+            padding: 1.5rem;
             border: 1px solid #e8ecff;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.25rem;
         }
 
         .bigin-insight-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
         }
 
         .bigin-insight-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 56px;
+            /* Larger icon */
+            height: 56px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.125rem;
+            font-size: 1.5rem;
             flex-shrink: 0;
         }
 
@@ -288,13 +361,14 @@
         }
 
         .bigin-insight-value {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
+            /* Larger value */
             font-weight: 700;
             line-height: 1.2;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
         }
 
-        /* Animations */
+        /* Animations - Enhanced for interactivity */
         @@keyframes pulse {
 
             0%,
@@ -303,54 +377,39 @@
             }
 
             50% {
-                opacity: 0.7;
+                opacity: 0.6;
             }
         }
 
+        @@keyframes
+        ripple {
+            to {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        /* Additional Enterprise Styles */
         .metric-card {
             background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
             border: 1px solid #f0f0f0;
             transition: all 0.3s ease;
             height: 100%;
         }
 
         .metric-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        .metric-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-        }
-
-        .phase-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            border: 1px solid #f0f0f0;
-            transition: all 0.3s ease;
-        }
-
-        .phase-card:hover {
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
         }
 
         .quick-action-btn {
             background: white;
             border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 1rem;
+            border-radius: 12px;
+            padding: 1.25rem;
             text-decoration: none;
             color: #333;
             transition: all 0.3s ease;
@@ -358,134 +417,32 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            min-height: 100px;
+            min-height: 120px;
+            /* Slightly larger */
         }
 
         .quick-action-btn:hover {
             background: #f8f9ff;
             border-color: #667eea;
             color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-        }
-
-        .progress-ring {
-            width: 60px;
-            height: 60px;
-        }
-
-        .workflow-progress {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .workflow-step {
-            position: relative;
-            text-align: center;
-            flex: 1;
-        }
-
-        .workflow-step::after {
-            content: '';
-            position: absolute;
-            top: 25px;
-            right: -50%;
-            width: 100%;
-            height: 2px;
-            background: #e0e0e0;
-            z-index: -1;
-        }
-
-        .workflow-step:last-child::after {
-            display: none;
-        }
-
-        .workflow-step.active::after {
-            background: #667eea;
-        }
-
-        .step-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #e0e0e0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0.5rem;
-            color: #666;
-        }
-
-        .workflow-step.active .step-icon {
-            background: #667eea;
-            color: white;
-        }
-
-        .recent-activity {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
-
-        .activity-item {
-            padding: 1rem;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-            align-items: center;
-        }
-
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-
-        .activity-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            font-size: 14px;
-        }
-
-        .bigin-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
         }
 
         .welcome-section {
             background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
         }
 
-        /* Animations */
-        @@keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.7;
-            }
-        }
-
-        @@keyframes ripple {
-            to {
-                transform: scale(2);
-                opacity: 0;
-            }
-        }
+        /* Removed compact overrides to make UI more spacious and enterprise-like */
+        /* Incorporated Bigin inspirations: Subtle gradients, color-coded elements, hover interactions, larger typography for readability */
     </style>
 }
 
-<!-- Dashboard Header -->
+<!-- Dashboard Header - Kept similar but with tooltips for interactivity -->
 <div class="dashboard-header">
     <div class="row align-items-center">
         <div class="col-lg-8">
@@ -496,17 +453,18 @@
             <div class="d-flex flex-wrap justify-content-lg-end gap-2">
                 @foreach (var role in Model.UserRoles ?? new List<string>())
                 {
-                    <span class="badge bg-light text-dark px-3 py-2 rounded-pill">@role</span>
+                    <span class="badge bg-light text-dark px-3 py-2 rounded-pill" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Your role: @role">@role</span>
                 }
             </div>
         </div>
     </div>
 </div>
 
-<!-- 4-Phase B2B2B Workflow Overview -->
+<!-- 4-Phase B2B2B Workflow Overview - Enhanced with hover effects and icons -->
 <div class="row mb-4">
     <div class="col-12">
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 shadow-sm bigin-metric-card"> <!-- Applied Bigin card style for consistency -->
             <div class="card-header bg-gradient-primary text-white border-bottom-0">
                 <h5 class="mb-0 text-white">
                     <i class="fas fa-sitemap"></i> 4-Phase B2B2B Workflow Status
@@ -516,13 +474,14 @@
             <div class="card-body p-0">
                 <div class="row g-0">
                     <div class="col-md-3">
-                        <div class="text-center p-4 border-end">
+                        <div class="text-center p-4 border-end transition-all" data-bs-toggle="tooltip"
+                            title="Customer PO Phase">
                             <div class="mb-3">
                                 <i class="fas fa-search fa-3x text-primary mb-2"></i>
                                 <h6 class="fw-bold text-primary">Phase 1: Customer PO</h6>
                             </div>
-                            <div class="h3 text-primary mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Lead") ==
-                                                                true ? Model.DealsByStage["Lead"] : 0)</div>
+                            <div class="h3 text-primary mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Lead") == true
+                                                                ? Model.DealsByStage["Lead"] : 0)</div>
                             <small class="text-muted d-block mb-3">Customer → Canarys Invoice</small>
                             <a asp-controller="Deals" asp-action="Index" asp-route-stage="Lead"
                                 class="btn btn-sm btn-outline-primary">
@@ -532,7 +491,7 @@
                     </div>
 
                     <div class="col-md-3">
-                        <div class="text-center p-4 border-end">
+                        <div class="text-center p-4 border-end" data-bs-toggle="tooltip" title="OEM Procurement Phase">
                             <div class="mb-3">
                                 <i class="fas fa-shopping-cart fa-3x text-warning mb-2"></i>
                                 <h6 class="fw-bold text-warning">Phase 2: OEM Procurement</h6>
@@ -548,13 +507,13 @@
                     </div>
 
                     <div class="col-md-3">
-                        <div class="text-center p-4 border-end">
+                        <div class="text-center p-4 border-end" data-bs-toggle="tooltip" title="License Delivery Phase">
                             <div class="mb-3">
                                 <i class="fas fa-key fa-3x text-info mb-2"></i>
                                 <h6 class="fw-bold text-info">Phase 3: License Delivery</h6>
                             </div>
-                            <div class="h3 text-info mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Negotiation")
-                                                                == true ? Model.DealsByStage["Negotiation"] : 0)</div>
+                            <div class="h3 text-info mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Negotiation") ==
+                                                                true ? Model.DealsByStage["Negotiation"] : 0)</div>
                             <small class="text-muted d-block mb-3">OEM → Customer Delivery</small>
                             <a asp-controller="Deals" asp-action="Index" asp-route-stage="Negotiation"
                                 class="btn btn-sm btn-outline-info">
@@ -564,13 +523,13 @@
                     </div>
 
                     <div class="col-md-3">
-                        <div class="text-center p-4">
+                        <div class="text-center p-4" data-bs-toggle="tooltip" title="OEM Settlement Phase">
                             <div class="mb-3">
                                 <i class="fas fa-credit-card fa-3x text-success mb-2"></i>
                                 <h6 class="fw-bold text-success">Phase 4: OEM Settlement</h6>
                             </div>
-                            <div class="h3 text-success mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Won") ==
-                                                                true ? Model.DealsByStage["Won"] : 0)</div>
+                            <div class="h3 text-success mb-2 fw-bold">@(Model.DealsByStage?.ContainsKey("Won") == true ?
+                                                                Model.DealsByStage["Won"] : 0)</div>
                             <small class="text-muted d-block mb-3">Settlement & Completion</small>
                             <a asp-controller="Deals" asp-action="Index" asp-route-stage="Won"
                                 class="btn btn-sm btn-outline-success">
@@ -584,7 +543,7 @@
     </div>
 </div>
 
-<!-- Quick Actions Section -->
+<!-- Quick Actions Section - Larger buttons for enterprise touch -->
 <div class="row mb-4">
     <div class="col-12">
         <h5 class="fw-semibold mb-3">Quick Actions</h5>
@@ -593,16 +552,18 @@
     @if (User?.IsInRole("Admin") == true || User?.IsInRole("Sales") == true)
     {
         <div class="col-lg-2 col-md-4 col-6 mb-3">
-            <a asp-controller="Companies" asp-action="Create" class="quick-action-btn">
-                <i class="fas fa-building fa-lg text-primary mb-2"></i>
+            <a asp-controller="Companies" asp-action="Create" class="quick-action-btn" data-bs-toggle="tooltip"
+                title="Create a new customer company">
+                <i class="fas fa-building fa-2x text-primary mb-2"></i> <!-- Larger icon -->
                 <span class="fw-medium">Add Company</span>
                 <small class="text-muted">Create new customer</small>
             </a>
         </div>
 
         <div class="col-lg-2 col-md-4 col-6 mb-3">
-            <a asp-controller="Deals" asp-action="Create" class="quick-action-btn">
-                <i class="fas fa-handshake fa-lg text-success mb-2"></i>
+            <a asp-controller="Deals" asp-action="Create" class="quick-action-btn" data-bs-toggle="tooltip"
+                title="Start a new B2B2B deal">
+                <i class="fas fa-handshake fa-2x text-success mb-2"></i>
                 <span class="fw-medium">Create Deal</span>
                 <small class="text-muted">Start new deal</small>
             </a>
@@ -612,8 +573,9 @@
     @if (User?.IsInRole("Admin") == true || User?.IsInRole("Sales") == true || User?.IsInRole("Management") == true)
     {
         <div class="col-lg-2 col-md-4 col-6 mb-3">
-            <a asp-controller="ProjectPipeline" asp-action="Create" class="quick-action-btn">
-                <i class="fas fa-project-diagram fa-lg text-info mb-2"></i>
+            <a asp-controller="ProjectPipeline" asp-action="Create" class="quick-action-btn" data-bs-toggle="tooltip"
+                title="Add a future project to the pipeline">
+                <i class="fas fa-project-diagram fa-2x text-info mb-2"></i>
                 <span class="fw-medium">Add Pipeline</span>
                 <small class="text-muted">Future project</small>
             </a>
@@ -623,8 +585,9 @@
     @if (User?.IsInRole("Admin") == true || User?.IsInRole("Finance") == true)
     {
         <div class="col-lg-2 col-md-4 col-6 mb-3">
-            <a asp-controller="InvoiceManagement" asp-action="Index" class="quick-action-btn">
-                <i class="fas fa-file-invoice-dollar fa-lg text-warning mb-2"></i>
+            <a asp-controller="InvoiceManagement" asp-action="Index" class="quick-action-btn" data-bs-toggle="tooltip"
+                title="Manage billing and invoices">
+                <i class="fas fa-file-invoice-dollar fa-2x text-warning mb-2"></i>
                 <span class="fw-medium">Invoices</span>
                 <small class="text-muted">Billing management</small>
             </a>
@@ -635,8 +598,9 @@
         true)
     {
         <div class="col-lg-2 col-md-4 col-6 mb-3">
-            <a asp-controller="Renewal" asp-action="Index" class="quick-action-btn">
-                <i class="fas fa-redo fa-lg text-orange mb-2"></i>
+            <a asp-controller="Renewal" asp-action="Index" class="quick-action-btn" data-bs-toggle="tooltip"
+                title="Handle license renewals">
+                <i class="fas fa-redo fa-2x text-orange mb-2"></i>
                 <span class="fw-medium">Renewals</span>
                 <small class="text-muted">License renewals</small>
             </a>
@@ -644,23 +608,25 @@
     }
 
     <div class="col-lg-2 col-md-4 col-6 mb-3">
-        <a asp-controller="Notification" asp-action="Dashboard" class="quick-action-btn">
-            <i class="fas fa-bell fa-lg text-purple mb-2"></i>
+        <a asp-controller="Notification" asp-action="Dashboard" class="quick-action-btn" data-bs-toggle="tooltip"
+            title="View alerts and updates">
+            <i class="fas fa-bell fa-2x text-purple mb-2"></i>
             <span class="fw-medium">Notifications</span>
             <small class="text-muted">Alerts & updates</small>
         </a>
     </div>
 
     <div class="col-lg-2 col-md-4 col-6 mb-3">
-        <a asp-controller="Analytics" asp-action="Index" class="quick-action-btn">
-            <i class="fas fa-chart-bar fa-lg text-danger mb-2"></i>
+        <a asp-controller="Analytics" asp-action="Index" class="quick-action-btn" data-bs-toggle="tooltip"
+            title="Get business insights and reports">
+            <i class="fas fa-chart-bar fa-2x text-danger mb-2"></i>
             <span class="fw-medium">Analytics</span>
             <small class="text-muted">Business insights</small>
         </a>
     </div>
 </div>
 
-<!-- Key Business Metrics - Bigin.com Style -->
+<!-- Key Business Metrics - Enhanced Bigin.com Style with tooltips -->
 <div class="row mb-5">
     <div class="col-12">
         <div class="bigin-metrics-header mb-4">
@@ -683,7 +649,7 @@
     </div>
 
     <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
-        <div class="bigin-metric-card h-100">
+        <div class="bigin-metric-card h-100" data-bs-toggle="tooltip" title="Total number of companies in the system">
             <div class="bigin-metric-body">
                 <div class="bigin-metric-icon bg-primary-soft">
                     <i class="fas fa-building text-primary"></i>
@@ -708,7 +674,7 @@
     </div>
 
     <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
-        <div class="bigin-metric-card h-100">
+        <div class="bigin-metric-card h-100" data-bs-toggle="tooltip" title="Total deals across all stages">
             <div class="bigin-metric-body">
                 <div class="bigin-metric-icon bg-success-soft">
                     <i class="fas fa-handshake text-success"></i>
@@ -733,7 +699,7 @@
     </div>
 
     <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
-        <div class="bigin-metric-card h-100">
+        <div class="bigin-metric-card h-100" data-bs-toggle="tooltip" title="Currently active licenses">
             <div class="bigin-metric-body">
                 <div class="bigin-metric-icon bg-warning-soft">
                     <i class="fas fa-key text-warning"></i>
@@ -758,7 +724,7 @@
     </div>
 
     <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
-        <div class="bigin-metric-card h-100">
+        <div class="bigin-metric-card h-100" data-bs-toggle="tooltip" title="Year-to-date total revenue">
             <div class="bigin-metric-body">
                 <div class="bigin-metric-icon bg-info-soft">
                     <i class="fas fa-dollar-sign text-info"></i>
@@ -783,10 +749,11 @@
     </div>
 </div>
 
-<!-- Additional Performance Metrics -->
+<!-- Additional Performance Metrics - With tooltips -->
 <div class="row mb-5">
     <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
-        <div class="bigin-metric-card bigin-metric-danger h-100">
+        <div class="bigin-metric-card bigin-metric-danger h-100" data-bs-toggle="tooltip"
+            title="Licenses expiring in the near future">
             <div class="bigin-metric-body">
                 <div class="bigin-metric-icon bg-danger-soft">
                     <i class="fas fa-exclamation-triangle text-danger"></i>
@@ -811,7 +778,7 @@
     </div>
 
     <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
-        <div class="bigin-metric-card h-100">
+        <div class="bigin-metric-card h-100" data-bs-toggle="tooltip" title="Revenue for the current month">
             <div class="bigin-metric-body">
                 <div class="bigin-metric-icon bg-success-soft">
                     <i class="fas fa-chart-line text-success"></i>
@@ -821,8 +788,7 @@
                     <div class="bigin-metric-label text-muted">Monthly Revenue</div>
                     <div class="bigin-metric-description">
                         <span class="@(Model.MonthlyGrowthPercentage >= 0 ? "text-success" : "text-danger") me-2">
-                            <i
-                                class="fas @(Model.MonthlyGrowthPercentage >= 0 ? "fa-trending-up" : "fa-trending-down")"></i>
+                            <i class="fas @(Model.MonthlyGrowthPercentage >= 0 ? "fa-arrow-up" : "fa-arrow-down")"></i>
                             @(Model.MonthlyGrowthPercentage >= 0 ? "+" :
                                                         "")@Model.MonthlyGrowthPercentage.ToString("F1")%
                         </span>
@@ -839,7 +805,7 @@
     </div>
 
     <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
-        <div class="bigin-metric-card h-100">
+        <div class="bigin-metric-card h-100" data-bs-toggle="tooltip" title="Monthly revenue as percentage of total">
             <div class="bigin-metric-body">
                 <div class="bigin-metric-icon bg-primary-soft">
                     <i class="fas fa-chart-bar text-primary"></i>
@@ -850,7 +816,7 @@
                     <div class="bigin-metric-label text-muted">Monthly Growth</div>
                     <div class="bigin-metric-description">
                         <span class="text-primary me-2">
-                            <i class="fas fa-trending-up"></i> Growth
+                            <i class="fas fa-arrow-up"></i> Growth
                         </span>
                         Performance indicator
                     </div>
@@ -890,7 +856,8 @@
         </div>
 
         <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
-            <div class="bigin-metric-card bigin-pipeline-card h-100">
+            <div class="bigin-metric-card bigin-pipeline-card h-100" data-bs-toggle="tooltip"
+                title="Total projects in the pipeline">
                 <div class="bigin-metric-body">
                     <div class="bigin-metric-icon bg-info-soft">
                         <i class="fas fa-project-diagram text-info"></i>
@@ -915,7 +882,8 @@
         </div>
 
         <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
-            <div class="bigin-metric-card bigin-pipeline-card h-100">
+            <div class="bigin-metric-card bigin-pipeline-card h-100" data-bs-toggle="tooltip"
+                title="Projects currently in progress">
                 <div class="bigin-metric-body">
                     <div class="bigin-metric-icon bg-primary-soft">
                         <i class="fas fa-tasks text-primary"></i>
@@ -940,7 +908,8 @@
         </div>
 
         <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
-            <div class="bigin-metric-card bigin-pipeline-card h-100">
+            <div class="bigin-metric-card bigin-pipeline-card h-100" data-bs-toggle="tooltip"
+                title="Forecasted revenue from pipeline">
                 <div class="bigin-metric-body">
                     <div class="bigin-metric-icon bg-success-soft">
                         <i class="fas fa-chart-line text-success"></i>
@@ -950,7 +919,7 @@
                         <div class="bigin-metric-label text-muted">Projected Revenue</div>
                         <div class="bigin-metric-description">
                             <span class="text-success me-2">
-                                <i class="fas fa-trending-up"></i> Forecast
+                                <i class="fas fa-arrow-up"></i> Forecast
                             </span>
                             Expected earnings
                         </div>
@@ -965,7 +934,8 @@
         </div>
 
         <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
-            <div class="bigin-metric-card bigin-pipeline-card h-100">
+            <div class="bigin-metric-card bigin-pipeline-card h-100" data-bs-toggle="tooltip"
+                title="Expected margin from pipeline">
                 <div class="bigin-metric-body">
                     <div class="bigin-metric-icon bg-warning-soft">
                         <i class="fas fa-percentage text-warning"></i>
@@ -990,7 +960,7 @@
         </div>
     </div>
 
-    <!-- Pipeline Performance Insights -->
+    <!-- Pipeline Performance Insights - Enhanced with tooltips -->
     <div class="row mb-5">
         <div class="col-12">
             <div class="bigin-pipeline-insights">
@@ -1002,7 +972,7 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-4 mb-3">
-                        <div class="bigin-insight-card">
+                        <div class="bigin-insight-card" data-bs-toggle="tooltip" title="Ratio of active to total projects">
                             <div class="bigin-insight-icon bg-primary-soft">
                                 <i class="fas fa-bullseye text-primary"></i>
                             </div>
@@ -1020,7 +990,8 @@
                         </div>
                     </div>
                     <div class="col-lg-4 mb-3">
-                        <div class="bigin-insight-card">
+                        <div class="bigin-insight-card" data-bs-toggle="tooltip"
+                            title="Average revenue per pipeline project">
                             <div class="bigin-insight-icon bg-success-soft">
                                 <i class="fas fa-calculator text-success"></i>
                             </div>
@@ -1038,7 +1009,8 @@
                         </div>
                     </div>
                     <div class="col-lg-4 mb-3">
-                        <div class="bigin-insight-card">
+                        <div class="bigin-insight-card" data-bs-toggle="tooltip"
+                            title="Margin as percentage of projected revenue">
                             <div class="bigin-insight-icon bg-info-soft">
                                 <i class="fas fa-chart-pie text-info"></i>
                             </div>
@@ -1061,7 +1033,8 @@
         </div>
     </div>
 }
-<!-- Admin Panel (for Admins only) -->
+
+<!-- Admin Panel (for Admins only) - Enhanced with tooltips -->
 @if (User?.IsInRole("Admin") == true)
 {
     <div class="row mb-4">
@@ -1076,7 +1049,8 @@
                 <div class="bigin-admin-body">
                     <div class="row">
                         <div class="col-lg-6 mb-4">
-                            <div class="bigin-admin-card border-start border-danger border-4">
+                            <div class="bigin-admin-card border-start border-danger border-4" data-bs-toggle="tooltip"
+                                title="Manage all user accounts">
                                 <div class="bigin-admin-card-body">
                                     <div class="d-flex align-items-center">
                                         <div class="bigin-admin-icon bg-danger-soft">
@@ -1107,7 +1081,8 @@
                         </div>
 
                         <div class="col-lg-6 mb-4">
-                            <div class="bigin-admin-card border-start border-warning border-4">
+                            <div class="bigin-admin-card border-start border-warning border-4" data-bs-toggle="tooltip"
+                                title="View pending payments">
                                 <div class="bigin-admin-card-body">
                                     <div class="d-flex align-items-center">
                                         <div class="bigin-admin-icon bg-warning-soft">
@@ -1147,19 +1122,23 @@
                                     <i class="fas fa-tools me-2"></i>Quick Admin Tools
                                 </h6>
                                 <div class="bigin-admin-quick-actions">
-                                    <a asp-controller="Report" asp-action="Index" class="bigin-quick-action-btn">
+                                    <a asp-controller="Report" asp-action="Index" class="bigin-quick-action-btn"
+                                        data-bs-toggle="tooltip" title="Generate system reports">
                                         <i class="fas fa-chart-area"></i>
                                         <span>System Reports</span>
                                     </a>
-                                    <a asp-controller="Analytics" asp-action="Index" class="bigin-quick-action-btn">
+                                    <a asp-controller="Analytics" asp-action="Index" class="bigin-quick-action-btn"
+                                        data-bs-toggle="tooltip" title="View advanced analytics">
                                         <i class="fas fa-analytics"></i>
                                         <span>Analytics</span>
                                     </a>
-                                    <a asp-controller="Notification" asp-action="Dashboard" class="bigin-quick-action-btn">
+                                    <a asp-controller="Notification" asp-action="Dashboard" class="bigin-quick-action-btn"
+                                        data-bs-toggle="tooltip" title="Manage notifications">
                                         <i class="fas fa-bell"></i>
                                         <span>Notifications</span>
                                     </a>
-                                    <a asp-controller="Activity" asp-action="WeeklyReport" class="bigin-quick-action-btn">
+                                    <a asp-controller="Activity" asp-action="WeeklyReport" class="bigin-quick-action-btn"
+                                        data-bs-toggle="tooltip" title="Review weekly activity">
                                         <i class="fas fa-calendar-week"></i>
                                         <span>Activity Reports</span>
                                     </a>
@@ -1175,69 +1154,71 @@
 
 @section Scripts {
     <script>
-        // Bigin.com-style Dashboard initialization
+        // Enhanced Bigin.com-style Dashboard initialization for enterprise interactivity
         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Bootstrap tooltips for added interactivity
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
             // Initialize smooth animations for metric cards
             initializeBiginAnimations();
 
-            // Add interactive hover effects
+            // Add interactive hover effects and ripples
             initializeInteractiveEffects();
         });
 
         function initializeBiginAnimations() {
-            // Animate metric cards on load
-            const metricCards = document.querySelectorAll('.bigin-metric-card');
+            // Animate metric cards on load with stagger
+            const metricCards = document.querySelectorAll('.bigin-metric-card, .bigin-insight-card, .quick-action-btn');
             metricCards.forEach((card, index) => {
                 card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
+                card.style.transform = 'translateY(30px)';
 
                 setTimeout(() => {
-                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0)';
-                }, index * 100);
+                }, index * 150); // Increased stagger for smoother entrance
             });
 
             // Animate admin panel if present
             const adminPanel = document.querySelector('.bigin-admin-panel');
             if (adminPanel) {
-                setTimeout(() => {
-                    adminPanel.style.opacity = '0';
-                    adminPanel.style.transform = 'translateY(30px)';
-                    adminPanel.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                adminPanel.style.opacity = '0';
+                adminPanel.style.transform = 'translateY(40px)';
+                adminPanel.style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
 
-                    setTimeout(() => {
-                        adminPanel.style.opacity = '1';
-                        adminPanel.style.transform = 'translateY(0)';
-                    }, 50);
-                }, 800);
+                setTimeout(() => {
+                    adminPanel.style.opacity = '1';
+                    adminPanel.style.transform = 'translateY(0)';
+                }, 600);
             }
         }
 
         function initializeInteractiveEffects() {
-            // Add ripple effect to metric cards
-            const metricCards = document.querySelectorAll('.bigin-metric-card');
-            metricCards.forEach(card => {
-                card.addEventListener('click', function (e) {
+            // Enhanced ripple effect on metric cards and buttons
+            const interactiveElements = document.querySelectorAll('.bigin-metric-card, .quick-action-btn, .bigin-insight-card');
+            interactiveElements.forEach(el => {
+                el.addEventListener('click', function (e) {
                     const ripple = document.createElement('div');
                     const rect = this.getBoundingClientRect();
-                    const size = Math.max(rect.width, rect.height);
+                    const size = Math.max(rect.width, rect.height) * 1.5; // Larger ripple for enterprise feel
                     const x = e.clientX - rect.left - size / 2;
                     const y = e.clientY - rect.top - size / 2;
 
                     ripple.style.cssText = `
-                                                    position: absolute;
-                                                    width: ${size}px;
-                                                    height: ${size}px;
-                                                    left: ${x}px;
-                                                    top: ${y}px;
-                                                    background: rgba(102, 126, 234, 0.1);
-                                                    border-radius: 50%;
-                                                    transform: scale(0);
-                                                    animation: ripple 0.6s ease-out;
-                                                    pointer-events: none;
-                                                    z-index: 1;
-                                                `;
+                                position: absolute;
+                                width: ${size}px;
+                                height: ${size}px;
+                                left: ${x}px;
+                                top: ${y}px;
+                                background: rgba(102, 126, 234, 0.15);
+                                border-radius: 50%;
+                                transform: scale(0);
+                                animation: ripple 0.8s ease-out;
+                                pointer-events: none;
+                                z-index: 1;
+                            `;
 
                     this.style.position = 'relative';
                     this.style.overflow = 'hidden';
@@ -1245,23 +1226,24 @@
 
                     setTimeout(() => {
                         ripple.remove();
-                    }, 600);
+                    }, 800);
                 });
             });
 
-            // Add pulse animation to live data badge
+            // Pulse animation on live data badge with smoother timing
             const liveBadge = document.querySelector('.bigin-metric-badge .badge');
             if (liveBadge) {
                 setInterval(() => {
-                    liveBadge.style.transform = 'scale(1.05)';
+                    liveBadge.style.transform = 'scale(1.1)';
+                    liveBadge.style.transition = 'transform 0.3s ease';
                     setTimeout(() => {
                         liveBadge.style.transform = 'scale(1)';
-                    }, 150);
-                }, 3000);
+                    }, 300);
+                }, 2000); // Adjusted interval
             }
         }
 
-        // Format currency for display
+        // Format currency for display (kept as is)
         function formatCurrency(amount) {
             return new Intl.NumberFormat('en-IN', {
                 style: 'currency',
@@ -1271,7 +1253,7 @@
             }).format(amount || 0);
         }
 
-        // Utility function for smooth scrolling to sections
+        // Utility function for smooth scrolling to sections (kept as is)
         function scrollToSection(sectionId) {
             const element = document.getElementById(sectionId);
             if (element) {

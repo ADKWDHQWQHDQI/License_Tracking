@@ -7,7 +7,7 @@
 
 <!-- Bigin.com-Style Sheet View -->
 <div class="bigin-sheet-container">
-    <!-- Header with View Toggle -->
+    <!-- Header -->
     <div class="sheet-header mb-4">
         <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -16,22 +16,32 @@
                 </h1>
                 <p class="bigin-subtitle mb-0">Sheet view - Comprehensive data grid with advanced filtering</p>
             </div>
-            <div class="bigin-view-toggles">
-                <div class="btn-group" role="group">
-                    <a asp-action="Index" class="btn btn-outline-primary">
-                        <i class="fas fa-list"></i> List View
-                    </a>
-                    <a asp-action="Kanban" class="btn btn-outline-primary">
-                        <i class="fas fa-columns"></i> Kanban View
-                    </a>
-                    <button type="button" class="btn btn-primary active">
-                        <i class="fas fa-table"></i> Sheet View
-                    </button>
-                </div>
-                <div class="ms-3">
-                    <a asp-action="Create" class="btn btn-success bigin-btn-primary">
-                        <i class="fas fa-plus"></i> New Deal
-                    </a>
+            <div class="d-flex gap-2">
+                <a asp-action="Create" class="btn btn-success bigin-btn-primary">
+                    <i class="fas fa-plus"></i> New Deal
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Toggle Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-light border-0">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-center">
+                        <div class="btn-group shadow-sm" role="group" aria-label="View options">
+                            <a asp-action="Index" class="btn btn-outline-primary">
+                                <i class="fas fa-list me-2"></i>List View
+                            </a>
+                            <a asp-action="Kanban" class="btn btn-outline-primary">
+                                <i class="fas fa-columns me-2"></i>Kanban View
+                            </a>
+                            <button type="button" class="btn btn-primary active">
+                                <i class="fas fa-table me-2"></i>Sheet View
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

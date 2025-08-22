@@ -1,202 +1,284 @@
 ﻿@{
-    ViewData["Title"] = "License Tracking System";
+    ViewData["Title"] = "CBMS by Canarys - Enterprise License Management Platform";
+    Layout = "~/Views/Shared/_LandingLayout.cshtml";
 }
 
-<div class="container">
-    <div class="row">
-        <div class="col-12 text-center">
-            <div class="hero-section py-5">
-                <div class="mb-4">
-                    <i class="fas fa-certificate fa-4x text-primary"></i>
-                </div>
-                <h1 class="display-4 fw-bold text-primary">License Tracking System</h1>
-                <p class="lead text-muted mb-4">
-                    Comprehensive solution for managing software licenses, renewals, billing, and procurement tracking
-                </p>
+<!-- Production Notice -->
+<div class="alert alert-info border-0 rounded-0 text-center mb-0"
+    style="background: linear-gradient(90deg, #2563EB, #1D4ED8); color: white;">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-center">
+            <i class="fas fa-shield-alt me-2"></i>
+            <strong>Production Environment</strong>
+            <span class="mx-2">|</span>
+            <span>Canarys Automations Internal Platform</span>
+            <span class="mx-2">|</span>
+            <small><i class="fas fa-globe me-1"></i>Enterprise License Management System</small>
+        </div>
+    </div>
+</div>
 
-                @if (User.Identity?.IsAuthenticated == true)
-                {
-                    <div class="alert alert-success d-inline-block">
-                        <i class="fas fa-check-circle"></i> Welcome back, <strong>@User.Identity.Name</strong>!
-                    </div>
-                    <div class="mt-3">
-                        <a asp-controller="License" asp-action="Index" class="btn btn-primary btn-lg">
-                            <i class="fas fa-clipboard-list"></i> Manage Licenses
+<!-- Hero Section -->
+<section id="hero" class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100 py-5">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        Enterprise License<br>
+                        <span class="text-primary">Management Platform</span>
+                    </h1>
+
+                    <p class="hero-subtitle">
+                        CBMS streamlines B2B2B license intermediary operations with comprehensive deal
+                        tracking, customer relationship management, and OEM partnership optimization.
+                    </p>
+
+                    <div class="hero-actions">
+                        <a asp-controller="Auth" asp-action="Register" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-rocket me-2"></i>Get Started
+                        </a>
+                        <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
                         </a>
                     </div>
-                }
-                else
-                {
-                    <div class="mt-4">
-                        <a asp-controller="Auth" asp-action="Login" class="btn btn-primary btn-lg me-3">
-                            <i class="fas fa-sign-in-alt"></i> Sign In
-                        </a>
-                        <a asp-controller="Auth" asp-action="Register" class="btn btn-outline-primary btn-lg">
-                            <i class="fas fa-user-plus"></i> Register
-                        </a>
+
+                    <div class="hero-features mt-4">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <span>4-Phase Deal Workflow</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <span>Multi-Invoice Management</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <span>Customer CRM Integration</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <span>OEM Partnership Tools</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                }
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual">
+                    <div class="dashboard-preview">
+                        <div class="browser-mockup">
+                            <div class="browser-header">
+                                <div class="browser-buttons">
+                                    <span class="browser-button bg-danger"></span>
+                                    <span class="browser-button bg-warning"></span>
+                                    <span class="browser-button bg-success"></span>
+                                </div>
+                                <div class="browser-url">cbms.canarys.com</div>
+                            </div>
+                            <div class="browser-content">
+                                <div class="dashboard-metrics">
+                                    <div class="metric-card">
+                                        <div class="metric-icon bg-primary">
+                                            <i class="fas fa-handshake"></i>
+                                        </div>
+                                        <div class="metric-content">
+                                            <h6>Active Deals</h6>
+                                            <h4>247</h4>
+                                        </div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-icon bg-success">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </div>
+                                        <div class="metric-content">
+                                            <h6>Revenue</h6>
+                                            <h4>$2.4M</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</section>
 
-    <div class="row mt-5">
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-key fa-3x text-primary mb-3"></i>
-                    <h4 class="card-title">License Management</h4>
-                    <p class="card-text">Track software licenses, expiry dates, and calculate margins with complete CRUD
-                        operations.</p>
+<!-- Features Section -->
+<section id="features" class="features-section">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Enterprise Features</h2>
+            <p class="section-subtitle">
+                Comprehensive tools designed for license intermediary businesses
+            </p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h5 class="feature-title">4-Phase Deal Management</h5>
+                    <p class="feature-description">
+                        Track deals from customer PO to OEM payment with structured workflow management.
+                    </p>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-bell fa-3x text-warning mb-3"></i>
-                    <h4 class="card-title">Renewal Alerts</h4>
-                    <p class="card-text">Automated renewal reminders and expiry tracking to never miss important dates.
+
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h5 class="feature-title">Customer Relationship Management</h5>
+                    <p class="feature-description">
+                        Manage companies, contacts, and business relationships with comprehensive CRM tools.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h5 class="feature-title">Multi-Invoice System</h5>
+                    <p class="feature-description">
+                        Handle customer invoicing, OEM procurement, and payment tracking in one platform.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h5 class="feature-title">Pipeline Management</h5>
+                    <p class="feature-description">
+                        Track future deals with estimated revenue and margin calculations.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h5 class="feature-title">OEM Partnership Tools</h5>
+                    <p class="feature-description">
+                        Manage OEM relationships, product catalogs, and partner performance metrics.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h5 class="feature-title">Enterprise Security</h5>
+                    <p class="feature-description">
+                        Role-based access control with comprehensive audit trails and data protection.
                     </p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-users fa-3x text-success mb-3"></i>
-                    <h4 class="card-title">Role-Based Access</h4>
-                    <p class="card-text">Secure access control with Admin, Sales, Finance, Operations, and Management
-                        roles.</p>
+    </div>
+</section>
+
+<!-- Workflow Section -->
+<section id="workflow" class="workflow-section">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Streamlined B2B2B Workflow</h2>
+            <p class="section-subtitle">
+                Four-phase process designed for license intermediary operations
+            </p>
+        </div>
+
+        <div class="workflow-steps">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="workflow-step">
+                        <div class="step-number">1</div>
+                        <h5 class="step-title">Customer Engagement</h5>
+                        <p class="step-description">
+                            Customer issues PO → Canarys releases invoice → Customer payment
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="workflow-step">
+                        <div class="step-number">2</div>
+                        <h5 class="step-title">OEM Procurement</h5>
+                        <p class="step-description">
+                            Canarys estimates quote → Send PO to OEM → Cost analysis
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="workflow-step">
+                        <div class="step-number">3</div>
+                        <h5 class="step-title">License Delivery</h5>
+                        <p class="step-description">
+                            OEM issues license → Customer receives access → License activation
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="workflow-step">
+                        <div class="step-number">4</div>
+                        <h5 class="step-title">OEM Settlement</h5>
+                        <p class="step-description">
+                            OEM invoices Canarys → Payment processing → Deal completion
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+</section>
 
-    @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || User.IsInRole("Management") ||
-        User.IsInRole("Finance")))
-    {
-        <!-- Quick Access to Analytics Features -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <h3 class="text-center mb-4"><i class="fas fa-chart-line text-primary"></i> Analytics Dashboard</h3>
-            </div>
-        </div>
-        <!-- Analytics section moved to Phase 6 implementation -->
-    }
-
-    @if (User.Identity?.IsAuthenticated == true)
-    {
-        <div class="row mt-5">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">
-                            <i class="fas fa-bell"></i> Quick Notification Access
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-md-3 mb-3">
-                                <div class="border rounded p-3 h-100">
-                                    <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
-                                    <h6>Critical Alerts</h6>
-                                    <span id="criticalCount" class="badge bg-danger">0</span>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="border rounded p-3 h-100">
-                                    <i class="fas fa-exclamation-circle fa-2x text-warning mb-2"></i>
-                                    <h6>High Priority</h6>
-                                    <span id="highCount" class="badge bg-warning">0</span>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="border rounded p-3 h-100">
-                                    <i class="fas fa-calendar-alt fa-2x text-info mb-2"></i>
-                                    <h6>Renewals</h6>
-                                    <span id="renewalCount" class="badge bg-info">0</span>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="border rounded p-3 h-100">
-                                    <i class="fas fa-clock fa-2x text-secondary mb-2"></i>
-                                    <h6>Overdue</h6>
-                                    <span id="overdueCount" class="badge bg-secondary">0</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="/Notification/Dashboard" class="btn btn-primary btn-lg">
-                                <i class="fas fa-bell"></i> Open Notification Center
-                            </a>
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <a href="/Home/CreateDemoNotifications" class="btn btn-outline-info btn-sm ms-2">
-                                    <i class="fas fa-sync-alt"></i> Generate Alerts
-                                </a>
-                            }
-                        </div>
-                    </div>
+<!-- CTA Section -->
+<section id="cta" class="cta-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="cta-title">Ready to Transform Your License Business?</h2>
+                <p class="cta-subtitle">
+                    Join hundreds of license intermediaries who trust CBMS for their B2B2B operations.
+                </p>
+                <div class="cta-actions">
+                    <a asp-controller="Auth" asp-action="Register" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-rocket me-2"></i>Start Free Trial
+                    </a>
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Access Platform
+                    </a>
                 </div>
             </div>
         </div>
-    }
-
-    @if (User.Identity?.IsAuthenticated != true)
-    {
-        <div class="row mt-5">
-            <div class="col-12">
-                <div class="card bg-light">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Get Started</h5>
-                        <p class="card-text">Sign in with the demo credentials or register for a new account.</p>
-                        <div class="alert alert-info d-inline-block">
-                            <strong>Demo Admin:</strong> admin@licenseapp.com / Admin@1234
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
+    </div>
+</section>
+<span class="hero-stat-number">99.9%</span>
+<span class="hero-stat-label">Uptime</span>
 </div>
-
-@if (User.Identity?.IsAuthenticated == true)
-{
-    @section Scripts {
-        <script>
-            $(document).ready(function () {
-                loadNotificationStats();
-                // Auto-refresh every 60 seconds
-                setInterval(loadNotificationStats, 60000);
-            });
-
-            function loadNotificationStats() {
-                $.get('/Notification/GetNotificationStats')
-                    .done(function (stats) {
-                        $('#criticalCount').text(stats.Critical);
-                        $('#highCount').text(stats.High);
-                        $('#renewalCount').text(stats.Renewals);
-                        $('#overdueCount').text(stats.Overdue);
-                    })
-                    .fail(function () {
-                        console.log('Error loading notification stats');
-                        // Show default values on error
-                        $('#criticalCount').text('0');
-                        $('#highCount').text('0');
-                        $('#renewalCount').text('0');
-                        $('#overdueCount').text('0');
-                    });
-            }
-
-            function updateStatsBadges(totalCount) {
-                // For now, show total count distributed
-                // In a real implementation, you'd want to get detailed stats
-                $('#criticalCount').text(Math.floor(totalCount * 0.1) || 0);
-                $('#highCount').text(Math.floor(totalCount * 0.3) || 0);
-                $('#renewalCount').text(Math.floor(totalCount * 0.4) || 0);
-                $('#overdueCount').text(Math.floor(totalCount * 0.2) || 0);
-            }
-        </script>
-    }
-}
+</div>

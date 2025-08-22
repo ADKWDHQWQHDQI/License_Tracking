@@ -1,68 +1,126 @@
 @model License_Tracking.Models.LoginModel
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Sign In";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow">
-                <div class="card-body">
-                    <div class="text-center mb-4">
-                        <h2 class="card-title">
-                            <i class="fas fa-sign-in-alt text-primary"></i>
-                            License Tracking
-                        </h2>
-                        <p class="text-muted">Sign in to your account</p>
-                    </div>
+<div class="auth-form">
+    <div class="auth-form-header">
+        <h1 class="auth-form-title">Welcome Back</h1>
+        <p class="auth-form-subtitle">Sign in to your CBMS account to continue</p>
+    </div>
 
-                    <form asp-action="Login" method="post">
-                        <div asp-validation-summary="All" class="alert alert-danger d-none"></div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label">
-                                <i class="fas fa-envelope"></i> Email Address
-                            </label>
-                            <input asp-for="Email" class="form-control" placeholder="Enter your email" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label">
-                                <i class="fas fa-lock"></i> Password
-                            </label>
-                            <input asp-for="Password" class="form-control" placeholder="Enter your password" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-sign-in-alt"></i> Sign In
-                            </button>
-                        </div>
-                    </form>
+    <form asp-action="Login" method="post" novalidate>
+        <input type="hidden" asp-for="@ViewData["ReturnUrl"]" />
 
-                    <div class="text-center">
-                        <p class="text-muted">Don't have an account? 
-                            <a asp-action="Register" class="text-primary">Register here</a>
-                        </p>
-                    </div>
-
-                    <div class="mt-4">
-                        <div class="alert alert-info">
-                            <strong>Demo Credentials:</strong><br>
-                            <small>
-                                <strong>Admin:</strong> admin@licenseapp.com / Admin@1234
-                            </small>
-                        </div>
-                    </div>
-                </div>
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div asp-validation-summary="All" class="validation-summary-errors">
+                <strong>Please fix the following errors:</strong>
             </div>
+        }
+
+        <div class="auth-form-group">
+            <label asp-for="Email" class="auth-form-label">
+                <i class="fas fa-envelope me-2"></i>Email Address
+            </label>
+            <input asp-for="Email" class="auth-form-control" placeholder="Enter your work email" type="email"
+                autocomplete="email" required />
+            <span asp-validation-for="Email" class="field-validation-error"></span>
         </div>
+
+        <div class="auth-form-group">
+            <label asp-for="Password" class="auth-form-label">
+                <i class="fas fa-lock me-2"></i>Password
+            </label>
+            <div style="position: relative;">
+                <input asp-for="Password" class="auth-form-control" placeholder="Enter your password" type="password"
+                    autocomplete="current-password" id="passwordInput" required />
+                <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3"
+                    style="border: none; background: none; color: var(--auth-gray-400);" onclick="togglePassword()">
+                    <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                </button>
+            </div>
+            <span asp-validation-for="Password" class="field-validation-error"></span>
+        </div>
+
+        <div class="auth-form-group">
+            <button type="submit" class="auth-btn auth-btn-primary">
+                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+            </button>
+        </div>
+    </form>
+
+    <div class="auth-divider">
+        <span>New to CBMS?</span>
+    </div>
+
+    <div class="auth-form-group">
+        <a asp-action="Register" class="auth-btn auth-btn-outline">
+            <i class="fas fa-user-plus me-2"></i>Create Account
+        </a>
+    </div>
+
+    <div class="auth-link">
+        <p>Need help? <a href="#support">Contact Support</a></p>
     </div>
 </div>
 
+<div class="demo-alert">
+    <strong>Demo Credentials</strong>
+    <small>Admin: admin@cbms.com / Admin@123</small>
+</div>
+</div>
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Auto-focus first empty field
+        document.addEventListener('DOMContentLoaded', function () {
+            const emailInput = document.getElementById('Email');
+            const passwordInput = document.getElementById('passwordInput');
+
+            if (emailInput && !emailInput.value) {
+                emailInput.focus();
+            } else if (passwordInput && !passwordInput.value) {
+                passwordInput.focus();
+            }
+        });
+
+        // Enhanced form validation feedback
+        document.querySelectorAll('.auth-form-control').forEach(input => {
+            input.addEventListener('blur', function () {
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.classList.add('input-validation-error');
+                } else {
+                    this.classList.remove('input-validation-error');
+                }
+            });
+
+            input.addEventListener('input', function () {
+                if (this.classList.contains('input-validation-error') && this.value.trim()) {
+                    this.classList.remove('input-validation-error');
+                }
+            });
+        });
+    </script>
 }

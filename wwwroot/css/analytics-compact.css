@@ -1,0 +1,157 @@
+/* Medium Analytics Styling for CBMS */
+
+/* Medium Card Sizing */
+.analytics-compact-card {
+    max-height: 200px !important;
+    min-height: 180px !important;
+}
+
+.analytics-compact-card .card-body {
+    padding: 1rem !important;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.analytics-compact-card .card-header {
+    padding: 0.75rem 1rem !important;
+}
+
+/* Medium Text Sizing */
+.analytics-compact-title {
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    margin-bottom: 0.3rem !important;
+}
+
+.analytics-compact-value {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    margin-bottom: 0.3rem !important;
+}
+
+.analytics-compact-subtitle {
+    font-size: 0.8rem !important;
+    color: #6c757d !important;
+}
+
+/* Medium Icons */
+.analytics-compact-icon {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.1rem !important;
+    flex-shrink: 0 !important;
+}
+
+/* Chart Container Medium */
+.analytics-chart-compact {
+    max-height: 350px !important;
+}
+
+.analytics-chart-compact canvas {
+    max-height: 280px !important;
+}
+
+/* Quick Stats Medium */
+.analytics-stats-compact {
+    max-height: 150px !important;
+}
+
+.analytics-stats-compact .card-body {
+    padding: 0.75rem !important;
+    text-align: center !important;
+}
+
+.analytics-stats-compact .card-title {
+    font-size: 0.8rem !important;
+    margin-bottom: 0.3rem !important;
+}
+
+.analytics-stats-compact h5,
+.analytics-stats-compact h6 {
+    font-size: 1.2rem !important;
+    margin-bottom: 0 !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .analytics-compact-card {
+        max-height: 120px !important;
+        min-height: 100px !important;
+    }
+    
+    .analytics-compact-value {
+        font-size: 1.1rem !important;
+    }
+    
+    .analytics-compact-icon {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Tab Content Compact */
+.analytics-tab-content .nav-link {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.8rem !important;
+}
+
+.analytics-tab-content .nav-link small {
+    font-size: 0.7rem !important;
+}
+
+/* Dashboard Specific Overrides */
+.dashboard-card-compact {
+    position: relative !important;
+    height: 220px !important;
+}
+
+.dashboard-card-compact .bigin-metric-body {
+    padding: 1.25rem !important;
+    height: calc(100% - 45px) !important;
+}
+
+.dashboard-card-compact .bigin-metric-footer {
+    height: 45px !important;
+    padding: 0.6rem 1.25rem !important;
+}
+
+.dashboard-card-compact .bigin-metric-value {
+    font-size: 1.75rem !important;
+}
+
+.dashboard-card-compact .bigin-metric-label {
+    font-size: 0.85rem !important;
+}
+
+.dashboard-card-compact .bigin-metric-description {
+    font-size: 0.8rem !important;
+}
+
+.dashboard-card-compact .bigin-metric-link {
+    font-size: 0.8rem !important;
+}
+
+/* Pipeline Analytics Specific */
+.pipeline-analytics-compact .card {
+    border-width: 2px 0 0 3px !important;
+}
+
+.pipeline-analytics-compact .card-body {
+    padding: 0.75rem !important;
+}
+
+/* Reports Analytics Specific */
+.reports-analytics-compact .card {
+    border-radius: 8px !important;
+}
+
+.reports-analytics-compact .card-header {
+    border-radius: 8px 8px 0 0 !important;
+}

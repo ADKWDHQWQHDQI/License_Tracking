@@ -23,11 +23,14 @@ namespace License_Tracking.Controllers
 
         public IActionResult Index()
         {
-            if (User.Identity?.IsAuthenticated != true)
+            // If user is authenticated, redirect to dashboard
+            if (User.Identity?.IsAuthenticated == true)
             {
-                return View();
+                return RedirectToAction("Index", "Dashboard");
             }
-            return RedirectToAction("Index", "Dashboard");
+            
+            // Show landing page for unauthenticated users
+            return View();
         }
 
         [Authorize(Roles = "Admin")]

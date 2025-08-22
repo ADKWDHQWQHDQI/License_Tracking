@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CBMS | Canarys Business Management System</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="CBMS - Secure access to your enterprise B2B2B CRM platform">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS Libraries -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body class="auth-layout">
+    <!-- Auth Container -->
+    <div class="auth-container">
+        <!-- Auth Brand Header -->
+        <div class="auth-brand">
+            <div class="auth-brand-container">
+                <i class="fas fa-handshake auth-brand-icon"></i>
+                <div class="auth-brand-text">
+                    <span class="auth-brand-primary">CBMS</span>
+                    <small class="auth-brand-secondary">by Canarys</small>
+                </div>
+            </div>
+            <p class="auth-brand-tagline">Enterprise License Management Platform</p>
+        </div>
+
+        <!-- Auth Form Content -->
+        @RenderBody()
+    </div>
+
+    <!-- JavaScript -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

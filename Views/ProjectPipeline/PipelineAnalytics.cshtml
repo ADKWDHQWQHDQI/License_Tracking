@@ -2,6 +2,62 @@
     ViewData["Title"] = "Pipeline Analytics Dashboard";
 }
 
+<link rel="stylesheet" href="~/css/bigin-theme.css" />
+<style>
+    /* Adjusted Analytics Styling - Non-compact for better visibility */
+    .analytics-card {
+        min-height: 250px;
+        box-shadow: var(--bigin-shadow-md);
+        border-radius: var(--bigin-radius-md);
+    }
+
+    .analytics-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .analytics-value {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .analytics-subtitle {
+        font-size: 1rem;
+        color: var(--bigin-gray-600);
+    }
+
+    .analytics-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    .chart-container {
+        height: 400px !important; /* Fixed height to prevent enlarging */
+        position: relative;
+    }
+
+    .chart-container canvas {
+        height: 100% !important;
+        width: 100% !important;
+    }
+
+    /* Prevent continuous enlarging by fixing sizes */
+    .tab-pane {
+        min-height: 500px;
+    }
+
+    /* Use Bigin theme variables */
+    .nav-pills .nav-link {
+        border-radius: var(--bigin-radius);
+        transition: var(--bigin-transition);
+    }
+
+    .nav-pills .nav-link.active {
+        background-color: var(--bigin-primary);
+        color: var(--bigin-white) !important;
+    }
+</style>
+
 <div class="container-fluid">
     <!-- Header Section - Bigin.com Style -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -20,129 +76,135 @@
     </div>
 
     <!-- Navigation Tabs - Bigin.com Style -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <ul class="nav nav-pills nav-fill" id="analyticsTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="overview-tab" data-bs-toggle="pill"
-                        data-bs-target="#overview-analytics" type="button" role="tab">
-                        <i class="fas fa-tachometer-alt"></i> Overview
-                        <small class="d-block">Key Metrics</small>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="pipeline-tab" data-bs-toggle="pill"
-                        data-bs-target="#pipeline-breakdown" type="button" role="tab">
-                        <i class="fas fa-chart-bar"></i> Pipeline
-                        <small class="d-block">Stage Analysis</small>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="performance-tab" data-bs-toggle="pill"
-                        data-bs-target="#performance-analytics" type="button" role="tab">
-                        <i class="fas fa-chart-line"></i> Performance
-                        <small class="d-block">Trends & Insights</small>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="deals-tab" data-bs-toggle="pill" data-bs-target="#deals-analysis"
-                        type="button" role="tab">
-                        <i class="fas fa-gem"></i> High-Value Deals
-                        <small class="d-block">Premium Opportunities</small>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <a class="nav-link" href="@Url.Action("PipelineRevenueAnalytics", "ProjectPipeline")" role="tab">
-                        <i class="fas fa-chart-line"></i> Revenue Analytics
-                        <small class="d-block">Monthly Projections</small>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Loading Indicator -->
-    <div id="loadingIndicator" class="text-center my-5" style="display: none;">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading analytics...</span>
-        </div>
-        <p class="mt-2">Loading pipeline analytics...</p>
-    </div>
-
-    <!-- Error Message -->
-    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
-    {
-        <div class="alert alert-danger">
-            <i class="fas fa-exclamation-triangle"></i> @ViewBag.ErrorMessage
-        </div>
-    }
-
-    <!-- Tab Content -->
-    <div class="tab-content" id="analyticsTabContent">
-
         <!-- Overview Tab - Bigin.com Style -->
         <div class="tab-pane fade show active" id="overview-analytics" role="tabpanel">
             <!-- Key Metrics Cards -->
             <div class="row mb-4">
-                <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="card border-primary border-start border-4 h-100">
+                <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+                    <div class="card analytics-card border-primary border-start border-3">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="flex-grow-1">
-                                    <h6 class="text-primary">Total Pipeline Value</h6>
-                                    <h4 class="mb-1" id="totalEstimatedRevenue">₹0</h4>
-                                    <small class="text-muted" id="totalProjectsText">0 projects</small>
+                                    <h6 class="text-primary mb-1">Total Pipeline Value</h6>
+                                    <h5 class="analytics-value mb-1" id="totalEstimatedRevenue">₹0</h5>
+                                    <small class="analytics-subtitle" id="totalProjectsText">0 projects</small>
                                 </div>
-                                <div class="ms-3">
-                                    <i class="fas fa-rupee-sign fa-2x text-primary"></i>
+                                <div class="ms-2">
+                                    <i class="fas fa-rupee-sign analytics-icon text-primary"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="card border-success border-start border-4 h-100">
+                <!-- Similar updates for other cards, increasing sizes -->
+                <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+                    <div class="card analytics-card border-success border-start border-3">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="flex-grow-1">
-                                    <h6 class="text-success">Weighted Revenue</h6>
-                                    <h4 class="mb-1" id="totalWeightedRevenue">₹0</h4>
-                                    <small class="text-muted">Probability adjusted</small>
+                                    <h6 class="text-success mb-1">Weighted Revenue</h6>
+                                    <h5 class="analytics-value mb-1" id="totalWeightedRevenue">₹0</h5>
+                                    <small class="analytics-subtitle">Probability adjusted</small>
                                 </div>
-                                <div class="ms-3">
-                                    <i class="fas fa-chart-line fa-2x text-success"></i>
+                                <div class="ms-2">
+                                    <i class="fas fa-chart-line analytics-icon text-success"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="card border-warning border-start border-4 h-100">
+                <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+                    <div class="card analytics-card border-warning border-start border-3">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="flex-grow-1">
-                                    <h6 class="text-warning">Estimated Margin</h6>
-                                    <h4 class="mb-1" id="totalEstimatedMargin">₹0</h4>
-                                    <small class="text-muted" id="marginPercentageText">0% margin</small>
+                                    <h6 class="text-warning mb-1">Estimated Margin</h6>
+                                    <h5 class="analytics-value mb-1" id="totalEstimatedMargin">₹0</h5>
+                                    <small class="analytics-subtitle" id="marginPercentageText">0% margin</small>
                                 </div>
-                                <div class="ms-3">
-                                    <i class="fas fa-percentage fa-2x text-warning"></i>
+                                <div class="ms-2">
+                                    <i class="fas fa-percentage analytics-icon text-warning"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="card border-info border-start border-4 h-100">
+                <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+                    <div class="card analytics-card border-info border-start border-3">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="flex-grow-1">
-                                    <h6 class="text-info">Active Projects</h6>
-                                    <h4 class="mb-1" id="activeProjects">0</h4>
-                                    <small class="text-muted" id="avgSuccessRateText">0% avg success</small>
+                                    <h6 class="text-info mb-1">Active Projects</h6>
+                                    <h5 class="analytics-value mb-1" id="activeProjects">0</h5>
+                                    <small class="analytics-subtitle">In pipeline</small>
                                 </div>
-                                <div class="ms-3">
-                                    <i class="fas fa-project-diagram fa-2x text-info"></i>
+                                <div class="ms-2">
+                                    <i class="fas fa-tasks analytics-icon text-info"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts with fixed containers -->
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="card analytics-card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-chart-pie text-primary"></i> Pipeline by Stage</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="pipelineStageChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card analytics-card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-chart-bar text-success"></i> Projects by OEM</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="projectsByOemChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Similar updates for other tabs, wrapping charts in .chart-container with fixed height -->
+                    <div class="card border-warning border-start border-3 h-100" style="max-height: 140px;">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-warning mb-1" style="font-size: 0.8rem;">Estimated Margin</h6>
+                                    <h5 class="mb-1" id="totalEstimatedMargin" style="font-size: 1.3rem;">₹0</h5>
+                                    <small class="text-muted" id="marginPercentageText" style="font-size: 0.7rem;">0%
+                                        margin</small>
+                                </div>
+                                <div class="ms-2">
+                                    <i class="fas fa-percentage fa-lg text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+                    <div class="card border-info border-start border-3 h-100" style="max-height: 140px;">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-info mb-1" style="font-size: 0.8rem;">Active Projects</h6>
+                                    <h5 class="mb-1" id="activeProjects" style="font-size: 1.3rem;">0</h5>
+                                    <small class="text-muted" id="avgSuccessRateText" style="font-size: 0.7rem;">0% avg
+                                        success</small>
+                                </div>
+                                <div class="ms-2">
+                                    <i class="fas fa-project-diagram fa-lg text-info"></i>
                                 </div>
                             </div>
                         </div>
@@ -152,51 +214,51 @@
 
             <!-- Quick Stats Row -->
             <div class="row mb-4">
-                <div class="col-lg-2 col-md-4 mb-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body">
-                            <h6 class="card-title text-muted">Confidence Level</h6>
-                            <h5 class="text-primary mb-0" id="avgConfidence">0/5</h5>
+                <div class="col-lg-2 col-md-4 col-6 mb-3">
+                    <div class="card text-center h-100" style="max-height: 120px;">
+                        <div class="card-body p-2">
+                            <h6 class="card-title text-muted" style="font-size: 0.75rem;">Confidence Level</h6>
+                            <h6 class="text-primary mb-0" id="avgConfidence" style="font-size: 1.1rem;">0/5</h6>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 mb-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body">
-                            <h6 class="card-title text-muted">High Probability</h6>
-                            <h5 class="text-success mb-0" id="highProbabilityDeals">0</h5>
+                <div class="col-lg-2 col-md-4 col-6 mb-3">
+                    <div class="card text-center h-100" style="max-height: 120px;">
+                        <div class="card-body p-2">
+                            <h6 class="card-title text-muted" style="font-size: 0.75rem;">High Probability</h6>
+                            <h6 class="text-success mb-0" id="highProbabilityDeals" style="font-size: 1.1rem;">0</h6>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 mb-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body">
-                            <h6 class="card-title text-muted">Low Confidence</h6>
-                            <h5 class="text-warning mb-0" id="lowConfidenceDeals">0</h5>
+                <div class="col-lg-2 col-md-4 col-6 mb-3">
+                    <div class="card text-center h-100" style="max-height: 120px;">
+                        <div class="card-body p-2">
+                            <h6 class="card-title text-muted" style="font-size: 0.75rem;">Low Confidence</h6>
+                            <h6 class="text-warning mb-0" id="lowConfidenceDeals" style="font-size: 1.1rem;">0</h6>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 mb-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body">
-                            <h6 class="card-title text-muted">Upcoming Closures</h6>
-                            <h5 class="text-danger mb-0" id="upcomingClosures">0</h5>
+                <div class="col-lg-2 col-md-4 col-6 mb-3">
+                    <div class="card text-center h-100" style="max-height: 120px;">
+                        <div class="card-body p-2">
+                            <h6 class="card-title text-muted" style="font-size: 0.75rem;">Upcoming Closures</h6>
+                            <h6 class="text-danger mb-0" id="upcomingClosures" style="font-size: 1.1rem;">0</h6>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 mb-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body">
-                            <h6 class="card-title text-muted">This Month</h6>
-                            <h5 class="text-info mb-0" id="projectsThisMonth">0</h5>
+                <div class="col-lg-2 col-md-4 col-6 mb-3">
+                    <div class="card text-center h-100" style="max-height: 120px;">
+                        <div class="card-body p-2">
+                            <h6 class="card-title text-muted" style="font-size: 0.75rem;">This Month</h6>
+                            <h6 class="text-info mb-0" id="projectsThisMonth" style="font-size: 1.1rem;">0</h6>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 mb-3">
-                    <div class="card text-center h-100">
-                        <div class="card-body">
-                            <h6 class="card-title text-muted">Stale Deals</h6>
-                            <h5 class="text-secondary mb-0" id="staleDeals">0</h5>
+                <div class="col-lg-2 col-md-4 col-6 mb-3">
+                    <div class="card text-center h-100" style="max-height: 120px;">
+                        <div class="card-body p-2">
+                            <h6 class="card-title text-muted" style="font-size: 0.75rem;">Stale Deals</h6>
+                            <h6 class="text-secondary mb-0" id="staleDeals" style="font-size: 1.1rem;">0</h6>
                         </div>
                     </div>
                 </div>
@@ -206,21 +268,23 @@
             <div class="row">
                 <div class="col-lg-6 mb-4">
                     <div class="card h-100">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-chart-pie text-primary"></i> Projects by Status</h6>
+                        <div class="card-header py-2">
+                            <h6 class="mb-0" style="font-size: 0.9rem;"><i class="fas fa-chart-pie text-primary"></i>
+                                Projects by Status</h6>
                         </div>
-                        <div class="card-body">
-                            <canvas id="statusChart" height="300"></canvas>
+                        <div class="card-body p-3">
+                            <canvas id="statusChart" height="200"></canvas>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6 mb-4">
                     <div class="card h-100">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-chart-bar text-success"></i> Pipeline Stages</h6>
+                        <div class="card-header py-2">
+                            <h6 class="mb-0" style="font-size: 0.9rem;"><i class="fas fa-chart-bar text-success"></i>
+                                Pipeline Stages</h6>
                         </div>
-                        <div class="card-body">
-                            <canvas id="stageChart" height="300"></canvas>
+                        <div class="card-body p-3">
+                            <canvas id="stageChart" height="200"></canvas>
                         </div>
                     </div>
                 </div>
@@ -245,8 +309,9 @@
             <div class="row">
                 <div class="col-lg-8 mb-4">
                     <div class="card h-100">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-chart-bar"></i> Revenue by Stage</h6>
+                        <div class="card-header py-2">
+                            <h6 class="mb-0" style="font-size: 0.9rem;"><i class="fas fa-chart-bar"></i> Revenue by
+                                Stage</h6>
                         </div>
                         <div class="card-body">
                             <canvas id="stageRevenueChart" height="300"></canvas>
@@ -460,19 +525,19 @@
         function displayFallbackData() {
             // Display a helpful message if no data is available
             const fallbackMessage = `
-                            <div class="alert alert-warning">
-                                <h6><i class="fas fa-exclamation-triangle"></i> No Analytics Data Available</h6>
-                                <p>The pipeline analytics data could not be loaded. This might be because:</p>
-                                <ul>
-                                    <li>No projects are currently in the pipeline</li>
-                                    <li>The analytics service is temporarily unavailable</li>
-                                    <li>You may not have permission to view this data</li>
-                                </ul>
-                                <button class="btn btn-sm btn-primary" onclick="loadPipelineAnalytics()">
-                                    <i class="fas fa-retry"></i> Retry Loading Data
-                                </button>
-                            </div>
-                        `;
+                                <div class="alert alert-warning">
+                                    <h6><i class="fas fa-exclamation-triangle"></i> No Analytics Data Available</h6>
+                                    <p>The pipeline analytics data could not be loaded. This might be because:</p>
+                                    <ul>
+                                        <li>No projects are currently in the pipeline</li>
+                                        <li>The analytics service is temporarily unavailable</li>
+                                        <li>You may not have permission to view this data</li>
+                                    </ul>
+                                    <button class="btn btn-sm btn-primary" onclick="loadPipelineAnalytics()">
+                                        <i class="fas fa-retry"></i> Retry Loading Data
+                                    </button>
+                                </div>
+                            `;
 
             // Show fallback in main containers
             document.getElementById('stageCards').innerHTML = `<div class="col-12">${fallbackMessage}</div>`;
@@ -864,30 +929,30 @@
                 const card = document.createElement('div');
                 card.className = 'col-lg-3 col-md-6 mb-3';
                 card.innerHTML = `
-                                <div class="card border-${color} border-start border-4 h-100">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="text-${color} mb-0">${stage}</h6>
-                                            <span class="badge bg-${color}">${count}</span>
-                                        </div>
-                                        <div class="mb-2">
-                                            <small class="text-muted">Revenue:</small>
-                                            <h6 class="mb-1">${formatCurrency(estimatedRevenue)}</h6>
-                                        </div>
-                                        <div class="mb-2">
-                                            <small class="text-muted">Weighted:</small>
-                                            <h6 class="mb-1">${formatCurrency(weightedRevenue)}</h6>
-                                        </div>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <small class="text-muted">Confidence:</small>
-                                            <span class="badge bg-outline-${color}">${averageConfidence.toFixed(1)}/5</span>
-                                        </div>
-                                        <div class="progress mt-2" style="height: 6px;">
-                                            <div class="progress-bar bg-${color}" style="width: ${(averageConfidence / 5) * 100}%"></div>
+                                    <div class="card border-${color} border-start border-4 h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="text-${color} mb-0">${stage}</h6>
+                                                <span class="badge bg-${color}">${count}</span>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">Revenue:</small>
+                                                <h6 class="mb-1">${formatCurrency(estimatedRevenue)}</h6>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">Weighted:</small>
+                                                <h6 class="mb-1">${formatCurrency(weightedRevenue)}</h6>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">Confidence:</small>
+                                                <span class="badge bg-outline-${color}">${averageConfidence.toFixed(1)}/5</span>
+                                            </div>
+                                            <div class="progress mt-2" style="height: 6px;">
+                                                <div class="progress-bar bg-${color}" style="width: ${(averageConfidence / 5) * 100}%"></div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            `;
+                                `;
                 stageCardsContainer.appendChild(card);
             });
         }
@@ -918,23 +983,23 @@
                     (estimatedMargin / estimatedRevenue * 100) : 0;
 
                 row.innerHTML = `
-                                <td><strong>${oem}</strong></td>
-                                <td>
-                                    <span class="badge bg-info">${data.count || 0}</span>
-                                </td>
-                                <td>${formatCurrency(estimatedRevenue)}</td>
-                                <td>${formatCurrency(data.weightedRevenue || 0)}</td>
-                                <td>${formatCurrency(estimatedMargin)}</td>
-                                <td>
-                                    <div class="progress" style="height: 20px;">
-                                        <div class="progress-bar bg-${marginPercentage >= 20 ? 'success' :
+                                    <td><strong>${oem}</strong></td>
+                                    <td>
+                                        <span class="badge bg-info">${data.count || 0}</span>
+                                    </td>
+                                    <td>${formatCurrency(estimatedRevenue)}</td>
+                                    <td>${formatCurrency(data.weightedRevenue || 0)}</td>
+                                    <td>${formatCurrency(estimatedMargin)}</td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-${marginPercentage >= 20 ? 'success' :
                         marginPercentage >= 10 ? 'warning' : 'danger'}" 
-                                            style="width: ${Math.min(marginPercentage, 100)}%">
-                                            ${marginPercentage.toFixed(1)}%
+                                                style="width: ${Math.min(marginPercentage, 100)}%">
+                                                ${marginPercentage.toFixed(1)}%
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                            `;
+                                    </td>
+                                `;
             });
         }
 
@@ -957,50 +1022,50 @@
             const pipelineStage = deal.pipelineStage || deal.PipelineStage || 'N/A';
 
             const modalHtml = `
-                            <div class="modal fade" id="dealDetailsModal" tabindex="-1">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title"><i class="fas fa-gem text-warning"></i> Deal Details</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <h6>Project Information</h6>
-                                                    <p><strong>Product:</strong> ${productName}</p>
-                                                    <p><strong>Client:</strong> ${clientName}</p>
-                                                    <p><strong>Stage:</strong> <span class="badge bg-primary">${pipelineStage}</span></p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <h6>Financial Details</h6>
-                                                    <p><strong>Estimated Revenue:</strong> ${formatCurrency(estimatedRevenue)}</p>
-                                                    <p><strong>Weighted Revenue:</strong> ${formatCurrency(weightedRevenue)}</p>
-                                                    <p><strong>Success Probability:</strong> ${successProbability}%</p>
-                                                </div>
+                                <div class="modal fade" id="dealDetailsModal" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title"><i class="fas fa-gem text-warning"></i> Deal Details</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
-                                            <div class="mt-3">
-                                                <h6>Success Probability</h6>
-                                                <div class="progress mb-3" style="height: 25px;">
-                                                    <div class="progress-bar bg-${successProbability >= 75 ? 'success' :
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <h6>Project Information</h6>
+                                                        <p><strong>Product:</strong> ${productName}</p>
+                                                        <p><strong>Client:</strong> ${clientName}</p>
+                                                        <p><strong>Stage:</strong> <span class="badge bg-primary">${pipelineStage}</span></p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <h6>Financial Details</h6>
+                                                        <p><strong>Estimated Revenue:</strong> ${formatCurrency(estimatedRevenue)}</p>
+                                                        <p><strong>Weighted Revenue:</strong> ${formatCurrency(weightedRevenue)}</p>
+                                                        <p><strong>Success Probability:</strong> ${successProbability}%</p>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-3">
+                                                    <h6>Success Probability</h6>
+                                                    <div class="progress mb-3" style="height: 25px;">
+                                                        <div class="progress-bar bg-${successProbability >= 75 ? 'success' :
                     successProbability >= 50 ? 'info' :
                         successProbability >= 25 ? 'warning' : 'danger'}" 
-                                                        style="width: ${successProbability}%">
-                                                        ${successProbability}%
+                                                            style="width: ${successProbability}%">
+                                                            ${successProbability}%
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <a href="/ProjectPipeline/Details/${projectId}" class="btn btn-primary">
-                                                <i class="fas fa-external-link-alt"></i> View Full Details
-                                            </a>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <a href="/ProjectPipeline/Details/${projectId}" class="btn btn-primary">
+                                                    <i class="fas fa-external-link-alt"></i> View Full Details
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
 
             // Remove existing modal if any
             const existingModal = document.getElementById('dealDetailsModal');
@@ -1042,38 +1107,38 @@
                 const projectId = deal.projectPipelineId || deal.ProjectPipelineId || index + 1;
 
                 row.innerHTML = `
-                                <td><strong>${productName}</strong></td>
-                                <td>${clientName}</td>
-                                <td>${formatCurrency(estimatedRevenue)}</td>
-                                <td>${formatCurrency(weightedRevenue)}</td>
-                                <td>
-                                    <div class="progress" style="height: 20px;">
-                                        <div class="progress-bar bg-${successProbability >= 75 ? 'success' :
+                                    <td><strong>${productName}</strong></td>
+                                    <td>${clientName}</td>
+                                    <td>${formatCurrency(estimatedRevenue)}</td>
+                                    <td>${formatCurrency(weightedRevenue)}</td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-${successProbability >= 75 ? 'success' :
                         successProbability >= 50 ? 'info' :
                             successProbability >= 25 ? 'warning' : 'danger'}" 
-                                            style="width: ${successProbability}%">
-                                            ${successProbability}%
+                                                style="width: ${successProbability}%">
+                                                ${successProbability}%
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge bg-${pipelineStage === 'Closed Won' ? 'success' :
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-${pipelineStage === 'Closed Won' ? 'success' :
                         pipelineStage === 'Negotiation' ? 'warning' :
                             pipelineStage === 'Proposal' ? 'info' :
                                 pipelineStage === 'Qualified' ? 'primary' :
                                     pipelineStage === 'Lead' ? 'secondary' : 'dark'}">
-                                        ${pipelineStage}
-                                    </span>
-                                </td>
-                                <td>
-                                    <a href="@Url.Action("Details")/${projectId}" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
-                                    <button class="btn btn-sm btn-outline-success ms-1" onclick="showDealDetails(${projectId})">
-                                        <i class="fas fa-info-circle"></i>
-                                    </button>
-                                </td>
-                            `;
+                                            ${pipelineStage}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="@Url.Action("Details")/${projectId}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-success ms-1" onclick="showDealDetails(${projectId})">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </td>
+                                `;
             });
         }
 
@@ -1124,9 +1189,9 @@
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-danger alert-dismissible fade show';
             alertDiv.innerHTML = `
-                            <i class="fas fa-exclamation-triangle"></i> ${message}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        `;
+                                <i class="fas fa-exclamation-triangle"></i> ${message}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            `;
             document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.row'));
         }
 

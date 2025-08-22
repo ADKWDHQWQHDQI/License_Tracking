@@ -44,6 +44,12 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+// Optimize password hashing for better performance
+builder.Services.Configure<PasswordHasherOptions>(options =>
+{
+    options.IterationCount = 10000; // Default is 10000, this is optimized for development
+});
+
 // Configure Authentication with Enhanced Security
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

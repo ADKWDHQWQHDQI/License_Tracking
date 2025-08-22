@@ -1,75 +1,187 @@
 @model License_Tracking.Models.RegisterModel
 
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Create Account";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow">
-                <div class="card-body">
-                    <div class="text-center mb-4">
-                        <h2 class="card-title">
-                            <i class="fas fa-user-plus text-success"></i>
-                            Create Account
-                        </h2>
-                        <p class="text-muted">Register for License Tracking System</p>
-                    </div>
+<div class="auth-form">
+    <div class="auth-form-header">
+        <h1 class="auth-form-title">Create Your Account</h1>
+        <p class="auth-form-subtitle">Join CBMS and start managing your license business</p>
+    </div>
 
-                    <form asp-action="Register" method="post">
-                        <div asp-validation-summary="All" class="alert alert-danger d-none"></div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label">
-                                <i class="fas fa-envelope"></i> Email Address
-                            </label>
-                            <input asp-for="Email" class="form-control" placeholder="Enter your email address" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label">
-                                <i class="fas fa-lock"></i> Password
-                            </label>
-                            <input asp-for="Password" class="form-control" placeholder="Enter a strong password" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
-                            <div class="form-text">Password must be at least 6 characters long with uppercase, lowercase, digit, and special character.</div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Role" class="form-label">
-                                <i class="fas fa-user-tag"></i> Role
-                            </label>
-                            <select asp-for="Role" class="form-select">
-                                <option value="">Select your role</option>
-                                <option value="Admin">Admin (Full Access)</option>
-                                <option value="Sales">Sales (Create/Edit Licenses)</option>
-                                <option value="Finance">Finance (View Financial Data)</option>
-                                <option value="Operations">Operations (View Operations Data)</option>
-                                <option value="Management">Management (View Reports)</option>
-                            </select>
-                            <span asp-validation-for="Role" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-user-plus"></i> Create Account
-                            </button>
-                        </div>
-                    </form>
+    <form asp-action="Register" method="post" novalidate>
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div asp-validation-summary="All" class="validation-summary-errors">
+                <strong>Please fix the following errors:</strong>
+            </div>
+        }
 
-                    <div class="text-center">
-                        <p class="text-muted">Already have an account? 
-                            <a asp-action="Login" class="text-primary">Sign in here</a>
-                        </p>
-                    </div>
-                </div>
+        <div class="auth-form-group">
+            <label asp-for="Email" class="auth-form-label">
+                <i class="fas fa-envelope me-2"></i>Work Email Address
+            </label>
+            <input asp-for="Email" class="auth-form-control" placeholder="Enter your work email" type="email"
+                autocomplete="email" required />
+            <span asp-validation-for="Email" class="field-validation-error"></span>
+            <small class="text-muted">Use your company email address</small>
+        </div>
+
+        <div class="auth-form-group">
+            <label asp-for="Password" class="auth-form-label">
+                <i class="fas fa-lock me-2"></i>Password
+            </label>
+            <div style="position: relative;">
+                <input asp-for="Password" class="auth-form-control" placeholder="Create a strong password"
+                    type="password" autocomplete="new-password" id="passwordInput" required />
+                <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3"
+                    style="border: none; background: none; color: var(--auth-gray-400);" onclick="togglePassword()">
+                    <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                </button>
+            </div>
+            <span asp-validation-for="Password" class="field-validation-error"></span>
+            <div class="password-requirements mt-2">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Password must contain at least 8 characters with uppercase, lowercase, number, and special character
+                </small>
             </div>
         </div>
+
+        <div class="auth-form-group">
+            <label asp-for="Role" class="auth-form-label">
+                <i class="fas fa-user-tag me-2"></i>Your Role
+            </label>
+            <select asp-for="Role" class="auth-form-control" required>
+                <option value="">Select your role in the organization</option>
+                <option value="Admin">Admin - Full system access and user management</option>
+                <option value="Sales">Sales - Manage deals and customer relationships</option>
+                <option value="Finance">Finance - Handle invoicing and financial reporting</option>
+                <option value="Operations">Operations - Manage OEM relationships and procurement</option>
+                <option value="Management">Management - View reports and analytics</option>
+                <option value="BA">Business Analyst - Track performance and targets</option>
+            </select>
+            <span asp-validation-for="Role" class="field-validation-error"></span>
+        </div>
+
+        <div class="auth-form-group">
+            <label class="d-flex align-items-start">
+                <input type="checkbox" name="AcceptTerms" class="form-check-input me-2 mt-1" required />
+                <span class="text-muted small">
+                    I agree to the <a href="#terms" class="text-primary">Terms of Service</a> and
+                    <a href="#privacy" class="text-primary">Privacy Policy</a>. I understand this is an enterprise
+                    platform for license intermediary businesses.
+                </span>
+            </label>
+        </div>
+
+        <div class="auth-form-group">
+            <button type="submit" class="auth-btn auth-btn-primary">
+                <i class="fas fa-rocket me-2"></i>Create Account
+            </button>
+        </div>
+    </form>
+
+    <div class="auth-divider">
+        <span>Already have an account?</span>
+    </div>
+
+    <div class="auth-form-group">
+        <a asp-action="Login" class="auth-btn auth-btn-outline">
+            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+        </a>
+    </div>
+
+    <div class="auth-link">
+        <p>Need help? <a href="#support">Contact Sales Team</a></p>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Password strength indicator
+        document.getElementById('passwordInput').addEventListener('input', function () {
+            const password = this.value;
+            const requirements = document.querySelector('.password-requirements small');
+
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasLowercase = /[a-z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecial = /[!@@#$%^&*(),.?":{}|<>]/.test(password);
+            const hasLength = password.length >= 8;
+
+            const strength = [hasUppercase, hasLowercase, hasNumber, hasSpecial, hasLength].filter(Boolean).length;
+
+            let strengthText = '';
+            let strengthColor = '';
+
+            switch (strength) {
+                case 0:
+                case 1:
+                case 2:
+                    strengthText = 'Weak password';
+                    strengthColor = 'text-danger';
+                    break;
+                case 3:
+                case 4:
+                    strengthText = 'Good password';
+                    strengthColor = 'text-warning';
+                    break;
+                case 5:
+                    strengthText = 'Strong password';
+                    strengthColor = 'text-success';
+                    break;
+            }
+
+            if (password.length > 0) {
+                requirements.innerHTML = `<i class="fas fa-shield-alt me-1"></i>${strengthText}`;
+                requirements.className = `${strengthColor}`;
+            } else {
+                requirements.innerHTML = `<i class="fas fa-info-circle me-1"></i>Password must contain at least 8 characters with uppercase, lowercase, number, and special character`;
+                requirements.className = 'text-muted';
+            }
+        });
+
+        // Auto-focus first field
+        document.addEventListener('DOMContentLoaded', function () {
+            const emailInput = document.getElementById('Email');
+            if (emailInput) {
+                emailInput.focus();
+            }
+        });
+
+        // Enhanced form validation feedback
+        document.querySelectorAll('.auth-form-control').forEach(input => {
+            input.addEventListener('blur', function () {
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.classList.add('input-validation-error');
+                } else {
+                    this.classList.remove('input-validation-error');
+                }
+            });
+
+            input.addEventListener('input', function () {
+                if (this.classList.contains('input-validation-error') && this.value.trim()) {
+                    this.classList.remove('input-validation-error');
+                }
+            });
+        });
+    </script>
 }
